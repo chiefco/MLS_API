@@ -16,6 +16,8 @@ gem 'rspec-rails'
 gem 'acts_as_api'
 gem 'carrierwave'
 gem 'SystemTimer', '>= 1.2.0'
+gem 'exception_notifier'
+gem 'aws-s3', :require => 'aws/s3'
 
 # Deploy with Capistrano
 # gem 'capistrano'

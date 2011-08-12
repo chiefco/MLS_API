@@ -14,6 +14,7 @@ gem 'bson_ext'
 gem 'devise'
 gem 'rspec-rails'
 gem 'acts_as_api'
+gem 'carrierwave'
 gem 'SystemTimer', '>= 1.2.0'
 
 # Deploy with Capistrano

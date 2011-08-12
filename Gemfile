@@ -12,7 +12,7 @@ gem 'rails', '3.0.9'
 gem 'mongoid', '2.1.2'
 gem 'bson_ext'
 gem 'devise'
-gem 'mongoid-rspec'
+gem 'rspec-rails'
 gem 'acts_as_api'
 gem 'SystemTimer', '>= 1.2.0'
 

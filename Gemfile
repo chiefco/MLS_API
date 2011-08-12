@@ -9,6 +9,10 @@ gem 'rails', '3.0.9'
 # Use unicorn as the web server
 # gem 'unicorn'
 
+gem 'mongoid', '2.1'
+gem 'devise'
+gem 'mongoid-rspec'
+
 # Deploy with Capistrano
 # gem 'capistrano'
 

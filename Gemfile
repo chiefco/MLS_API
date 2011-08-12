@@ -12,6 +12,8 @@ gem 'rails', '3.0.9'
 gem 'mongoid', '2.1'
 gem 'devise'
 gem 'mongoid-rspec'
+gem 'acts_as_api'
+gem 'SystemTimer', '>= 1.2.0'
 
 # Deploy with Capistrano
 # gem 'capistrano'

@@ -2,7 +2,7 @@ class SessionsController < Devise::SessionsController
   def create
     user=params[:user]
     params[:user]={}
-    params[:user][:email],params[:user][:password]=user.decode_credentials if params[:user]
+    params[:user][:email],params[:user][:password]=user.decode_credentials if user
     resource = warden.authenticate!(:scope => resource_name)
     respond_to do |format|
       format.xml  { render :xml => resource.to_xml(:except=>USER_COLUMN) }

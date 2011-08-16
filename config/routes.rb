@@ -1,7 +1,7 @@
 MeetlinkshareApi::Application.routes.draw do
-  devise_for :users
+  devise_for :users, :controllers => { :sessions => "sessions",:confirmations=>'confirmations' }
   resources :items
-
+  root :to => "users#new"
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

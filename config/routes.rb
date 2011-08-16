@@ -1,11 +1,6 @@
 MeetlinkshareApi::Application.routes.draw do
-<<<<<<< HEAD
-  devise_for :users, :controllers=> {:registrations=>"registrations"}
-=======
-  devise_for :users, :controllers => { :sessions => "sessions",:confirmations=>'confirmations' }
->>>>>>> b047fe1e27779d3e98e21fc710382d6f54d4a00b
+  devise_for :users, :controllers => { :sessions => "sessions",:confirmations=>'confirmations', :registrations=>"registrations" }
   resources :items
-  root :to => "users#new"
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

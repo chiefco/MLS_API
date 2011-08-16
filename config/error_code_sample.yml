@@ -102,6 +102,7 @@ Invalid Parameter:
   3063: page_order - Invalid Parameter
   3064: Not defined in template
   3065: id - Invalid Parameter
+  3066: password - Blank Parameter
 Format Error:
   4001: email - Invalid email format
   4002: due_date - Invalid date format

@@ -14,11 +14,21 @@ en:
   devise:
     failure:
       already_authenticated: 'You are already signed in.'
-      unauthenticated: 'You need to sign in or sign up before continuing.'
-      unconfirmed: 'You have to confirm your account before continuing.'
-      locked: 'Your account is locked.'
-      invalid: 'Invalid email or password.'
-      invalid_token: 'Invalid authentication token.'
+      unauthenticated: 
+        message: 'You do not have permission to make this API call'
+        code: 1001
+      unconfirmed: 
+        message: 'Account is not verified'
+        code: 1003
+      locked:
+        message: 'Account is locked or inactive'
+        code: 1002
+      invalid:
+        message: 'Email/Password is incorrect'
+        code: 1000
+      invalid_token: 
+        message: 'Token is not valid'
+        code: 1005
       timeout: 'Your session expired, please sign in again to continue.'
       inactive: 'Your account was not activated yet.'
     sessions:

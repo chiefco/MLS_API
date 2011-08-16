@@ -5,7 +5,6 @@ class ItemsController < ApplicationController
   def index
     @items = Item.all
     respond_with(@items)
-    end
   end
 
   # GET /items/1

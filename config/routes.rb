@@ -1,7 +1,6 @@
 MeetlinkshareApi::Application.routes.draw do
-  devise_for :users, :controllers => { :sessions => "sessions",:confirmations=>'confirmations' }
+  devise_for :users, :controllers => { :sessions => "sessions",:confirmations=>'confirmations', :registrations=>"registrations" }
   resources :items
-  root :to => "users#new"
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
@@ -51,7 +50,7 @@ MeetlinkshareApi::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  # root :to => "users#index"
+  root :to => "users#index"
 
   # See how all your routes lay out with "rake routes"
 

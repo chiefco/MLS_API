@@ -1,0 +1,119 @@
+Authentication/Authorization Failed:
+  1001: Username/Password is incorrect
+  1002: You do not have permission to make this API call 
+  1003: Account is locked or inactive 
+  1004: Authentication/Authorization Failed
+  1005: Token is not valid
+Missing Parameter:
+  2001: size - Required parameter missing
+  2002: email - Required parameter missing
+  2003: password - Required parameter missing
+  2004: password_confirmation- Required parameter missing
+  2005: first_name - Required parameter missing
+  2006: last_name - Required parameter missing
+  2007: company - Required parameter missing
+  2008: user_id - Required parameter missing
+  2009: name - Required parameter missing
+  2010: location_id - Required parameter missing
+  2011: template_id - Required parameter missing
+  2012: item_id - Required parameter missing
+  2013:  description - Required parameter missing
+  2014: topi_name - Required parameter missing
+  2015:activity_type - Required parameter missing
+  2016: activity_id - Required parameter missing
+  2017: task_id - Required parameter missing
+  2018:time - Required parameter missing
+  2019:  bookmarkable_id - Required parameter missing
+  2020: bookmarkable_type - Required parameter missing
+  2021: bookmark_id - Required parameter missing
+  2022: position - Required parameter missing
+  2023: page_id - Required parameter missing
+  2024: page_order - Required parameter missing
+  2025: category_id - Required parameter missing
+  2026: attachable_id - Required parameter missing
+  2027:  attachable_type - Required parameter missing
+  2028: attachment_id - Required parameter missing
+  2029:  file_name - Required parameter missing
+  2030:  file_type - Required parameter missing
+  2031: Search value - Required parameter missing
+Invalid Parameter:
+  3001: A Parameter is Invalid  Unable to identify parameter
+  3002: email - Blank Parameter
+  3003: email - Personal email
+  3004: email - Already exist
+  3005: password - Parameter length less than 6
+  3006: password - Parameter length greater than 32
+  3007: password_confimation - Parameter length less than 6
+  3008: password_confimation - Parameter length greater than 32
+  3009: password and password_confimation does not match 
+  3010: first_name - Blank Parameter
+  3011: last_name - Blank Parameter
+  3012: company - Blank Parameter
+  3013: name - Blank Parameter
+  3014: description - Blank Parameter
+  3015: time - Blank Parameter
+  3016: topic_name - Blank Parameter
+  3017: file_name - Blank Parameter
+  3018: file_type - Blank Parameter
+  3019: size - Blank Parameter
+  3020: activity_type - Blank Parameter
+  3021: bookmarkable_type - Blank Parameter
+  3022: attachable_type - Blank Parameter
+  3023: user_id - Blank Parameter
+  3024: location_id - Blank Parameter
+  3025: template_id - Blank Parameter
+  3026: item_id - Blank Parameter
+  3027: activity_id - Blank Parameter 
+  3028: task_id - Blank Parameter
+  3029: bookmarkable_id - Blank Parameter
+  3030: bookmark_id - Blank Parameter
+  3031: page_id - Blank Parameter
+  3032: category_id - Blank Parameter
+  3033: attachment_id - Blank Parameter
+  3034: attachable_id - Blank Parameter
+  3035: page_order - Blank Parameter
+  3036: id - Blank Parameter
+  3037: status - Invalid Parameter
+  3038: first_name - Invalid Parameter
+  3039: last_name - Invalid Parameter
+  3040: company - Invalid Parameter
+  3041: name - Invalid Parameter
+  3042: description - Invalid Parameter
+  3043: time - Invalid Parameter
+  3044: topic_name - Invalid Parameter
+  3045: file_name - Invalid Parameter
+  3046: file_type - Invalid Parameter
+  3047: size - Invalid Parameter
+  3048: activity_type - Invalid Parameter
+  3049: bookmarkable_type - Invalid Parameter 
+  3050: attachable_type - Invalid Parameter
+  3051: user_id - Invalid Parameter
+  3052: location_id - Invalid Parameter
+  3053: template_id - Invalid Parameter
+  3054: item_id - Invalid Parameter
+  3055: activity_id - Invalid Parameter
+  3056: task_id - Invalid Parameter
+  3057: bookmarkable_id - Invalid Parameter
+  3058: bookmark_id - Invalid Parameter
+  3059: page_id - Invalid Parameter
+  3060: category_id - Invalid Parameter
+  3061: attachment_id - Invalid Parameter
+  3062: attachable_id - Invalid Parameter
+  3063: page_order - Invalid Parameter
+  3064: Not defined in template
+  3065: id - Invalid Parameter
+  3066: password - Blank Parameter
+Format Error:
+  4001: email - Invalid email format
+  4002: due_date - Invalid date format
+Record Not Found:
+  5001: Record does not exist in database
+  5002: Unknown template Id/Template not found
+Upload Error:
+  6001: The file was not correctly uploaded
+  6002: The file was zero bytes in length
+  6003: The file type was not recognised
+  6004: Not an valid file format
+  6005: File size too large
+Conditions Failed:
+  7001: Conditions not satisfied

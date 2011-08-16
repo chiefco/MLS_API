@@ -20,11 +20,16 @@ module Mongoid #:nodoc:
   end
 end
 
-
 class Hash
   def recursive_symbolize_keys!
     symbolize_keys!
     values.select{ | v | v.is_a?( Hash ) }.each{ | h | h.recursive_symbolize_keys! }
     self
+  end
+end
+
+class String
+  def decode_credentials
+    Base64.decode64(self).split #decodes the credentials as [email,password]
   end
 end

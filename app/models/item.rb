@@ -6,4 +6,7 @@ class Item
   field :meet_date, :type => Time
   field :status, :type => Boolean
   field :frequency_count, :type => Integer
+  
+  validates_presence_of :name,:message=>'name - Required parameter missing',:code=>2009
+
 end

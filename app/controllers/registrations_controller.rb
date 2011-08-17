@@ -23,7 +23,11 @@ class RegistrationsController < Devise::RegistrationsController
       end
     else
       clean_up_passwords(resource)
-      respond_with_navigational(resource) { render_with_scope :new }
+      respond_to do |format|
+					format.html
+					format.xml { render :xml=> resource.all_errors.to_xml(:root=>'errors') }
+					format.json { render :json=> resource.all_errors }
+				end 
     end
   end
 

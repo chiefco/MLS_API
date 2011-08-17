@@ -16,7 +16,7 @@ class RegistrationsController < Devise::RegistrationsController
         format.html
         format.xml { render :xml=> resource.all_errors.to_xml(:root=>'errors') }
         format.json { render :json=> resource.all_errors }
-      end 
+      end
     end
   end
 end

@@ -5,7 +5,7 @@ class User
   # Include default devise modules. Others available are:i
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
   devise :confirmable, :database_authenticatable, :registerable, :recoverable, :rememberable, :token_authenticatable, :trackable
-  
+
   validates_presence_of :first_name, :message=>"first_name - Blank Parameter", :code=>2041
   validates_presence_of :last_name, :message=>"last_name - Blank Parameter", :code=>2043
   validates_presence_of   :email, :message=>"email - Blank Parameter", :code=>2032
@@ -16,7 +16,7 @@ class User
   validates_confirmation_of :password, :message=>"password and password_confimation does not match", :code=>2040
   validates_length_of       :password, :message=>"Too short(Minimum is 6 characters)", :minimum => 6, :code=>2038, :allow_blank => true
   validates_length_of       :password, :message=>"Too long(Maximum is 128 characters)", :maximum =>128, :code=>2039, :allow_blank => true
-  
+
   field :first_name, :type=> String
   field :last_name, :type=>String
   field :job_title, :type=>String
@@ -39,12 +39,12 @@ class User
     template.add :current_sign_in_ip
     template.add :last_sign_in_ip
   end
-  
+
   def build_user_create_success_xml
     self.to_xml(:skip_instruct=>true, :only=>[:email, :first_name, :last_name])
-  end 
-  
+  end
+
   def build_user_create_success_json
     { "response" => "success", "status" => 200, self.class.to_s.downcase =>self.to_json(:only=>[:email, :first_name, :last_name]) }
-  end 
+  end
 end

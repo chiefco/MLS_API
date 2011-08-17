@@ -1,31 +1,22 @@
 class RegistrationsController < Devise::RegistrationsController
-
-  # POST /resource
+  self.responder = ActsAsApi::Responder
+  respond_to :json, :xml
   def create
     build_resource
     if resource.save
-      if resource.active_for_authentication?
-        sign_in(resource_name, resource)
-        respond_to do |format|
-					format.html
-					format.xml { render :xml=> resource }
-					format.json { render :json=> resource }
-				end 
-      else
-        expire_session_data_after_sign_in!
-        respond_to do |format|
-					format.html
-					format.xml { render :xml=> resource }
-					format.json { render :json=> { "response" => "success", "status" => 200, "user" => { "email" => resource.email, "first_name" => resource.first_name, "last_name" => resource.last_name }} }
-				end
+      expire_session_data_after_sign_in!
+      respond_to do |format|
+        format.html
+        format.xml{ render_for_api :user_with_token, :xml => resource, :root => :user}
+        format.json{render_for_api :user_with_token, :json => resource, :root => :user}
       end
     else
       clean_up_passwords(resource)
       respond_to do |format|
-					format.html
-					format.xml { render :xml=> resource.all_errors.to_xml(:root=>'errors') }
-					format.json { render :json=> resource.all_errors }
-				end 
+        format.html
+        format.xml { render :xml=> resource.all_errors.to_xml(:root=>'errors') }
+        format.json { render :json=> resource.all_errors }
+      end 
     end
   end
- end
+end

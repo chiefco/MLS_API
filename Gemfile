@@ -18,6 +18,7 @@ gem 'carrierwave'
 gem 'SystemTimer', '>= 1.2.0'
 gem 'exception_notifier'
 gem 'aws-s3', :require => 'aws/s3'
+gem 'builder'
 
 # Deploy with Capistrano
 # gem 'capistrano'

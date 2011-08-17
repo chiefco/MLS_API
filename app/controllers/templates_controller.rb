@@ -3,13 +3,12 @@ class TemplatesController < ApplicationController
   # GET /templates.xml
   def index
     @templates = Template.all
-      respond_to do |format|
-        format.html # index.html.erb
-        format.xml  { render :xml =>success.to_xml(:root=>'template') }
-        format.json  { render :json => success}
-      end
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml => @templates.to_xml(:sub_tests => { :response => :success })}
+      format.json  { render :json =>{"count"=>"#{@templates.size}","template"=>@templates}.merge(success)}
     end
-
+  end
   # GET /templates/1
   # GET /templates/1.xml
   def show
@@ -18,6 +17,7 @@ class TemplatesController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @template }
+      format.json  { render :json =>{"template"=>@template }.merge(success)}
     end
   end
 
@@ -41,17 +41,15 @@ class TemplatesController < ApplicationController
   # POST /templates.xml
   def create
     @template = Template.new(params[:template])
-
     respond_to do |format|
       if @template.save
         format.html { redirect_to(@template, :notice => 'Template was successfully created.') }
-        format.xml  { render :xml => @template, :status => :created, :location => @template }
-         format.json { render :json=> { "response" => "success", "status" => "200", "template" => { "id"=>@template.id,"name" => @template.name, "description" => @template.description}} }
-        else
+        format.xml  { render :xml =>{ "template" => { "id"=>@template.id,"name" => @template.name, "description" => @template.description}}.merge(success).to_xml(:root=>"xml")}
+        format.json { render :json=> {"template" => { "id"=>@template.id,"name" => @template.name, "description" => @template.description}}.merge(success) }
+      else
         format.html { render :action => "new" }
-        format.xml  { render :xml => @template.errors, :status => :unprocessable_entity }
-        format.xml  { render :xml => @template.errors, :status => :unprocessable_entity }
-        format.json { render :json=>  @template.all_errors }
+        format.xml  { render :xml => @template.all_errors.to_xml(:root=>"errors") }
+        format.json { render :json=>  {"errors"=>@template.all_errors }.merge(failure)}
       end
     end
   end
@@ -63,10 +61,12 @@ class TemplatesController < ApplicationController
     respond_to do |format|
       if @template.update_attributes(params[:template])
         format.html { redirect_to(@template, :notice => 'Template was successfully updated.') }
-        format.xml  { head :ok }
+        format.xml  { render :xml => @template, :status => :created, :location => @template }
+        format.json { render :json=> {"template" => { "id"=>@template.id,"name" => @template.name, "description" => @template.description}}.merge(success)}
       else
         format.html { render :action => "edit" }
-        format.xml  { render :xml => @template.errors, :status => :unprocessable_entity }
+        format.xml  { render :xml => @template.all_errors.to_xml(:root=>"errors") }
+        format.json { render :json=>  {"errors"=>@template.all_errors }.merge(failure)}
       end
     end
   end
@@ -78,7 +78,7 @@ class TemplatesController < ApplicationController
     @template.destroy
     respond_to do |format|
       format.html { redirect_to(templates_url) }
-      format.xml  { render :xml => success.to_xml(:root=>'errors') }
+      format.xml  { render :xml => success.to_xml(:root=>'xml') }
       format.json  { render :json=> success}
     end
   end

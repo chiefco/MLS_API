@@ -1,4 +1,6 @@
 MeetlinkshareApi::Application.routes.draw do
+  resources :templates
+
   devise_for :users, :controllers => { :sessions => "sessions",:confirmations=>'confirmations', :registrations=>"registrations" }
   resources :items
   # The priority is based upon order of creation:

@@ -4,28 +4,18 @@ class RegistrationsController < Devise::RegistrationsController
   def create
     build_resource
     if resource.save
-      if resource.active_for_authentication?
-        sign_in(resource_name, resource)
-        respond_to do |format|
-					format.html
-					format.xml { render :xml=> resource }
-					format.json { render :json=> resource }
-				end 
-      else
-        expire_session_data_after_sign_in!
-        respond_to do |format|
-					format.html
-					format.xml { render :xml=> resource }
-					format.json { render :json=> { "response" => "success", "status" => 200, "user" => { "email" => resource.email, "first_name" => resource.first_name, "last_name" => resource.last_name }} }
-				end
-      end
+			expire_session_data_after_sign_in!
+			respond_to do |format|
+				format.xml { render :xml=> resource.build_user_create_success_xml}
+				format.json { render :json=> resource.build_user_create_success_json }
+			end
     else
       clean_up_passwords(resource)
       respond_to do |format|
-					format.html
 					format.xml { render :xml=> resource.all_errors.to_xml(:root=>'errors') }
 					format.json { render :json=> resource.all_errors }
 				end 
     end
   end
+	
  end

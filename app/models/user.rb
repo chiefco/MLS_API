@@ -8,7 +8,7 @@ class User
   validates_presence_of :last_name, :message=>"last_name - Blank Parameter", :code=>2043
   validates_presence_of   :email, :message=>"email - Blank Parameter", :code=>2032
   validates_uniqueness_of :email, :message=>"email - Already exist", :code=>2035, :case_sensitive => (case_insensitive_keys != false), :allow_blank => true
-  #validates_format_of     :email, :message=>"email - Invalid email format", :code=>2033, :with  => email_regexp, :allow_blank => true
+  validates_format_of     :email, :message=>"email - Invalid email format", :code=>2033, :with  => /\A([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})\z/i, :allow_blank => true
   validates_presence_of     :password, :message=>"password - Blank Parameter"
   validates_presence_of     :password_confirmation, :message=>"password_confirmation - Blank Parameter"
   validates_confirmation_of :password, :message=>"password and password_confimation does not match", :code=>2040

@@ -1,13 +1,18 @@
 class ConfirmationsController < Devise::ConfirmationsController
+  
   def show
     self.resource = resource_class.confirm_by_token(params[:confirmation_token])
     if resource.errors.empty?
-      set_flash_message(:notice, :confirmed) if is_navigational_format?
       resource.reset_authentication_token!  # Create the access_token after confirmation
-      #sign_in(resource_name, resource)
-      respond_with_navigational(resource){ redirect_to redirect_location(resource_name, resource) }
+      respond_to  do |format|
+        format.json { render :json=> resource.build_confirm_success_json }
+        format.xml { render :xml=> resource.build_confirm_success_xml }
+      end 
     else
-      respond_with_navigational(resource.errors, :status => :unprocessable_entity){ render_with_scope :new }
+      respond_to  do |format|
+        format.json { render :json=> resource.build_confirm_failure_json }
+        format.xml { render :xml=> resource.build_confirm_failure_xml }
+      end 
     end
   end
 end

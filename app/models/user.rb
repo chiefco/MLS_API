@@ -46,11 +46,11 @@ class User
   end
 
   def build_user_create_success_json
-    { "response" => "success", "status" => 200, self.class.to_s.downcase =>self.to_json(:only=>[:email, :first_name, :last_name]) }.to_json
+    { "response" => "success", self.class.to_s.downcase =>self.to_json(:only=>[:email, :first_name, :last_name]) }.to_json
   end 
-   
+  
   def build_confirm_success_json
-    { "response" => "success", "status" => 200, "confirmed" => true }.to_json
+    { "response" => "success", "confirmed" => true }.to_json
   end 
   
   def build_confirm_failure_json

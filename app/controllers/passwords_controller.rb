@@ -18,4 +18,19 @@ class PasswordsController < Devise::PasswordsController
       end
     end    
   end
+  
+  def update
+    self.resource = resource_class.reset_password_by_token(params[resource_name])
+    if resource.errors.empty?
+      respond_to do |format|
+        format.xml { render :xml => self.resource.reset_password_success_xml }
+        format.json{ render :json=> self.resource.reset_password_success_json }
+      end
+    else
+      respond_to do |format|
+        format.xml { render :xml=> resource.all_errors.to_xml(:root=>'errors') }
+        format.json { render :json=> resource.all_errors }
+      end
+    end
+  end 
 end

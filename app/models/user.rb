@@ -1,5 +1,6 @@
 class User
   include Mongoid::Document
+  include Mongoid::Timestamps
   # Include default devise modules. Others available are:i
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
   devise :confirmable, :database_authenticatable, :registerable, :recoverable, :rememberable, :token_authenticatable, :trackable
@@ -27,7 +28,15 @@ class User
   end 
   
   def build_user_create_success_json
-    { "response" => "success", "status" => 200, self.class.to_s.downcase =>self.to_json(:only=>[:email, :first_name, :last_name]) }
+    { "response" => "success", "status" => 200, self.class.to_s.downcase =>self.to_json(:only=>[:email, :first_name, :last_name]) }.to_json
+  end 
+   
+  def build_confirm_success_json
+    { "response" => "success", "status" => 200, "confirmed" => true }.to_json
+  end 
+  
+  def build_confirm_failure_json
+    { "response" => "failure",  "confirmed" => false}.to_json
   end 
 
 end

@@ -1,10 +1,7 @@
 class User
   include Mongoid::Document
   include Mongoid::Timestamps
-<<<<<<< HEAD
-=======
   acts_as_api
->>>>>>> 9a063514b10bcb5f59d99338ddd6e9ecbd89fc0e
   # Include default devise modules. Others available are:i
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
   devise :confirmable, :database_authenticatable, :registerable, :recoverable, :rememberable, :token_authenticatable, :trackable
@@ -48,7 +45,6 @@ class User
   end
 
   def build_user_create_success_json
-<<<<<<< HEAD
     { "response" => "success", "status" => 200, self.class.to_s.downcase =>self.to_json(:only=>[:email, :first_name, :last_name]) }.to_json
   end 
    
@@ -59,9 +55,13 @@ class User
   def build_confirm_failure_json
     { "response" => "failure",  "confirmed" => false}.to_json
   end 
+  
+  def build_confirm_success_xml
+    "<?xml version=\"1.0\" encoding=\"UTF-8\"?><result><response>success</response><status>200</status><confirmed>true</confirmed>"
+  end 
+  
+  def build_confirm_failure_xml
+    "<?xml version=\"1.0\" encoding=\"UTF-8\"?><result><response>failure</response><confirmed>false</confirmed>"
+  end 
 
-=======
-    { "response" => "success", "status" => 200, self.class.to_s.downcase =>self.to_json(:only=>[:email, :first_name, :last_name]) }
-  end
->>>>>>> 9a063514b10bcb5f59d99338ddd6e9ecbd89fc0e
 end

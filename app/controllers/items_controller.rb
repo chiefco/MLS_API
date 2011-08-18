@@ -1,4 +1,5 @@
 class ItemsController < ApplicationController
+  before_filter :authenticate_user!
   respond_to :html, :xml, :json
   # GET /items
   # GET /items.xml

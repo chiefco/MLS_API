@@ -5,4 +5,9 @@ class TemplateDefinition
     field :has_task_section,:type=>Boolean
     field :has_text_section,:type=>Boolean
     field :has_topic_section,:type=>Boolean
+    field :custom_page_id,:type=>Integer
+    referenced_in :template
+    has_one :custom_page
+    #~ references_one :custom_page
+    #~ embedded_in :template
 end

@@ -46,6 +46,23 @@ class User
   end
 
   def build_user_create_success_json
-    { "response" => "success", "status" => 200, self.class.to_s.downcase =>self.to_json(:only=>[:email, :first_name, :last_name]) }
-  end
+    { "response" => "success", "status" => 200, self.class.to_s.downcase =>self.to_json(:only=>[:email, :first_name, :last_name]) }.to_json
+  end 
+   
+  def build_confirm_success_json
+    { "response" => "success", "status" => 200, "confirmed" => true }.to_json
+  end 
+  
+  def build_confirm_failure_json
+    { "response" => "failure",  "confirmed" => false}.to_json
+  end 
+  
+  def build_confirm_success_xml
+    "<?xml version=\"1.0\" encoding=\"UTF-8\"?><result><response>success</response><status>200</status><confirmed>true</confirmed>"
+  end 
+  
+  def build_confirm_failure_xml
+    "<?xml version=\"1.0\" encoding=\"UTF-8\"?><result><response>failure</response><confirmed>false</confirmed>"
+  end 
+
 end

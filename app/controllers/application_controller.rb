@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   after_filter :clear_session
   RESET_TOKEN_SENT={:reset_token_sent=>true}
-  RESET_TOKEN_ERROR={:reset_token_sent=>false}
+  RESET_TOKEN_ERROR={:code=>5003,:message=>"Email not found"}
   USER_COLUMN=[:status,:remember_token,:remember_created_at,:created_at,:updated_at]
   #~ protect_from_forgery
   def success

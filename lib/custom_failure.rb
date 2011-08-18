@@ -10,7 +10,6 @@ class CustomFailure < Devise::FailureApp
       i18n_message
     end
   end
-  
   protected
   def i18n_message(default = nil)
     message = warden.message || warden_options[:message] || default || :unauthenticated

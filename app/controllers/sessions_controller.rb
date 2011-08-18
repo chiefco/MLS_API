@@ -5,8 +5,8 @@ class SessionsController < Devise::SessionsController
     params[:user][:email],params[:user][:password]=user.decode_credentials if user
     resource = warden.authenticate!(:scope => resource_name)
     respond_to do |format|
-      format.xml  { render :xml => resource.to_xml(:except=>USER_COLUMN) }
-      format.json { render :json => resource.to_json(:except=>USER_COLUMN) }
+      format.xml{ render_for_api :user_with_token, :xml => resource, :root => :user}
+      format.json{render_for_api :user_with_token, :json => resource, :root => :user}
     end
   end
 end

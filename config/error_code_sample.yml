@@ -117,3 +117,6 @@ Upload Error:
   6005: File size too large
 Conditions Failed:
   7001: Conditions not satisfied
+  
+  
+  name : name-already exist

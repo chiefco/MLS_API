@@ -2,6 +2,7 @@ require File.expand_path('../boot', __FILE__)
 
 # Pick the frameworks you want:
 # require "active_record/railtie"
+require 'active_support'
 require "action_controller/railtie"
 require "action_mailer/railtie"
 require "active_resource/railtie"
@@ -9,6 +10,7 @@ require "rails/test_unit/railtie"
 # If you have a Gemfile, require the gems listed there, including any gems
 # you've limited to :test, :development, or :production.
 require File.expand_path('../../lib/general', __FILE__)
+require File.expand_path('../../lib/validate_header', __FILE__)
 Bundler.require(:default, Rails.env) if defined?(Bundler)
 
 module MeetlinkshareApi
@@ -40,7 +42,7 @@ module MeetlinkshareApi
 
     # JavaScript files you want as :defaults (application.js is always included).
     # config.action_view.javascript_expansions[:defaults] = %w(jquery rails)
-
+    config.middleware.use Rack::ValidateHeader
     # Configure the default encoding used in templates for Ruby 1.9.
     config.encoding = "utf-8"
 

@@ -1,21 +1,44 @@
 class RegistrationsController < Devise::RegistrationsController
-
-  # POST /resource
+  before_filter :authenticate_user!,:except=>[:create]
+  before_filter :change_params,:only=>[:update,:reset_password]
   def create
     build_resource
-    if resource.save
-			expire_session_data_after_sign_in!
-			respond_to do |format|
-				format.xml { render :xml=> resource.build_user_create_success_xml}
-				format.json { render :json=> resource.build_user_create_success_json }
-			end
+    saved=resource.save
+    render_results(saved,resource)
+  end
+  
+  def update
+    self.resource = resource_class.to_adapter.get!(send(:"current_#{resource_name}").to_key)
+    updated= resource.update_without_password(params[resource_name])
+    render_results(updated,resource)
+  end
+  
+  def reset_password
+    self.resource = resource_class.to_adapter.get!(send(:"current_#{resource_name}").to_key)
+    updated= resource.update_with_password(params[resource_name])
+    render_results(updated,resource)
+  end
+  
+  private
+  
+  def render_results(valid,resource)
+    if valid
+     respond_to do |format|
+        format.html
+        format.xml{ render_for_api :user_with_token, :xml => resource, :root => :user}
+        format.json{render_for_api :user_with_token, :json => resource, :root => :user}
+      end
     else
-      clean_up_passwords(resource)
       respond_to do |format|
-					format.xml { render :xml=> resource.all_errors.to_xml(:root=>'errors') }
-					format.json { render :json=> resource.all_errors }
-				end 
+        format.html
+        format.xml { render :xml=> resource.all_errors.to_xml(:root=>'errors') }
+        format.json { render :json=> resource.all_errors }
+      end
     end
   end
-	
- end
+  
+  def change_params
+    params[:user]=params[:user_data]
+  end
+end
+

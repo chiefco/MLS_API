@@ -2,7 +2,7 @@ MeetlinkshareApi::Application.routes.draw do
   resources :templates
 
   devise_for :users, :controllers => { :sessions => "sessions",:confirmations=>'confirmations', :registrations=>"registrations",:passwords=>'passwords' } do
-    post "forgot_password", :to => "devise/passwords#create"
+    post "forgot_password", :to => "passwords#create"
   end
   
   resources :items

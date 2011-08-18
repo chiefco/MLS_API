@@ -33,7 +33,7 @@ class User
     template.add :job_title
     template.add :company
     template.add :business_unit
-    template.add :authentication_token
+    template.add :authentication_token,:as=>:access_token
     template.add :sign_in_count
     template.add :current_sign_in_at
     template.add :last_sign_in_at

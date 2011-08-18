@@ -14,7 +14,6 @@ module Rack
     end
 
     def _call(env)
-      puts env.inspect
       content_type = Rack::Request.new(env).media_type
       valid_request?(env) ? @app.call(env) : ERROR_RESPONSE
     end

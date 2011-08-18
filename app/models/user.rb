@@ -4,6 +4,7 @@ class User
   acts_as_api
   # Include default devise modules. Others available are:i
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
+  references_many :items
   devise :confirmable, :database_authenticatable, :registerable, :recoverable, :rememberable, :token_authenticatable, :trackable
 
   validates_presence_of :first_name, :message=>"first_name - Blank Parameter", :code=>2041

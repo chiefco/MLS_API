@@ -4,19 +4,21 @@ class RegistrationsController < Devise::RegistrationsController
   
   def index 
     paginate_options = {} 
-    paginate_options.store(:page,params[:page]) if params[:page]
-    paginate_options.store(:per_page,params[:page_size]) if params[:page_size]
+    paginate_options.store(:page,set_page)
+    paginate_options.store(:per_page,set_page_size)
     if params[:sort_by] && params[:order_by]
       @users = User.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)
+    elsif params[:sort_by] 
+      @users = User.order_by([params[:sort_by],:desc]).paginate(paginate_options)
     else
-      @users = User.all.paginate(paginate_options)
+      @users = User.order_by(['created_at', :desc]).paginate(paginate_options)
     end 
     respond_to do |format|
       format.xml{ render_for_api :user_with_out_token, :xml => @users, :root => :users}
       format.json{render_for_api :user_with_out_token, :json => @users, :root => :users}
     end
   end 
-  
+    
   def create
     build_resource
     saved=resource.save
@@ -65,5 +67,22 @@ class RegistrationsController < Devise::RegistrationsController
     params[:user]=params[:user_data]
   end
   
+  def set_page_size
+    if params[:page_size]
+      params[:page_size]
+    else
+      10
+    end 
+  end 
+  
+  def set_page
+    if params[:page]
+      params[:page]
+    else
+      1
+    end 
+  end 
+  
+
 end
 

@@ -1,3 +1,4 @@
+#Add error codes with the error messages
 module ActiveModel
   class Errors < ActiveSupport::OrderedHash
     def add(attribute, message = nil, options = {})
@@ -33,3 +34,28 @@ class String
     Base64.decode64(self).split #decodes the credentials as [email,password]
   end
 end
+
+#Error code for routing errors
+
+module ActionDispatch
+  class ShowExceptions
+    def render_exception(env, exception)
+      error=[{:message=>'bad request',:code=>9001}]
+      method='.to_json'
+      method='.to_xml(:root=>"errors")' if env['HTTP_ACCEPT']=='application/xml'
+      if exception.kind_of? ActionController::RoutingError
+        render(404, eval("#{error}#{method}"))
+      else
+        render(500, 'Something went wrong')
+      end
+    end
+  end
+end
+
+#generate the token value
+module ForDevise
+  def self.friendly_token(count=15)
+    SecureRandom.base64(count).tr('+/=', 'xyz')
+  end
+end
+ 

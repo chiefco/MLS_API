@@ -1,6 +1,8 @@
 class Item
   include Mongoid::Document
   include Mongoid::Timestamps
+  acts_as_api
+  
   field :name, :type => String
   field :description, :type => String
   field :item_date, :type => Time
@@ -14,7 +16,31 @@ class Item
   #~ references_and_referenced_in_many  :categories, :stored_as => :array, :inverse_of => :categories
   belongs_to  :template
   belongs_to  :location
+<<<<<<< HEAD
   def selected_items
     {self.class.to_s.downcase=>self.to_json(:only=>[:id, :name])}.to_json
     end
+=======
+  referenced_in :user
+  referenced_in :template
+  validates_presence_of :name,:message=>'name - Required parameter missing',:code=>2009
+  validates_presence_of :template_id,:message=>'template_id - Required parameter missing',:code=>2011
+  #~ validates :template_fields
+
+  def template_fields
+    true
+  end
+  
+  api_accessible :item_with_user do |t|
+    t.add :name
+    t.add :description
+    t.add :meet_date
+    t.add :_id
+    t.add :frequency_count
+  end
+  
+  api_accessible :item_detail,:extend=>:item_with_user do |t|
+    t.add 'user'
+  end
+>>>>>>> 5b23cd8d1628577d619929c104d4cf3db561345d
 end

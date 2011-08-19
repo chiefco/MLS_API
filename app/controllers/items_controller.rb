@@ -4,34 +4,22 @@ class ItemsController < ApplicationController
   # GET /items
   # GET /items.xml
   def index
-<<<<<<< HEAD
     @items = Item.all
     respond_to do |format|
       format.xml  { render :xml => @item }
       format.json  { render :json =>{:count=>@items.size,:items=>@items }.merge(success)}
     end
-=======
-    @items = current_user.items
-    respond_with(@items)
->>>>>>> 5b23cd8d1628577d619929c104d4cf3db561345d
   end
 
   # GET /items/1
   # GET /items/1.xml
   def show
-<<<<<<< HEAD
     @item = Item.find(params[:id])
-=======
-    @item = current_user.items.find(params[:id])
-
->>>>>>> 5b23cd8d1628577d619929c104d4cf3db561345d
     respond_to do |format|
       format.xml  { render :xml => @item }
       format.json  { render :json =>{"item"=>{:item_id=>@item.id,:item_name=>@item.name,:location=>@item.location.name,:description=>@item.description,:current_category_name=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id).name),:created_at=>@item.created_at,:updated_at=>@item.updated_at}}.merge(success) }
     end
   end
-
-<<<<<<< HEAD
   # GET /items/new
   # GET /items/new.xml
   def new
@@ -48,8 +36,7 @@ class ItemsController < ApplicationController
 
   # POST /items
   # POST /items.xml
-=======
->>>>>>> 5b23cd8d1628577d619929c104d4cf3db561345d
+
   def create
     @item = Item.new(params[:item])
     @template=Template.find(params[:item][:template_id]) if params[:item][:template_id]

@@ -1,7 +1,13 @@
 MeetlinkshareApi::Application.routes.draw do
   resources :templates
 
-  devise_for :users, :controllers => { :sessions => "sessions",:confirmations=>'confirmations', :registrations=>"registrations" }
+  devise_for :users, :controllers => { :sessions => "sessions",:confirmations=>'confirmations', :registrations=>"registrations",:passwords=>'passwords' } do
+    post "forgot_password", :to => "passwords#create"
+    get "user/:id", :to=>"registrations#show"
+    get "users", :to=> "registrations#index"
+  end
+ 
+  
   resources :items
   # The priority is based upon order of creation:
   # first created -> highest priority.

@@ -3,7 +3,9 @@
 en:
   errors:
     messages:
-      expired: "has expired, please request a new one"
+      expired: 
+        code: 5005
+        message: "Invalid token"
       not_found: "not found"
       already_confirmed: "was already confirmed, please try signing in"
       not_locked: "was not locked"

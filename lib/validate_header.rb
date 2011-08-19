@@ -14,14 +14,14 @@ module Rack
     end
 
     def _call(env)
-      puts env.inspect
-      content_type = Rack::Request.new(env).media_type
+      #~ content_type = Rack::Request.new(env).media_type
+      env['HTTP_ACCEPT']="application/json" if env['HTTP_ACCEPT']!="application/xml" || env['HTTP_ACCEPT']!="application/json"
       valid_request?(env) ? @app.call(env) : ERROR_RESPONSE
     end
 
     def valid_request?(env)
       content_type = Rack::Request.new(env).media_type
-      ALLOWED_METHODS.include?(env['REQUEST_METHOD']) && CONTENT_TYPE.include?(content_type)
+      ALLOWED_METHODS.include?(env['REQUEST_METHOD'])
     end
   end
 end

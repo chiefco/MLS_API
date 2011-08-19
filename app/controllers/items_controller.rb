@@ -21,7 +21,6 @@ class ItemsController < ApplicationController
 
   def create
     @item = Item.new(params[:item])
-<<<<<<< HEAD:app/controllers/items_controller.rb
     @template=Template.find(params[:item][:template_id]) if params[:item][:template_id]
     respond_to do |format|
       if @item.save
@@ -32,16 +31,6 @@ class ItemsController < ApplicationController
         format.html { render :action => "new" }
         format.xml  { render :xml => @item.errors, :status => :unprocessable_entity }
         format.json  { render :json => {"errors"=>@item.all_errors } }
-=======
-    respond_to do |format|
-      if @item.save
-        current_user.items<<@item
-        format.xml { render_for_api :item_detail, :xml => @item, :root => :item}
-        format.json { render_for_api :item_detail,:json => @item, :status => :created }
-      else
-        format.xml { render :xml=> @item.all_errors.to_xml(:root=>'errors') }
-        format.json { render :json=> @item.all_errors }
->>>>>>> master:app/controllers/items_controller.rb
       end
     end
   end

@@ -8,15 +8,13 @@ class Item
   field :item_date, :type => Time
   field :status, :type => Boolean
   field :frequency_count, :type => Integer
-<<<<<<< HEAD:app/models/item.rb
-  field :template_id, :type => Integer
-  field :location_id, :type => Integer
-  field :current_category_id, :type => Integer
+  field :template_id, :type => String
+  field :location_id, :type => String
+  field :current_category_id, :type => String
   validates_presence_of :name,:message=>'name - Required parameter missing',:code=>2009
   validates_presence_of :template_id,:message=>'template_id - Blank Parameter',:code=>3025
   belongs_to  :template
   belongs_to  :location
-=======
   referenced_in :user
   referenced_in :template
   validates_presence_of :name,:message=>'name - Required parameter missing',:code=>2009
@@ -38,5 +36,4 @@ class Item
   api_accessible :item_detail,:extend=>:item_with_user do |t|
     t.add 'user'
   end
->>>>>>> master:app/models/item.rb
 end

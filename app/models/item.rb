@@ -12,7 +12,7 @@ class Item
   referenced_in :template
   validates_presence_of :name,:message=>'name - Required parameter missing',:code=>2009
   validates_presence_of :template_id,:message=>'template_id - Required parameter missing',:code=>2011
-  validates :template_fields
+  #~ validates :template_fields
 
   def template_fields
     true

@@ -3,8 +3,14 @@ class RegistrationsController < Devise::RegistrationsController
   before_filter :change_params,:only=>[:update,:reset_password]
   
   def index 
-  # @users = User.all 
-  @users = User.paginate(conditions: {page: params[:page], per_page:params[:size]})
+    paginate_options = {} 
+    paginate_options.store(:page,params[:page]) if params[:page]
+    paginate_options.store(:per_page,params[:page_size]) if params[:page_size]
+    if params[:sort_by] && params[:order_by]
+      @users = User.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)
+    else
+      @users = User.all.paginate(paginate_options)
+    end 
     respond_to do |format|
       format.xml{ render_for_api :user_with_out_token, :xml => @users, :root => :users}
       format.json{render_for_api :user_with_out_token, :json => @users, :root => :users}

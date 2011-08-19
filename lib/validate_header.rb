@@ -15,6 +15,7 @@ module Rack
 
     def _call(env)
       #~ content_type = Rack::Request.new(env).media_type
+      env['HTTP_ACCEPT']="application/json" if env['HTTP_ACCEPT']!="application/xml" || env['HTTP_ACCEPT']!="application/json"
       valid_request?(env) ? @app.call(env) : ERROR_RESPONSE
     end
 

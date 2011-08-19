@@ -19,13 +19,9 @@ gem 'carrierwave','0.5.4'
 gem 'exception_notifier','1.0.0'
 gem "aws-s3", "~> 0.6.2", :require => 'aws/s3'
 gem 'builder','~> 2.1.2'
-<<<<<<< HEAD
 gem 'will_paginate', '2.3.16'
-
-
-=======
 gem 'newrelic_rpm'
->>>>>>> 2f534983073aa4bbc656dd4d505a933e5a81c790
+
 # Deploy with Capistrano
 # gem 'capistrano'
 

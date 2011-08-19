@@ -25,7 +25,7 @@ class User
   field :business_unit, :type=> String
   field :status, :type=> Boolean,:default=>true
 
-  api_accessible :user_with_token do |template|
+  api_accessible :user_with_out_token do |template|
     template.add :email
     template.add :first_name
     template.add :last_name
@@ -33,20 +33,15 @@ class User
     template.add :job_title
     template.add :company
     template.add :business_unit
-    template.add :authentication_token,:as=>:access_token
     template.add :sign_in_count
     template.add :current_sign_in_at
     template.add :last_sign_in_at
     template.add :current_sign_in_ip
     template.add :last_sign_in_ip
-  end
-
-  def build_user_create_success_xml
-    self.to_xml(:skip_instruct=>true, :only=>[:email, :first_name, :last_name])
-  end
-
-  def build_user_create_success_json
-    { "response" => "success", self.class.to_s.downcase =>self.to_json(:only=>[:email, :first_name, :last_name]) }.to_json
+  end  
+  
+  api_accessible :user_with_token , :extend=> :user_with_out_token do |template|
+    template.add :authentication_token,:as=>:access_token
   end 
   
   def build_confirm_success_json

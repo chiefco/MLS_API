@@ -1,6 +1,15 @@
 class RegistrationsController < Devise::RegistrationsController
   before_filter :authenticate_user!,:except=>[:create]
   before_filter :change_params,:only=>[:update,:reset_password]
+  
+  def index 
+    @users = User.all
+    respond_to do |format|
+      format.xml{ render_for_api :user_with_out_token, :xml => @users, :root => :users}
+      format.json{render_for_api :user_with_out_token, :json => @users, :root => :users}
+    end
+  end 
+  
   def create
     build_resource
     saved=resource.save

@@ -18,11 +18,12 @@ class RegistrationsController < Devise::RegistrationsController
   
   def update
     self.resource = resource_class.to_adapter.get!(send(:"current_#{resource_name}").to_key)
-    updated= resource.update_without_password(params[resource_name])
+    update_password=params[:user][:password] || params[:user][:password_confirmation] || params[:user][:current_password]
+    updated= update_password ? resource.update_with_password(params[resource_name]) : resource.update_without_password(params[resource_name])
     render_results(updated,resource)
   end
   
-  def reset_password
+  def update_user
     self.resource = resource_class.to_adapter.get!(send(:"current_#{resource_name}").to_key)
     updated= resource.update_with_password(params[resource_name])
     render_results(updated,resource)

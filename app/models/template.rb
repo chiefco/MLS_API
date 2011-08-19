@@ -9,5 +9,5 @@ class Template
   #~ embeds_many :template_definitions
   #~ recursively_embeds_many :template_definitions
   references_many :template_definitions, :dependent => :destroy
-  belongs_to :item
+  has_one :item
 end

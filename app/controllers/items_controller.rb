@@ -39,7 +39,6 @@ class ItemsController < ApplicationController
   # POST /items.xml
   def create
     @item = Item.new(params[:item])
-    
     @template=Template.find(params[:item][:template_id]) if params[:item][:template_id]
     respond_to do |format|
       if @item.save
@@ -58,11 +57,13 @@ class ItemsController < ApplicationController
   # PUT /items/1.xml
   def update
     @item = Item.find(params[:id])
-
     respond_to do |format|
       if @item.update_attributes(params[:item])
+        @location=Location.create(:name=>params[:item][:location])
+        @item.update_attributes(:location_id=>@location.id)
         format.html { redirect_to(@item, :notice => 'Item was successfully updated.') }
-        format.xml  { head :ok }
+        format.xml  { render :xml=>@item }
+        format.json  { render :json =>{"item"=>{"description"=>@item.description,"item_date"=>@item.item_date,"location"=>@location.name}} }
       else
         format.html { render :action => "edit" }
         format.xml  { render :xml => @item.errors, :status => :unprocessable_entity }

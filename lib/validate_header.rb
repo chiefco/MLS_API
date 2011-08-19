@@ -14,13 +14,13 @@ module Rack
     end
 
     def _call(env)
-      content_type = Rack::Request.new(env).media_type
+      #~ content_type = Rack::Request.new(env).media_type
       valid_request?(env) ? @app.call(env) : ERROR_RESPONSE
     end
 
     def valid_request?(env)
       content_type = Rack::Request.new(env).media_type
-      ALLOWED_METHODS.include?(env['REQUEST_METHOD']) && CONTENT_TYPE.include?(content_type)
+      ALLOWED_METHODS.include?(env['REQUEST_METHOD'])
     end
   end
 end

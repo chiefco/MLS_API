@@ -20,6 +20,13 @@ class RegistrationsController < Devise::RegistrationsController
     render_results(updated,resource)
   end
   
+  def show
+     respond_to do |format|
+        format.xml{ render_for_api :user_with_token, :xml => current_user, :root => :user}
+        format.json{render_for_api :user_with_token, :json => current_user, :root => :user}
+      end
+  end 
+  
   private
   
   def render_results(valid,resource)
@@ -41,5 +48,6 @@ class RegistrationsController < Devise::RegistrationsController
   def change_params
     params[:user]=params[:user_data]
   end
+  
 end
 

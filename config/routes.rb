@@ -1,4 +1,6 @@
 MeetlinkshareApi::Application.routes.draw do
+  resources :topics
+
   resources :template_categories
 
   resources :templates

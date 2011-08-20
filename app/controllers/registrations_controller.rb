@@ -77,22 +77,7 @@ class RegistrationsController < Devise::RegistrationsController
     params[:user]=params[:user_data]
   end
   
-  def set_page_size
-    if params[:page_size]
-      params[:page_size]
-    else
-      10
-    end 
-  end 
-  
-  def set_page
-    if params[:page]
-      params[:page]
-    else
-      1
-    end 
-  end 
-  
+ 
   def get_criteria(query)
     [ {first_name: query} , { last_name: query }, { email: query }, { job_title: query }, { company: query}, { business_unit: query } ]
   end 

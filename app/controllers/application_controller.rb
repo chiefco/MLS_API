@@ -15,4 +15,19 @@ class ApplicationController < ActionController::Base
   def clear_session
     session.clear
   end
+  def set_page_size
+    if params[:page_size]
+      params[:page_size]
+    else
+      10
+    end 
+  end 
+
+  def set_page
+    if params[:page]
+      params[:page]
+    else
+      1
+    end 
+  end 
 end

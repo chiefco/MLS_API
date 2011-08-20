@@ -4,10 +4,20 @@ class ItemsController < ApplicationController
   # GET /items
   # GET /items.xml
   def index
-    @items = Item.all
+    paginate_options = {} 
+    paginate_options.store(:page,set_page)
+    paginate_options.store(:per_page,set_page_size)
+    if params[:sort_by] && params[:order_by]
+     @items = params[:q] ? Item.any_of(get_criteria(params[:q])).order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)  : Item.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)
+    elsif params[:sort_by] 
+      @items = params[:q] ? Item.any_of(get_criteria(params[:q])).order_by([params[:sort_by],:desc]).paginate(paginate_options) : Item.order_by([params[:sort_by],:desc]).paginate(paginate_options) 
+    else
+      @items = params[:q] ? Item.any_of(get_criteria(params[:q])).order_by(['created_at', :desc]).paginate(paginate_options) : Item.order_by(['created_at', :desc]).paginate(paginate_options)
+      end
+    #~ @items = Item.paginate(conditions: {page: params[:page], per_page:params[:size]})
     respond_to do |format|
       format.xml  { render :xml => @items}
-      format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>:location_name),:count=>@items.size}.merge(success)}
+      format.json {render :json =>{:items=>@items,:count=>@items.size}.merge(success)}
     end
   end
 
@@ -80,4 +90,8 @@ class ItemsController < ApplicationController
       format.json  { render :json=> success}
     end
   end
+  
+   def get_criteria(query)
+    [ {name: query} , { description: query } ]
+  end 
 end

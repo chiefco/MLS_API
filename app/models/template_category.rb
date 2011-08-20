@@ -1,5 +1,5 @@
 class TemplateCategory
   include Mongoid::Document
   field :name
-  refereced_in :template
+  referenced_in :template
 end

@@ -42,5 +42,12 @@ class Item
   api_accessible :item_detail,:extend=>:item_with_user do |t|
     t.add 'user'
   end
-
+  
+  def selected_item_fields
+    self.to_json(:skip_instruct => true, :except =>[ :_id, :created_at, :updated_at ])
+  end
+  
+  def location_name
+    self.location.nil? ? "nil" : self.location.name
+  end
 end

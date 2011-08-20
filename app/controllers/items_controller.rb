@@ -6,8 +6,8 @@ class ItemsController < ApplicationController
   def index
     @items = Item.all
     respond_to do |format|
-      format.xml  { render :xml => @item }
-      format.json  { render :json =>{:count=>@items.size,:items=>@items }.merge(success)}
+      format.xml  { render :xml => @items}
+      format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>:location_name),:count=>@items.size}.merge(success)}
     end
   end
 

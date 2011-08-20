@@ -3,18 +3,36 @@ class RegistrationsController < Devise::RegistrationsController
   before_filter :change_params,:only=>[:update,:reset_password]
   
   def index 
-  # @users = User.all 
-  @users = User.paginate(conditions: {page: params[:page], per_page:params[:size]})
+    paginate_options = {} 
+    paginate_options.store(:page,set_page)
+    paginate_options.store(:per_page,set_page_size)
+    if params[:sort_by] && params[:order_by]
+     @users = params[:q] ? User.any_of(get_criteria(params[:q])).order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)  : User.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)
+    elsif params[:sort_by] 
+      @users = params[:q] ? User.any_of(get_criteria(params[:q])).order_by([params[:sort_by],:desc]).paginate(paginate_options) : User.order_by([params[:sort_by],:desc]).paginate(paginate_options) 
+    else
+      @users = params[:q] ? User.any_of(get_criteria(params[:q])).order_by(['created_at', :desc]).paginate(paginate_options) : User.order_by(['created_at', :desc]).paginate(paginate_options)
+    end 
     respond_to do |format|
       format.xml{ render_for_api :user_with_out_token, :xml => @users, :root => :users}
       format.json{render_for_api :user_with_out_token, :json => @users, :root => :users}
     end
   end 
-  
+    
   def create
     build_resource
     saved=resource.save
-    render_results(saved,resource)
+    if saved
+     respond_to do |format|
+        format.xml{ render :xml=> success}
+        format.json{render :json => success}
+      end
+    else
+      respond_to do |format|
+        format.xml { render :xml=> resource.all_errors.to_xml(:root=>'errors') }
+        format.json { render :json=> resource.all_errors }
+      end
+    end
   end
   
   def update
@@ -59,5 +77,25 @@ class RegistrationsController < Devise::RegistrationsController
     params[:user]=params[:user_data]
   end
   
+  def set_page_size
+    if params[:page_size]
+      params[:page_size]
+    else
+      10
+    end 
+  end 
+  
+  def set_page
+    if params[:page]
+      params[:page]
+    else
+      1
+    end 
+  end 
+  
+  def get_criteria(query)
+    [ {first_name: query} , { last_name: query }, { email: query }, { job_title: query }, { company: query}, { business_unit: query } ]
+  end 
+
 end
 

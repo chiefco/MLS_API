@@ -30,19 +30,6 @@ class ItemsController < ApplicationController
       format.json  { render :json =>{"item"=>{:item_id=>@item.id,:item_name=>@item.name,:location=>(@item.location.nil? ? "nil" : @item.location.name),:description=>@item.description,:current_category_name=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id).name),:created_at=>@item.created_at,:updated_at=>@item.updated_at}}.merge(success) }
     end
   end
-  # GET /items/new
-  # GET /items/new.xml
-  def new
-    @item = Item.new
-    respond_to do |format|
-      format.xml  { render :xml => @item }
-    end
-  end
-
-  # GET /items/1/edit
-  def edit
-    @item = Item.find(params[:id])
-  end
 
   # POST /items
   # POST /items.xml
@@ -91,7 +78,16 @@ class ItemsController < ApplicationController
     end
   end
   
-   def get_criteria(query)
+  def  item_topics
+    @item = Item.find(params[:id])
+    @topics=@item.topics(:fields=>[:name,:_id])
+    respond_to do |format| 
+      format.json {render :json=>{:item=>@topics.to_a.to_json(:only=>[:name,:_id,:status]),:count=>@item.topics.count}.merge(success)}
+ #~ format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>:location_name),:count=>@items.size}.merge(success)}
+    end
+  end
+    
+  def get_criteria(query)
     [ {name: query} , { description: query } ]
   end 
 end

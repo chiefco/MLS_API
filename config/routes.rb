@@ -11,7 +11,8 @@ MeetlinkshareApi::Application.routes.draw do
     get "users", :to=> "registrations#index"
   end
  
-  
+  match "/item_topics/:id"=> 'items#item_topics'
+
   resources :items
   # The priority is based upon order of creation:
   # first created -> highest priority.

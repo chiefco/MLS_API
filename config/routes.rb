@@ -1,4 +1,6 @@
 MeetlinkshareApi::Application.routes.draw do
+  resources :template_categories
+
   resources :templates
 
   devise_for :users, :controllers => { :sessions => "sessions",:confirmations=>'confirmations', :registrations=>"registrations",:passwords=>'passwords' } do

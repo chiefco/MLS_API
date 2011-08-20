@@ -22,7 +22,17 @@ class RegistrationsController < Devise::RegistrationsController
   def create
     build_resource
     saved=resource.save
-    render_results(saved,resource)
+    if saved
+     respond_to do |format|
+        format.xml{ render :xml=> success}
+        format.json{render :json => success}
+      end
+    else
+      respond_to do |format|
+        format.xml { render :xml=> resource.all_errors.to_xml(:root=>'errors') }
+        format.json { render :json=> resource.all_errors }
+      end
+    end
   end
   
   def update

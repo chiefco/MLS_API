@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   RESET_TOKEN_SENT={:reset_token_sent=>true}
   RESET_TOKEN_ERROR={:code=>5003,:message=>"Email not found"}
   UNAUTHORIZED={:code=>1004,:message=>"Authentication/Authorization Failed"}
+  INVALID_PARAMETER_ID={:code=>3065,:message=>"id -Invalid Parameter"}
   USER_COLUMN=[:status,:remember_token,:remember_created_at,:created_at,:updated_at]
   #~ protect_from_forgery
   

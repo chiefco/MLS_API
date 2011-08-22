@@ -22,25 +22,9 @@ class V1::CategoriesController < ApplicationController
       end
     else
       respond_to do |format|
-        format.json { render :json=> failure.merge(invalid_parameter_id) }
+        format.json { render :json=> failure.merge(INVALID_PARAMETER_ID) }
       end
     end 
-  end
-
-  # GET /v1/categories/new
-  # GET /v1/categories/new.xml
-  def new
-    @category = Category.new
-
-    respond_to do |format|
-      format.xml  { render :xml => @category }
-      format.json  { render :json => @category }
-    end
-  end
-
-  # GET /v1/categories/1/edit
-  def edit
-    @category = Category.find(params[:id])
   end
 
   # POST /v1/categories
@@ -75,7 +59,7 @@ class V1::CategoriesController < ApplicationController
       end
     else
       respond_to do |format|
-        format.json { render :json=> failure.merge(invalid_parameter_id) }
+        format.json { render :json=> failure.merge(INVALID_PARAMETER_ID) }
       end
     end 
   end
@@ -91,7 +75,7 @@ class V1::CategoriesController < ApplicationController
       end
     else
       respond_to do |format|
-        format.json { render :json=> failure.merge(invalid_parameter_id) }
+        format.json { render :json=> failure.merge(INVALID_PARAMETER_ID) }
       end
     end
   end

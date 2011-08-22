@@ -6,13 +6,13 @@ MeetlinkshareApi::Application.routes.draw do
     resources :templates
     resources :items
     resources :categories
-    devise_for :users, :controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
+    devise_for :users, :controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords', :categories=>"v1/categories" } do
       post "forgot_password", :to => "passwords#create"
       get "user/:id", :to=>"registrations#show"
       get "users", :to=> "registrations#index"
     end
-  end
  
+  end
   match "v1/item_topics/:id"=> 'v1/items#item_topics'
 
 

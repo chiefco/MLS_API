@@ -1,11 +1,11 @@
 class V1::CategoriesController < ApplicationController
+  #before_filter :authenticate_user!
   # GET /v1/categories
   # GET /v1/categories.xml
   def index
     @categories = Category.all
 
     respond_to do |format|
-      format.html # index.html.erb
       format.xml  { render :xml => @categories }
       format.json  { render :json => @categories }
     end
@@ -14,13 +14,17 @@ class V1::CategoriesController < ApplicationController
   # GET /v1/categories/1
   # GET /v1/categories/1.xml
   def show
-    @category = Category.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml => @category }
-      format.json  { render :json => @category }
-    end
+    @category = Category.where(:_id=>params[:id]).first
+    if @category
+      respond_to do |format|
+        format.xml  { render :xml => @category }
+        format.json  { render :json => @category.success_json(["_id","name","parent_id","show_in_quick_links"]).merge(success) }
+      end
+    else
+      respond_to do |format|
+        format.json { render :json=> failure.merge(invalid_parameter_id) }
+      end
+    end 
   end
 
   # GET /v1/categories/new
@@ -29,7 +33,6 @@ class V1::CategoriesController < ApplicationController
     @category = Category.new
 
     respond_to do |format|
-      format.html # new.html.erb
       format.xml  { render :xml => @category }
       format.json  { render :json => @category }
     end
@@ -43,12 +46,12 @@ class V1::CategoriesController < ApplicationController
   # POST /v1/categories
   # POST /v1/categories.xml
   def create
-    @category = Category.new(params[:v1_category])
+    @category = Category.new(params[:category])
 
     respond_to do |format|
       if @category.save
         format.xml  { render :xml => @category, :status => :created, :location => @category }
-        format.json  { render :json => {@category.success_json(["id","name"]).merge(success)}, :status => :created, :location => @category }
+        format.json  { render :json => @category.success_json(["name","parent_id", "show_in_quick_links"]).merge(success) }
       else
         format.xml  { render :xml => @category.errors, :status => :unprocessable_entity }
         format.json  { render :json => { "errors"=> @category.all_errors}}
@@ -59,28 +62,37 @@ class V1::CategoriesController < ApplicationController
   # PUT /v1/categories/1
   # PUT /v1/categories/1.xml
   def update
-    @category = Category.find(params[:id])
-
-    respond_to do |format|
-      if @category.update_attributes(params[:v1_category])
-        format.html { redirect_to(@category, :notice => 'Category was successfully updated.') }
-        format.xml  { head :ok }
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @category.errors, :status => :unprocessable_entity }
+    @category = Category.where(:_id=>params[:id]).first
+    if @category
+      respond_to do |format|
+        if @category.update_attributes(params[:category])
+          format.xml  { render :xml => @category, :status => :created, :location => @category }
+          format.json  { render :json => @category.success_json(["_id","name","parent_id", "show_in_quick_links"]).merge(success) }
+        else
+          format.xml  { render :xml => @category.errors, :status => :unprocessable_entity }
+          format.json  { render :json => { "errors"=> @category.all_errors}}
+        end
       end
-    end
+    else
+      respond_to do |format|
+        format.json { render :json=> failure.merge(invalid_parameter_id) }
+      end
+    end 
   end
 
   # DELETE /v1/categories/1
   # DELETE /v1/categories/1.xml
   def destroy
-    @category = Category.find(params[:id])
-    @category.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(v1_categories_url) }
-      format.xml  { head :ok }
+    @category = Category.where(:_id=>params[:id]).first
+    if @category
+      @category.destroy
+      respond_to do |format|
+        format.json { render :json=> success }
+      end
+    else
+      respond_to do |format|
+        format.json { render :json=> failure.merge(invalid_parameter_id) }
+      end
     end
   end
 end

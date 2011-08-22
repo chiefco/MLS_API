@@ -30,4 +30,9 @@ class ApplicationController < ActionController::Base
       1
     end 
   end 
+  
+   #invalid parameter
+   def invalid_parameter_id
+    {:code=>"3065",:message=>"id -Invalid Parameter"}
+  end
 end

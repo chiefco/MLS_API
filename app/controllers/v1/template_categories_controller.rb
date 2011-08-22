@@ -1,4 +1,4 @@
-class TemplateCategoriesController < ApplicationController
+class V1::TemplateCategoriesController < ApplicationController
   # GET /template_categories
   # GET /template_categories.xml
   def index

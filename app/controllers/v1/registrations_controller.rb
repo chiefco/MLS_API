@@ -7,8 +7,6 @@ class V1::RegistrationsController < Devise::RegistrationsController
     paginate_options.store(:page,set_page)
     paginate_options.store(:per_page,set_page_size)
     @users = User.list(params,paginate_options) 
-    puts "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC"
-    puts @users.inspect 
     respond_to do |format|
       format.xml{ render_for_api :user_with_out_token, :xml => @users, :root => :users}
       format.json{render_for_api :user_with_out_token, :json => @users, :root => :users}

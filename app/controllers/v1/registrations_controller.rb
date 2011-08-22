@@ -1,4 +1,4 @@
-class RegistrationsController < Devise::RegistrationsController
+class V1::RegistrationsController < Devise::RegistrationsController
   before_filter :authenticate_user!,:except=>[:create]
   before_filter :change_params,:only=>[:update,:reset_password]
   

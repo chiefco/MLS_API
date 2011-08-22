@@ -1,4 +1,4 @@
-class SessionsController < Devise::SessionsController
+class V1::SessionsController < Devise::SessionsController
   def create
     user=params[:user]
     params[:user]={}

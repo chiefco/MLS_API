@@ -1,19 +1,20 @@
 MeetlinkshareApi::Application.routes.draw do
-  resources :topics
 
-  resources :template_categories
-
-  resources :templates
-
-  devise_for :users, :controllers => { :sessions => "sessions",:confirmations=>'confirmations', :registrations=>"registrations",:passwords=>'passwords' } do
-    post "forgot_password", :to => "passwords#create"
-    get "user/:id", :to=>"registrations#show"
-    get "users", :to=> "registrations#index"
+  namespace :v1 do
+    resources :topics
+    resources :template_categories
+    resources :templates
+    resources :items
+    devise_for :users, :controllers => { :sessions => "sessions",:confirmations=>'confirmations', :registrations=>"registrations",:passwords=>'passwords' } do
+      post "v1/forgot_password", :to => "v1/passwords#create"
+      get "v1/user/:id", :to=>"v1/registrations#show"
+      get "v1/users", :to=> "v1/registrations#index"
+    end
   end
  
-  match "/item_topics/:id"=> 'items#item_topics'
+  match "v1/item_topics/:id"=> 'v1/items#item_topics'
 
-  resources :items
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
@@ -63,7 +64,7 @@ MeetlinkshareApi::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  root :to => "users#index"
+  root :to => "v1/users#index"
 
   # See how all your routes lay out with "rake routes"
 
@@ -71,3 +72,4 @@ MeetlinkshareApi::Application.routes.draw do
   # Note: This route will make all actions in every controller accessible via GET requests.
   # match ':controller(/:action(/:id(.:format)))'
 end
+

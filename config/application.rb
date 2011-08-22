@@ -11,6 +11,7 @@ require "rails/test_unit/railtie"
 # you've limited to :test, :development, or :production.
 require File.expand_path('../../lib/general', __FILE__)
 require File.expand_path('../../lib/validate_header', __FILE__)
+require File.expand_path('../../lib/params_parser', __FILE__)
 Bundler.require(:default, Rails.env) if defined?(Bundler)
 
 module MeetlinkshareApi
@@ -42,6 +43,7 @@ module MeetlinkshareApi
 
     # JavaScript files you want as :defaults (application.js is always included).
     # config.action_view.javascript_expansions[:defaults] = %w(jquery rails)
+    config.middleware.use ActionDispatch::ParamsParser
     config.middleware.use Rack::ValidateHeader
     # Configure the default encoding used in templates for Ruby 1.9.
     config.encoding = "utf-8"

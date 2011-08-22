@@ -41,8 +41,12 @@ class User
   end  
   
   api_accessible :user_with_token , :extend=> :user_with_out_token do |template|
-    template.add :authentication_token,:as=>:access_token
+    template.add :authentication_token #,:as=>:access_token
   end 
+  
+  def self.valid_user?(token='')
+    self.where(:authentication_token=>token,:status=>true).first
+  end
   
   def build_confirm_success_json
     { "response" => "success", "confirmed" => true }.to_json

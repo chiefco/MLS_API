@@ -16,10 +16,19 @@ class V1::BookmarksController < ApplicationController
     @v1_bookmark = Bookmark.where(:_id=>params[:id]).first
     respond_to do |format|
       if  @v1_bookmark
-       format.xml  { render :xml => @v1_bookmark }
+        bookmark_v1={:bookmark=>{:name=>@v1_bookmark.name,:id=>@v1_bookmark._id}}
+        @v1_bookmark.bookmarked_contents.each do |bookmark|
+          if bookmark.bookmarkable_type=="item"
+           @item=Item.where(:_id=> bookmark.bookmarkable_id).first
+           bookmark_v1={:item=>{:name=>@item.name,:id=>@item._id,:location=>(@item.location.nil? ? "nil" : @item.location.name)}}.merge(bookmark_v1)
+          end
+        end
+        #~ format.json {render=>{bookmark_v1}.to_json}
+        #~ format.xml  { render :xml => @v1_bookmark }
+        #~ format.json  { render :xml => @v1_bookmark }
       else
-       format.xml  { render :xml => failure.merge(invalid_parameter_id).to_xml(:root=>'xml') }
-       format.json  { render :json=> failure.merge(invalid_parameter_id)}
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
   end
@@ -31,7 +40,7 @@ class V1::BookmarksController < ApplicationController
     respond_to do |format|
       if @v1_bookmark.save
         format.xml  { render :xml => @v1_bookmark, :status => :created, :location => @v1_bookmark }
-        format.json  { render :json =>{:bookmark=>{:name=>@v1_bookmark.name,:show_in_quick_links=>@v1_bookmark.show_in_quick_links}} }
+        format.json  { render :json =>{:bookmark=>{:name=>@v1_bookmark.name,:id=>@v1_bookmark._id}} }
       else
         format.xml  { render :xml => @v1_bookmark.errors}
         format.json  { render :json => @v1_bookmark.all_errors }
@@ -53,8 +62,8 @@ class V1::BookmarksController < ApplicationController
           format.json  { render :json => @v1_bookmark.all_errors }
         end
       else
-        format.xml  { render :xml => failure.merge(invalid_parameter_id).to_xml(:root=>'xml') }
-        format.json  { render :json=> failure.merge(invalid_parameter_id)}
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
   end
@@ -69,8 +78,8 @@ class V1::BookmarksController < ApplicationController
         format.xml  { render :xml => success.to_xml(:root=>'xml') }
         format.json  { render :json=> success}
       else
-        format.xml  { render :xml => failure.merge(invalid_parameter_id).to_xml(:root=>'xml') }
-        format.json  { render :json=> failure.merge(invalid_parameter_id)}
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
   end

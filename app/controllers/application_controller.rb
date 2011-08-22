@@ -49,7 +49,13 @@ class ApplicationController < ActionController::Base
     end 
   end 
   
+<<<<<<< HEAD:app/controllers/application_controller.rb
   def current_user
     @current_user
+=======
+   #invalid parameter
+   def invalid_parameter_id
+    {:code=>"3065",:message=>"id -Invalid Parameter"}
+>>>>>>> 137fe12bfcd2b28123798163fe2afa4bc44190df:app/controllers/application_controller.rb
   end
 end

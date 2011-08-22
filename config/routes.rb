@@ -1,5 +1,11 @@
 MeetlinkshareApi::Application.routes.draw do
+<<<<<<< HEAD:config/routes.rb
   VERSION1="v1"
+=======
+
+  namespace :v1 do resources :bookmarks end
+
+>>>>>>> 137fe12bfcd2b28123798163fe2afa4bc44190df:config/routes.rb
   namespace :v1 do
     resources :topics
     resources :template_categories

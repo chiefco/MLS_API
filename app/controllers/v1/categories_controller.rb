@@ -1,4 +1,6 @@
 class V1::CategoriesController < ApplicationController
+  
+  before_filter :authenticate_request!
   #before_filter :authenticate_user!
   # GET /v1/categories
   # GET /v1/categories.xml

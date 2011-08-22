@@ -1,16 +1,7 @@
 MeetlinkshareApi::Application.routes.draw do
-<<<<<<< HEAD:config/routes.rb
   VERSION1="v1"
-=======
-
-  namespace :v1 do resources :bookmarks end
-
->>>>>>> 137fe12bfcd2b28123798163fe2afa4bc44190df:config/routes.rb
   namespace :v1 do
-    resources :topics
-    resources :template_categories
-    resources :templates
-    resources :items
+    resources :topics, :template_categories, :templates, :items, :bookmarks
   end
   devise_for 'v1/users', :controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
     post "v1/forgot_password", :to => "v1/passwords#create"

@@ -6,4 +6,5 @@ class BookmarkedContent
   field :start_time, :type => Time
   field :position,:type=>String
   field :show_in_quick_links,:type =>Boolean
+  referenced_in :bookmark
 end

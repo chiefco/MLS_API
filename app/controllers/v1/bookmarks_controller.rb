@@ -16,10 +16,11 @@ class V1::BookmarksController < ApplicationController
     @v1_bookmark = Bookmark.where(:_id=>params[:id]).first
     respond_to do |format|
       if  @v1_bookmark
-       format.xml  { render :xml => @v1_bookmark }
+        format.xml  { render :xml => @v1_bookmark }
+        format.json  { render :xml => @v1_bookmark }
       else
-       format.xml  { render :xml => failure.merge(invalid_parameter_id).to_xml(:root=>'xml') }
-       format.json  { render :json=> failure.merge(invalid_parameter_id)}
+        format.xml  { render :xml => failure.merge(invalid_parameter_id).to_xml(:root=>'xml') }
+        format.json  { render :json=> failure.merge(invalid_parameter_id)}
       end
     end
   end

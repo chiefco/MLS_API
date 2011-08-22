@@ -5,17 +5,10 @@ MeetlinkshareApi::Application.routes.draw do
     resources :template_categories
     resources :templates
     resources :items
-<<<<<<< HEAD:config/routes.rb
-    devise_for :users, :controllers => { :sessions => "sessions",:confirmations=>'confirmations', :registrations=>"registrations",:passwords=>'passwords' } do
-      post "v1/forgot_password", :to => "v1/passwords#create"
-      get "v1/user/:id", :to=>"v1/registrations#show"
-      get "v1/users", :to=> "v1/registrations#index"
-=======
     devise_for :users, :controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
       post "forgot_password", :to => "passwords#create"
       get "user/:id", :to=>"registrations#show"
       get "users", :to=> "registrations#index"
->>>>>>> master:config/routes.rb
     end
   end
  

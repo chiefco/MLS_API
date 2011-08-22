@@ -1,10 +1,5 @@
-<<<<<<< HEAD:app/controllers/v1/items_controller.rb
-class ItemsController < ApplicationController
-  #~ before_filter :authenticate_user!
-=======
 class V1::ItemsController < ApplicationController
   before_filter :authenticate_user!
->>>>>>> master:app/controllers/v1/items_controller.rb
   respond_to :html, :xml, :json
   # GET /items
   # GET /items.xml

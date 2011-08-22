@@ -2,6 +2,8 @@ class User
   include Mongoid::Document
   include Mongoid::Timestamps
   acts_as_api
+  SORT_BY_ALLOWED = [ :email, :first_name, :last_name, :job_title, :company, :business_unit]
+  ORDER_BY_ALLOWED =  [:asc,:desc]
   # Include default devise modules. Others available are:i
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
   references_many :items
@@ -63,5 +65,19 @@ class User
   def build_confirm_failure_xml
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?><result><response>failure</response><confirmed>false</confirmed></result>"
   end 
-
+  
+  def self.list(params,paginate_options)
+    params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
+    params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
+    if params[:q]
+      User.any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
+    else
+      User.order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
+    end 
+  end
+  
+  def self.get_criteria(query)
+    [ {first_name: query} , { last_name: query }, { email: query }, { job_title: query }, { company: query}, { business_unit: query } ]
+  end 
+  
 end

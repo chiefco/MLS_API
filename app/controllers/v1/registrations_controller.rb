@@ -6,13 +6,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
     paginate_options = {} 
     paginate_options.store(:page,set_page)
     paginate_options.store(:per_page,set_page_size)
-    if params[:sort_by] && params[:order_by]
-     @users = params[:q] ? User.any_of(get_criteria(params[:q])).order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)  : User.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)
-    elsif params[:sort_by] 
-      @users = params[:q] ? User.any_of(get_criteria(params[:q])).order_by([params[:sort_by],:desc]).paginate(paginate_options) : User.order_by([params[:sort_by],:desc]).paginate(paginate_options) 
-    else
-      @users = params[:q] ? User.any_of(get_criteria(params[:q])).order_by(['created_at', :desc]).paginate(paginate_options) : User.order_by(['created_at', :desc]).paginate(paginate_options)
-    end 
+    @users = User.list(params,paginate_options) 
+    puts "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC"
+    puts @users.inspect 
     respond_to do |format|
       format.xml{ render_for_api :user_with_out_token, :xml => @users, :root => :users}
       format.json{render_for_api :user_with_out_token, :json => @users, :root => :users}
@@ -80,9 +76,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
     
   end
  
-  def get_criteria(query)
-    [ {first_name: query} , { last_name: query }, { email: query }, { job_title: query }, { company: query}, { business_unit: query } ]
-  end 
+  #~ def get_criteria(query)
+    #~ [ {first_name: query} , { last_name: query }, { email: query }, { job_title: query }, { company: query}, { business_unit: query } ]
+  #~ end 
 
 end
 

@@ -1,12 +1,4 @@
-class TopicsController < ApplicationController
-  # GET /topics
-  # GET /topics.xml
-  def index
-    @topics = Topic.all
-    respond_to do |format|
-      format.xml  { render :xml => @topics }
-    end
-  end
+class  V1::TopicsController < ApplicationController
 
   # GET /topics/1
   # GET /topics/1.xml
@@ -14,12 +6,8 @@ class TopicsController < ApplicationController
     @topic = Topic.find(params[:id])
     respond_to do |format|
       format.xml  { render :xml => @topic }
+      format.json  { render :json => {:topic=>@topic.to_json(:only=>[:name,:_id,:status],:methods=>:get_item)}.merge(success) }
     end
-  end
-
-  # GET /topics/1/edit
-  def edit
-    @topic = Topic.find(params[:id])
   end
 
   # POST /topics
@@ -43,11 +31,11 @@ class TopicsController < ApplicationController
     @topic = Topic.find(params[:id])
     respond_to do |format|
       if @topic.update_attributes(params[:topic])
-        format.xml  { render :xml => @topic, :status => :created, :location => @topic }
+        format.xml  { render :xml => @topic, :status => :created, :location=>@topic }
         format.json  { render :json => @topic }    
       else
-        format.xml  { render :xml => @topic, :status => :created, :location => @topic }
-        format.json  { render :json => @topic }        
+        format.xml  { render :xml => @topic.errors, :status => :unprocessable_entity }
+        format.json  { render :json => {"errors"=>@topic.all_errors }}
       end
     end
   end

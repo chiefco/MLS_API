@@ -1,5 +1,7 @@
 MeetlinkshareApi::Application.routes.draw do
 
+  namespace :v1 do resources :bookmarks end
+
   namespace :v1 do
     resources :topics
     resources :template_categories

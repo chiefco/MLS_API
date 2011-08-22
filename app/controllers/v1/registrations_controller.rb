@@ -20,9 +20,8 @@ class V1::RegistrationsController < Devise::RegistrationsController
   end 
     
   def create
-    build_resource
-    saved=resource.save
-    if saved
+    resource=User.new(params[:user])
+    if resource.save
      respond_to do |format|
         format.xml{ render :xml=> success}
         format.json{render :json => success}
@@ -77,6 +76,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
     params[:user]=params[:user_data]
   end
   
+  def v1_params
+    
+  end
  
   def get_criteria(query)
     [ {first_name: query} , { last_name: query }, { email: query }, { job_title: query }, { company: query}, { business_unit: query } ]

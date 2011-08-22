@@ -1,4 +1,4 @@
-class TemplatesController < ApplicationController
+class V1::TemplatesController < ApplicationController
   # GET /templates
   # GET /templates.xml
   def index

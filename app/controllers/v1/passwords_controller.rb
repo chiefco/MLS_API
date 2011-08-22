@@ -1,4 +1,4 @@
-class PasswordsController < Devise::PasswordsController
+class V1::PasswordsController < Devise::PasswordsController
   prepend_before_filter :require_no_authentication
 
 

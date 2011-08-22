@@ -18,7 +18,7 @@ class V1::CategoriesController < ApplicationController
     if @category
       respond_to do |format|
         format.xml  { render :xml => @category }
-        format.json  { render :json => success.merge(@category.success_json(["_id","name","parent_id","show_in_quick_links"])) }
+        format.json  { render :json => success.merge(@category.success_json([:_id,:name,:parent_id,:show_in_quick_links])) }
       end
     else
       respond_to do |format|
@@ -35,7 +35,7 @@ class V1::CategoriesController < ApplicationController
     respond_to do |format|
       if @category.save
         format.xml  { render :xml => @category, :status => :created }
-        format.json  { render :json => success.merge(@category.success_json(["name","parent_id", "show_in_quick_links"]))  }
+        format.json  { render :json => success.merge(@category.success_json([:name,:parent_id, :show_in_quick_links]))  }
       else
         format.xml  { render :xml => @category.errors, :status => :unprocessable_entity }
         format.json  { render :json => { "errors"=> @category.all_errors}}
@@ -51,7 +51,7 @@ class V1::CategoriesController < ApplicationController
       respond_to do |format|
         if @category.update_attributes(params[:category])
           format.xml  { render :xml => @category, :status => :created}
-          format.json  { render :json => success.merge(@category.success_json(["_id","name","parent_id", "show_in_quick_links"]))}
+          format.json  { render :json => success.merge(@category.success_json([:_id,:name,:parent_id, :show_in_quick_links]))}
         else
           format.xml  { render :xml => @category.errors, :status => :unprocessable_entity }
           format.json  { render :json => { "errors"=> @category.all_errors}}

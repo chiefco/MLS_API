@@ -11,7 +11,7 @@ class Category
   #maps object to hash with supplied attributes
   def success_json(selected_fields=nil)
     unless selected_fields.blank?
-      response = self.attributes.select { |key,value| selected_fields.include?(key) }
+      response = self.attributes.select { |key,value| selected_fields.include?(key.to_sym) }
     end 
   end 
 

@@ -9,6 +9,7 @@ MeetlinkshareApi::Application.routes.draw do
     get "v1/users", :to=> "v1/registrations#index"
   end
   match "v1/item_topics/:id"=> 'v1/items#item_topics'
+  match "v1/category_subcategories/:id" => 'v1/categories#subcategories'
 
 
   # The priority is based upon order of creation:

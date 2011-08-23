@@ -10,6 +10,7 @@ MeetlinkshareApi::Application.routes.draw do
   end
   match "v1/item_topics/:id"=> 'v1/items#item_topics'
   match "v1/category_subcategories/:id" => 'v1/categories#subcategories'
+  match "v1/category_items/:id" => 'v1/categories#items'
 
 
   # The priority is based upon order of creation:

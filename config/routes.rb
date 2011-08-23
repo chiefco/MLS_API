@@ -1,5 +1,5 @@
 MeetlinkshareApi::Application.routes.draw do
-  VERSION1="v1"
+  API_VERSION1="v1"
   namespace :v1 do
     resources :topics, :template_categories, :templates, :items, :bookmarks, :categories
   end

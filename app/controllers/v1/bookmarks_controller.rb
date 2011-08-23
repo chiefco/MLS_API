@@ -19,8 +19,8 @@ class V1::BookmarksController < ApplicationController
           end
         end
         bookmarks<<{:id=>bookmark._id,:name=>bookmark.name}.merge(sample).to_json
-        format.json {render :json=>{:bookmarks=>bookmarks}} 
-        format.xml {render :xml=>{:bookmarks=>bookmarks}.to_xml(:root=>'xml')} 
+        format.json {render :json=>{:bookmarks=>bookmarks}.merge(success).merge({:count=>@v1_bookmarks.count})} 
+        format.xml {render :xml=>{:bookmarks=>bookmarks}.merge(success).merge({:count=>@v1_bookmarks.count}).to_xml(:root=>'xml')} 
       end
     end
   end
@@ -77,7 +77,7 @@ class V1::BookmarksController < ApplicationController
       if  @v1_bookmark
         if @v1_bookmark.update_attributes(params[:bookmark])
           format.xml  { render :xml => @v1_bookmark, :status => :created, :location => @v1_bookmark }
-          format.json  { render :json =>{:bookmark=>{:name=>@v1_bookmark.name,:show_in_quick_links=>@v1_bookmark.show_in_quick_links}} }
+          format.json  { render :json =>{:bookmark=>{:name=>@v1_bookmark.name}} }
         else
           format.xml  { render :xml => @v1_bookmark.errors}
           format.json  { render :json => @v1_bookmark.all_errors }
@@ -104,7 +104,7 @@ class V1::BookmarksController < ApplicationController
     end
   end
   
-  #Find the Bookmark by the param[:id]
+  #Find the Bookmark by param[:id]
   def find_bookmark
     @v1_bookmark = Bookmark.where(:_id=>params[:id]).first
   end

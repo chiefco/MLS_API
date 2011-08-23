@@ -20,7 +20,7 @@ class V1::CategoriesController < ApplicationController
     if @category
       respond_to do |format|
         format.xml  { render :xml => @category }
-        format.json  { render :json => success.merge(@category.success_json([:_id,:name,:parent_id,:show_in_quick_links])) }
+        format.json  { render :json => success.merge(object_to_hash(@category ,[:_id,:name,:parent_id,:show_in_quick_links])) }
       end
     else
       respond_to do |format|
@@ -38,7 +38,7 @@ class V1::CategoriesController < ApplicationController
     respond_to do |format|
       if @category.save
         format.xml  { render :xml => @category }
-        format.json  { render :json => success.merge(@category.success_json([:name,:parent_id, :show_in_quick_links]))  }
+        format.json  { render :json => success.merge(object_to_hash(@category,[:name,:parent_id, :show_in_quick_links]))  }
       else
         format.xml  { render :xml => @category.all_errors, :root=>"errors" }
         format.json  { render :json => { "errors"=> @category.all_errors}}
@@ -54,7 +54,7 @@ class V1::CategoriesController < ApplicationController
       respond_to do |format|
         if @category.update_attributes(params[:category])
           format.xml  { render :xml => @category }
-          format.json  { render :json => success.merge(@category.success_json([:_id,:name,:parent_id, :show_in_quick_links]))}
+          format.json  { render :json => success.merge(object_to_hash(@category,[:_id,:name,:parent_id, :show_in_quick_links]))}
         else
           format.xml  { render :xml => @category.all_errors , :root=>"errors"}
           format.json  { render :json => { "errors"=> @category.all_errors}}
@@ -89,7 +89,7 @@ class V1::CategoriesController < ApplicationController
   #List sub categories /category_subcategories/:id
   def subcategories
     @category= Category.where(:_id =>params[:id])
-    if @category
+    if @category.first
       @sub_categories = @category.first.children
       respond_to do |format| 
         format.json { render :json=> success.merge(subcategories_success) }
@@ -103,10 +103,30 @@ class V1::CategoriesController < ApplicationController
     end 
   end 
   
+  def items
+    @category= Category.where(:_id =>params[:id])
+    if @category.first
+      @items = @category.first.items
+      respond_to do |format| 
+        format.json { render :json=> success.merge(items_success) }
+        format.xml { render :xml=> success.merge(items_success).to_xml(:root=>'result') }
+      end 
+    else
+      respond_to do |format|
+        format.json { render :json=> failure.merge(INVALID_PARAMETER_ID) }
+        format.xml { render :xml=> failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'error') }
+      end
+    end 
+  end 
+  
   private 
   
   def subcategories_success
-    {:id => params[:id] , :count=>@sub_categories.count, "sub-categories" => @sub_categories }
+    {:id => params[:id] , :count=>@sub_categories.count, "sub-categories" => all_objects_to_hash(@sub_categories,[:_id,:name]) }
+  end 
+  
+  def items_success
+    {:id => params[:id] , :count=>@items.count, "items" => all_objects_to_hash(@items,[:_id,:name]) }
   end 
   
 end

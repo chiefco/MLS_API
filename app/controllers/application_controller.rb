@@ -40,4 +40,23 @@ class ApplicationController < ActionController::Base
   def current_user
     @current_user
   end
+  
+  #maps object to hash with supplied attributes
+  def object_to_hash(object,selected_fields=nil)
+    unless selected_fields.blank?
+      response = object.attributes.select { |key,value| selected_fields.include?(key.to_sym) }
+    end 
+  end 
+  
+  #maps object array to hash array with supplied attributes
+  def all_objects_to_hash(objects,selected_fields=nil)
+    response = []
+    unless selected_fields.blank? && objects.blank?
+      objects.each do |object|
+        response << object.attributes.select { |key,value| selected_fields.include?(key.to_sym) }
+      end 
+      response
+    end 
+  end 
+  
 end

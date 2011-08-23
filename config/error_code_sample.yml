@@ -17,13 +17,13 @@ Missing Parameter:
   2010: location_id - Required parameter missing
   2011: template_id - Required parameter missing
   2012: item_id - Required parameter missing
-  2013:  description - Required parameter missing
+  2013: description - Required parameter missing
   2014: topi_name - Required parameter missing
-  2015:activity_type - Required parameter missing
+  2015: activity_type - Required parameter missing
   2016: activity_id - Required parameter missing
   2017: task_id - Required parameter missing
-  2018:time - Required parameter missing
-  2019:  bookmarkable_id - Required parameter missing
+  2018: time - Required parameter missing
+  2019: bookmarkable_id - Required parameter missing
   2020: bookmarkable_type - Required parameter missing
   2021: bookmark_id - Required parameter missing
   2022: position - Required parameter missing
@@ -118,6 +118,4 @@ Upload Error:
   6005: File size too large
 Conditions Failed:
   7001: Conditions not satisfied
-  
-  
   name : name-already exist

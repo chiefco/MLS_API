@@ -15,6 +15,7 @@ end
 
 module Mongoid #:nodoc:
   module Document
+  mattr_accessor :id
     def all_errors
       self.errors.values.flatten
     end
@@ -28,8 +29,8 @@ module Mongoid #:nodoc:
       attrs
     end
     
-    def to_xml(options={})
-      attrs = super(options)
+    def id
+      {:id=>self._id}
     end
   end
 end

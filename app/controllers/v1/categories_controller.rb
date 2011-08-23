@@ -122,11 +122,11 @@ class V1::CategoriesController < ApplicationController
   private 
   
   def subcategories_success
-    {:id => params[:id] , :count=>@sub_categories.count, "sub-categories" => all_objects_to_hash(@sub_categories,[:_id,:name]) }
+    {:id => params[:id] , :count=>@sub_categories.count, "sub-categories" => all_objects_to_hash(@sub_categories,[:_id,:name],{:_id=>:category_id}) }
   end 
   
   def items_success
-    {:id => params[:id] , :count=>@items.count, "items" => all_objects_to_hash(@items,[:_id,:name]) }
+    {:id => params[:id] , :count=>@items.count, "items" => all_objects_to_hash(@items,[:_id,:name],{:_id=>:item_id}) }
   end 
   
 end

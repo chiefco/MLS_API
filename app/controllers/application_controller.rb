@@ -41,21 +41,30 @@ class ApplicationController < ActionController::Base
     @current_user
   end
   
-  #maps object to hash with supplied attributes
-  def object_to_hash(object,selected_fields=nil)
+  #maps single object to hash with supplied attributes,attributes rename options
+  def object_to_hash(object,selected_fields=nil,rename={})
     unless selected_fields.blank?
       response = object.attributes.select { |key,value| selected_fields.include?(key.to_sym) }
+      return response if rename.blank?
+      rename.each do |key,value|
+        response[value.to_s] = response.delete(key.to_s) if response.has_key?(key.to_s)
+      end 
     end 
   end 
   
-  #maps object array to hash array with supplied attributes
-  def all_objects_to_hash(objects,selected_fields=nil)
-    response = []
+  #maps object array to hash array with supplied attributes,attributes rename options
+  def all_objects_to_hash(objects,selected_fields=nil,rename={})
+    responses = []
     unless selected_fields.blank? && objects.blank?
       objects.each do |object|
-        response << object.attributes.select { |key,value| selected_fields.include?(key.to_sym) }
+        responses << object.attributes.select { |key,value| selected_fields.include?(key.to_sym) }
       end 
-      response
+      return responses if rename.blank?
+      responses.each do |response|
+        rename.each do |key,value|
+            response[value.to_s] = response.delete(key.to_s) if response.has_key?(key.to_s)
+        end 
+      end 
     end 
   end 
   

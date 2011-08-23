@@ -18,6 +18,19 @@ module Mongoid #:nodoc:
     def all_errors
       self.errors.values.flatten
     end
+    
+    def as_json(options={})
+      attrs = super(options)
+      if attrs.has_key?("_id")
+        attrs["id"]=attrs["_id"]
+        attrs.delete("_id")
+      end
+      attrs
+    end
+    
+    def to_xml(options={})
+      attrs = super(options)
+    end
   end
 end
 
@@ -26,6 +39,14 @@ class Hash
     symbolize_keys!
     values.select{ | v | v.is_a?( Hash ) }.each{ | h | h.recursive_symbolize_keys! }
     self
+  end
+  
+  def to_success
+    {:response=>:success}.merge(self)
+  end
+  
+  def to_failure
+    {:response=>:failure}.merge(self)
   end
 end
 

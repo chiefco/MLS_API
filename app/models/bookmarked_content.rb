@@ -7,4 +7,7 @@ class BookmarkedContent
   field :position,:type=>String
   field :show_in_quick_links,:type =>Boolean
   referenced_in :bookmark
-end
+  #~ belongs_to :bookmarkable,:polymorphic=>true
+    belongs_to :bookmarkable, polymorphic: true
+    end
+

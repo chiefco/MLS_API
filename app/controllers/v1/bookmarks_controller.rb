@@ -1,35 +1,50 @@
 class V1::BookmarksController < ApplicationController
+  before_filter :authenticate_request!
+  before_filter :find_bookmark,:only=>([:update,:show,:destroy])
   # GET /v1/bookmarks
   # GET /v1/bookmarks.xml
   def index
     @v1_bookmarks = Bookmark.all
+    bookmarks=[]
     respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render :xml => @v1_bookmarks }
-      format.json  { render :json => @v1_bookmarks }
+      @v1_bookmarks.each do |bookmark|
+        sample={}
+        item=[]
+        bookmark.bookmarked_contents.each do |content|
+          if content.bookmarkable_type=="Item"
+            @item=Item.where(:_id=> content.bookmarkable_id).first
+            bookmark_v1={:name=>@item.name,:id=>@item._id,:location=>(@item.location.nil? ? "nil" : @item.location.name)} if @item
+            item<<bookmark_v1
+            sample=sample.merge({:items=>item.compact.to_json}) if sample.is_a?(Hash) 
+          end
+        end
+        bookmarks<<{:id=>bookmark._id,:name=>bookmark.name}.merge(sample).to_json
+        format.json {render :json=>{:bookmarks=>bookmarks}} 
+        format.xml {render :xml=>{:bookmarks=>bookmarks}.to_xml(:root=>'xml')} 
+      end
     end
   end
 
   # GET /v1/bookmarks/1
   # GET /v1/bookmarks/1.xml
   def show
-    @v1_bookmark = Bookmark.where(:_id=>params[:id]).first
-    item=attachments=[]
+    item=[]
+    attachments=[]
     sample={}
     respond_to do |format|
       if  @v1_bookmark
         bookmarks={:bookmark=>{:name=>@v1_bookmark.name,:id=>@v1_bookmark._id}}
         @v1_bookmark.bookmarked_contents.each do |bookmark|
-          if bookmark.bookmarkable_type=="item"
+          if bookmark.bookmarkable_type=="Item"
             @item=Item.where(:_id=> bookmark.bookmarkable_id).first
-            bookmark_v1={:name=>@item.name,:id=>@item._id,:location=>(@item.location.nil? ? "nil" : @item.location.name)}
+            bookmark_v1={:name=>@item.name,:id=>@item._id,:location=>(@item.location.nil? ? "nil" : @item.location.name)} if @item
             item<<bookmark_v1
             sample=sample.merge({:items=>item.to_json}) if sample.is_a?(Hash)
-          elsif bookmark.bookmarkable_type=="item1"
-            @item=Item.where(:_id=> bookmark.bookmarkable_id).first
-            bookmark_v2={:name=>@item.name,:id=>@item._id,:location=>(@item.location.nil? ? "nil" : @item.location.name)}
-            attachments<<bookmark_v2
-            sample=sample.merge({:attachments=>attachments.to_json}) if sample.is_a?(Hash)
+            #~ elsif bookmark.bookmarkable_type=="item1"
+            #~ @item=Item.where(:_id=> bookmark.bookmarkable_id).first
+            #~ bookmark_v2={:name=>@item.name,:id=>@item._id,:location=>(@item.location.nil? ? "nil" : @item.location.name)}    if @item
+            #~ attachments<<bookmark_v2
+            #~ sample=sample.merge({:attachments=>attachments.to_json}) if sample.is_a?(Hash)
           end
         end
         format.json {render :json=>sample.merge(bookmarks).merge(success)}
@@ -58,7 +73,6 @@ class V1::BookmarksController < ApplicationController
   # PUT /v1/bookmarks/1
   # PUT /v1/bookmarks/1.xml
   def update
-    @v1_bookmark = Bookmark.where(:_id=>params[:id]).first
     respond_to do |format|
       if  @v1_bookmark
         if @v1_bookmark.update_attributes(params[:bookmark])
@@ -78,7 +92,6 @@ class V1::BookmarksController < ApplicationController
   # DELETE /v1/bookmarks/1
   # DELETE /v1/bookmarks/1.xml
   def destroy
-    @v1_bookmark = Bookmark.where(:_id=>params[:id]).first
      respond_to do |format|
       if  @v1_bookmark
         @v1_bookmark.destroy
@@ -91,4 +104,8 @@ class V1::BookmarksController < ApplicationController
     end
   end
   
+  #Find the Bookmark by the param[:id]
+  def find_bookmark
+    @v1_bookmark = Bookmark.where(:_id=>params[:id]).first
+  end
 end

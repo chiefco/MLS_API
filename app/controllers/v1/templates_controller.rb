@@ -1,10 +1,11 @@
 class V1::TemplatesController < ApplicationController
   before_filter :find_template,:only=>[:update,:destroy,:show]
+  FOR_XML={:methods=>:id,:except=>:_id,:root=>:result}
   def index
     @templates = Template.all
     value={:count=>@templates.size,:templates=>@templates}.to_success
     respond_to do |format|
-      format.xml  { render :xml => value.to_xml(:root=>:result)}
+      format.xml  { render :xml => value.to_xml(FOR_XML)}
       format.json  { render :json =>value}
     end
   end
@@ -12,7 +13,7 @@ class V1::TemplatesController < ApplicationController
   def show
     value={:template=>@template}.to_success
     respond_to do |format|
-      format.xml  { render :xml => value.to_xml(:root=>:result) }
+      format.xml  { render :xml => value.to_xml(FOR_XML) }
       format.json  { render :json =>value.to_json}
     end
   end
@@ -22,10 +23,10 @@ class V1::TemplatesController < ApplicationController
     respond_to do |format|
       if @template.save
         value={:template=>@template}.to_success
-        format.xml  { render :xml => value.to_xml(:root=>:result) }
-        format.json  { render :json =>value}
+        format.xml { render :xml => value.to_xml(FOR_XML) }
+        format.json { render :json =>value}
       else
-        format.xml  { render :xml => @template.all_errors.to_xml(:root=>"errors") }
+        format.xml { render :xml => @template.all_errors.to_xml(:root=>"errors") }
         format.json { render :json=>  {"errors"=>@template.all_errors }.merge(failure)}
       end
     end
@@ -35,10 +36,10 @@ class V1::TemplatesController < ApplicationController
     respond_to do |format|
       if @template.update_attributes(params[:template])
         value={:template=>@template}.to_success
-        format.xml  { render :xml => @template, :status => :created, :location => @template }
-        format.json { render :json=> {"template" => { "id"=>@template.id,"name" => @template.name, "description" => @template.description}}.merge(success)}
+        format.xml { render :xml => value.to_xml(FOR_XML) }
+        format.json { render :json =>value}
       else
-        format.xml  { render :xml => @template.all_errors.to_xml(:root=>"errors") }
+        format.xml { render :xml => @template.all_errors.to_xml(:root=>"errors") }
         format.json { render :json=>  {"errors"=>@template.all_errors }.merge(failure)}
       end
     end

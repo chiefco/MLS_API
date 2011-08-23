@@ -1,6 +1,7 @@
 class V1::CategoriesController < ApplicationController
   
   before_filter :authenticate_request!
+  before_filter :find_resource, :except=>[:index, :create]
   #before_filter :authenticate_user!
   # GET /v1/categories
   # GET /v1/categories.xml
@@ -16,7 +17,6 @@ class V1::CategoriesController < ApplicationController
   # GET /v1/categories/1
   # GET /v1/categories/1.xml
   def show
-    @category = Category.where(:_id=>params[:id]).first
     if @category
       respond_to do |format|
         format.xml  { render :xml => @category }
@@ -33,8 +33,9 @@ class V1::CategoriesController < ApplicationController
   # POST /v1/categories
   # POST /v1/categories.xml
   def create
+    params[:category][:user_id] = @current_user.id 
     @category = Category.new(params[:category])
-
+    
     respond_to do |format|
       if @category.save
         format.xml  { render :xml => @category }
@@ -49,7 +50,6 @@ class V1::CategoriesController < ApplicationController
   # PUT /v1/categories/1
   # PUT /v1/categories/1.xml
   def update
-    @category = Category.where(:_id=>params[:id]).first
     if @category
       respond_to do |format|
         if @category.update_attributes(params[:category])
@@ -71,7 +71,6 @@ class V1::CategoriesController < ApplicationController
   # DELETE /v1/categories/1
   # DELETE /v1/categories/1.xml
   def destroy
-    @category = Category.where(:_id=>params[:id]).first
     if @category
       @category.destroy
       respond_to do |format|
@@ -88,9 +87,8 @@ class V1::CategoriesController < ApplicationController
   
   #List sub categories /category_subcategories/:id
   def subcategories
-    @category= Category.where(:_id =>params[:id])
-    if @category.first
-      @sub_categories = @category.first.children
+    if @category
+      @sub_categories = @category.children
       respond_to do |format| 
         format.json { render :json=> success.merge(subcategories_success) }
         format.xml { render :xml=> success.merge(subcategories_success).to_xml(:root=>'result') }
@@ -104,9 +102,8 @@ class V1::CategoriesController < ApplicationController
   end 
   
   def items
-    @category= Category.where(:_id =>params[:id])
-    if @category.first
-      @items = @category.first.items
+    if @category
+      @items = @category.items
       respond_to do |format| 
         format.json { render :json=> success.merge(items_success) }
         format.xml { render :xml=> success.merge(items_success).to_xml(:root=>'result') }
@@ -127,6 +124,10 @@ class V1::CategoriesController < ApplicationController
   
   def items_success
     {:id => params[:id] , :count=>@items.count, "items" => all_objects_to_hash(@items,[:_id,:name],{:_id=>:item_id}) }
+  end 
+  
+  def find_resource
+    @category= Category.where(:_id =>params[:id]).first
   end 
   
 end

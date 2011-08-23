@@ -10,11 +10,11 @@ class ApplicationController < ActionController::Base
   #~ protect_from_forgery
   
   def authenticate_request!
-    current_user=User.valid_user?(params[:access_token]) if params[:access_token]
+    @current_user=User.valid_user?(params[:access_token]) if params[:access_token]
     respond_to do |format|
       format.json{render :json=>UNAUTHORIZED}
       format.xml{render :xml=>UNAUTHORIZED,:root=>:error}
-    end and return unless current_user
+    end and return unless @current_user
   end  
   
   def success

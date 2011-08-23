@@ -20,7 +20,13 @@ class Item
   belongs_to  :template
   belongs_to  :location
   references_many :topics,:dependent => :destroy
+<<<<<<< HEAD
   references_and_referenced_in_many :categories, :autosave=>true
+=======
+  #~ has_many :bookmarked_contents,:as=>:bookmarkable
+  has_many :bookmarked_contents, as: :bookmarkable
+  referenced_in :user
+>>>>>>> 3ce95d35471fceae2c4b4d6fb41674b2cd584726
   referenced_in :template
 
   def template_fields

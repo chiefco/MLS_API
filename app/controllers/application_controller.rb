@@ -5,6 +5,8 @@ class ApplicationController < ActionController::Base
   UNAUTHORIZED={:code=>1004,:message=>"Authentication/Authorization Failed"}
   INVALID_PARAMETER_ID={:code=>3065,:message=>"id -Invalid Parameter"}
   USER_COLUMN=[:status,:remember_token,:remember_created_at,:created_at,:updated_at]
+  PAGE_SIZE=10
+  PAGE=1
   #~ protect_from_forgery
   
   def authenticate_request!
@@ -16,43 +18,24 @@ class ApplicationController < ActionController::Base
   end  
   
   def success
-    @success={"response" => "success"}
+    {:response=>:success}
   end
 
   def failure
-    @failure={"response" => "failure"}
-  end
-  
-  def suc
-    {:response=>:success}
-  end
-  
-  def fail
     {:response=>:failure}
   end
-  
+    
   def clear_session
     session.clear
   end
+  
   def set_page_size
-    if params[:page_size]
-      params[:page_size]
-    else
-      10
-    end 
+    params[:page_size] ? params[:page_size] : PAGE_SIZE
   end 
 
   def set_page
-    if params[:page]
-      params[:page]
-    else
-      1
-    end 
+    params[:page] ? params[:page] : PAGE
   end 
-  #invalid parameter
-  def invalid_parameter_id
-    {:code=>"3065",:message=>"id -Invalid Parameter"}
-  end
   
   def current_user
     @current_user

@@ -1,12 +1,18 @@
 class  V1::TopicsController < ApplicationController
-
+  before_filter :authenticate_request!
+  before_filter :find_topic,:only=>([:update,:show,:destroy])
   # GET /topics/1
   # GET /topics/1.xml
   def show
-    @topic = Topic.find(params[:id])
     respond_to do |format|
-      format.xml  { render :xml => @topic }
-      format.json  { render :json => {:topic=>@topic.to_json(:only=>[:name,:_id,:status],:methods=>:get_item)}.merge(success) }
+      if @topic
+        format.xml  { render :xml => @topic }
+        item=:get_item
+        format.json  { render :json => {:topic=>@topic.to_json(:only=>[:name,:_id,:status],:methods=>item)}.merge(success) }
+      else
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
     end
   end
 
@@ -16,8 +22,8 @@ class  V1::TopicsController < ApplicationController
     @topic = Topic.new(params[:topic])
     respond_to do |format|
       if @topic.save
-        format.xml  { render :xml => @topic, :status => :created, :location => @topic }
-        format.json  { render :json => @topic }
+        format.xml  { render :xml => @topic}
+        format.json  { render :json => {:topic=>@topic.to_json(:only=>[:name,:status,:item_id,:_id]) }.merge(success) }
       else
         format.xml  { render :xml => @topic.errors, :status => :unprocessable_entity }
         format.json  { render :json => {"errors"=>@topic.all_errors }}
@@ -28,14 +34,18 @@ class  V1::TopicsController < ApplicationController
   # PUT /topics/1
   # PUT /topics/1.xml
   def update
-    @topic = Topic.find(params[:id])
     respond_to do |format|
-      if @topic.update_attributes(params[:topic])
-        format.xml  { render :xml => @topic, :status => :created, :location=>@topic }
-        format.json  { render :json => @topic }    
+      if @topic
+        if @topic.update_attributes(params[:topic])
+          format.xml  { render :xml => @topic }
+          format.json  { render :json => {:topic=>@topic.to_json(:only=>[:name,:status,:item_id,:_id]) }.merge(success)}    
+        else
+          format.xml  { render :xml => @topic.errors.to_xml(:root=>'xml')}
+          format.json  { render :json => {"errors"=>@topic.all_errors }.merge(failure)}
+        end
       else
-        format.xml  { render :xml => @topic.errors, :status => :unprocessable_entity }
-        format.json  { render :json => {"errors"=>@topic.all_errors }}
+      format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
+      format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
   end
@@ -43,12 +53,20 @@ class  V1::TopicsController < ApplicationController
   # DELETE /topics/1
   # DELETE /topics/1.xml
   def destroy
-    @topic = Topic.find(params[:id])
-    @topic.destroy
-    respond_to do |format|
-      format.xml  { head :ok }
-      format.xml  { render :xml => success.to_xml(:root=>'xml') }
-      format.json  { render :json=> success}
+   respond_to do |format|
+      if @topic
+         @topic.destroy
+         format.xml  { render :xml => success.to_xml(:root=>'xml') }
+         format.json  { render :json=> success}
+      else
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
     end
+  end
+  
+   #Find the Topic by param[:id]
+  def find_topic
+    @topic = Topic.where(:_id=>params[:id]).first
   end
 end

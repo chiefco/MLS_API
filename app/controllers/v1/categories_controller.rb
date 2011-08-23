@@ -85,4 +85,28 @@ class V1::CategoriesController < ApplicationController
       end
     end
   end
+  
+  #List sub categories /category_subcategories/:id
+  def subcategories
+    @category= Category.where(:_id =>params[:id])
+    if @category
+      @sub_categories = @category.first.children
+      respond_to do |format| 
+        format.json { render :json=> success.merge(subcategories_success) }
+        format.xml { render :xml=> success.merge(subcategories_success).to_xml(:root=>'result') }
+      end 
+    else
+      respond_to do |format|
+        format.json { render :json=> failure.merge(INVALID_PARAMETER_ID) }
+        format.xml { render :xml=> failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'error') }
+      end
+    end 
+  end 
+  
+  private 
+  
+  def subcategories_success
+    {:id => params[:id] , :count=>@sub_categories.count, "sub-categories" => @sub_categories }
+  end 
+  
 end

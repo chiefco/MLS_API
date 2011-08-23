@@ -14,18 +14,25 @@ class V1::BookmarksController < ApplicationController
   # GET /v1/bookmarks/1.xml
   def show
     @v1_bookmark = Bookmark.where(:_id=>params[:id]).first
+    item=attachments=[]
+    sample={}
     respond_to do |format|
       if  @v1_bookmark
-        bookmark_v1={:bookmark=>{:name=>@v1_bookmark.name,:id=>@v1_bookmark._id}}
+        bookmarks={:bookmark=>{:name=>@v1_bookmark.name,:id=>@v1_bookmark._id}}
         @v1_bookmark.bookmarked_contents.each do |bookmark|
           if bookmark.bookmarkable_type=="item"
-           @item=Item.where(:_id=> bookmark.bookmarkable_id).first
-           bookmark_v1={:item=>{:name=>@item.name,:id=>@item._id,:location=>(@item.location.nil? ? "nil" : @item.location.name)}}.merge(bookmark_v1)
+            @item=Item.where(:_id=> bookmark.bookmarkable_id).first
+            bookmark_v1={:name=>@item.name,:id=>@item._id,:location=>(@item.location.nil? ? "nil" : @item.location.name)}
+            item<<bookmark_v1
+            sample=sample.merge({:items=>item.to_json}) if sample.is_a?(Hash)
+          elsif bookmark.bookmarkable_type=="item1"
+            @item=Item.where(:_id=> bookmark.bookmarkable_id).first
+            bookmark_v2={:name=>@item.name,:id=>@item._id,:location=>(@item.location.nil? ? "nil" : @item.location.name)}
+            attachments<<bookmark_v2
+            sample=sample.merge({:attachments=>attachments.to_json}) if sample.is_a?(Hash)
           end
         end
-        #~ format.json {render=>{bookmark_v1}.to_json}
-        #~ format.xml  { render :xml => @v1_bookmark }
-        #~ format.json  { render :xml => @v1_bookmark }
+        format.json {render :json=>sample.merge(bookmarks).merge(success)}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}

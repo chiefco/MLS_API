@@ -17,6 +17,8 @@ class Item
   belongs_to  :template
   belongs_to  :location
   references_many :topics,:dependent => :destroy
+  #~ has_many :bookmarked_contents,:as=>:bookmarkable
+  has_many :bookmarked_contents, as: :bookmarkable
   referenced_in :user
   referenced_in :template
   validates_presence_of :name,:message=>'name - Required parameter missing',:code=>2009

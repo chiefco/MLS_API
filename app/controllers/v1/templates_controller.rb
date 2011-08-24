@@ -11,7 +11,7 @@ class V1::TemplatesController < ApplicationController
   end
   
   def show
-    value={:template=>@template}.to_success
+    value={:template=>@template,:template_definitions=>@template.template_definitions.attributes}.to_success
     respond_to do |format|
       format.xml  { render :xml => value.to_xml(FOR_XML) }
       format.json  { render :json =>value.to_json}

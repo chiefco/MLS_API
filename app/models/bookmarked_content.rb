@@ -9,5 +9,5 @@ class BookmarkedContent
   referenced_in :bookmark
   #~ belongs_to :bookmarkable,:polymorphic=>true
     belongs_to :bookmarkable, polymorphic: true
-    end
+end
 

@@ -10,12 +10,16 @@ class ApplicationController < ActionController::Base
   #~ protect_from_forgery
   
   def authenticate_request!
-    current_user=User.valid_user?(params[:access_token]) if params[:access_token]
+    @current_user=User.valid_user?(params[:access_token]) if params[:access_token]
     respond_to do |format|
       format.json{render :json=>UNAUTHORIZED}
       format.xml{render :xml=>UNAUTHORIZED,:root=>:error}
-    end and return unless current_user
+    end and return unless @current_user
   end  
+  
+  def current_user
+    @current_user=User.valid_user?(params[:access_token]) if params[:access_token]
+  end
   
   def success
     {:response=>:success}
@@ -36,10 +40,6 @@ class ApplicationController < ActionController::Base
   def set_page
     params[:page] ? params[:page] : PAGE
   end 
-  
-  def current_user
-    @current_user
-  end
   
   #maps object to hash with supplied attributes
   def object_to_hash(object,selected_fields=nil)

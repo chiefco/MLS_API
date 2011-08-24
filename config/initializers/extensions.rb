@@ -51,6 +51,14 @@ class Hash
   end
 end
 
+class Array
+  def attributes
+    self.collect! do |record|
+      record=record.attributes if record.kind_of?(Mongoid::Document)
+    end
+  end
+end
+
 class String
   def decode_credentials
     Base64.decode64(self).split #decodes the credentials as [email,password]

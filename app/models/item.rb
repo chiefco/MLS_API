@@ -25,7 +25,7 @@ class Item
   #~ has_many :bookmarked_contents,:as=>:bookmarkable
   has_many :bookmarked_contents, as: :bookmarkable
   referenced_in :user
-  references_and_referenced_in_many :categories, :autosave=>true
+  references_and_referenced_in_many :categories
   referenced_in :template
 
   def template_fields

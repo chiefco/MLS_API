@@ -7,6 +7,9 @@ class User
   # Include default devise modules. Others available are:i
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
   references_many :items
+  references_many :categories
+  has_many :attachments, as: :attachable
+  
   devise :confirmable, :database_authenticatable, :registerable, :recoverable, :rememberable, :token_authenticatable, :trackable
 
   validates_presence_of :first_name, :message=>"first_name - Blank Parameter", :code=>2041
@@ -26,7 +29,7 @@ class User
   field :company, :type=> String
   field :business_unit, :type=> String
   field :status, :type=> Boolean,:default=>true
-
+  
   api_accessible :user_with_out_token do |template|
     template.add :email
     template.add :first_name

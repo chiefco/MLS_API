@@ -11,4 +11,6 @@ class TemplateDefinition
   has_one :custom_page
   #~ references_one :custom_page
   #~ embedded_in :template
+  default_scope :without=>[:created_at,:updated_at,:template_id,:_id]
+
 end

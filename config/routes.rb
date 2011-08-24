@@ -2,7 +2,7 @@ MeetlinkshareApi::Application.routes.draw do
 
   API_VERSION1="v1"
   namespace :v1 do
-    resources :topics, :template_categories, :templates, :items, :bookmarks, :categories,:custom_pages
+    resources :topics, :template_categories, :templates, :items, :bookmarks, :categories,:custom_pages,:searches
   end
   devise_for 'v1/users', :controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
     post "v1/forgot_password", :to => "v1/passwords#create"

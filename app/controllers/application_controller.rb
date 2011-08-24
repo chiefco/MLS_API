@@ -16,11 +16,7 @@ class ApplicationController < ActionController::Base
       format.xml{render :xml=>UNAUTHORIZED,:root=>:error}
     end and return unless @current_user
   end  
-  
-  def current_user
-    @current_user=User.valid_user?(params[:access_token]) if params[:access_token]
-  end
-  
+    
   def success
     {:response=>:success}
   end
@@ -41,17 +37,9 @@ class ApplicationController < ActionController::Base
     params[:page] ? params[:page] : PAGE
   end 
   
-<<<<<<< HEAD:app/controllers/application_controller.rb
-  #maps object to hash with supplied attributes
-  def object_to_hash(object,selected_fields=nil)
-=======
-  def current_user
-    @current_user
-  end
-  
+ 
   #maps single object to hash with supplied attributes,attributes rename options
   def object_to_hash(object,selected_fields=nil,rename={})
->>>>>>> 1aff96f22165b72fdebfc04b9f3f15ddca96ef18:app/controllers/application_controller.rb
     unless selected_fields.blank?
       response = object.attributes.select { |key,value| selected_fields.include?(key.to_sym) }
       return response if rename.blank?

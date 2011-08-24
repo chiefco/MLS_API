@@ -1,7 +1,8 @@
 MeetlinkshareApi::Application.routes.draw do
+
   API_VERSION1="v1"
   namespace :v1 do
-    resources :topics, :template_categories, :templates, :items, :bookmarks, :categories
+    resources :topics, :template_categories, :templates, :items, :bookmarks, :categories,:custom_pages
   end
   devise_for 'v1/users', :controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
     post "v1/forgot_password", :to => "v1/passwords#create"
@@ -12,6 +13,12 @@ MeetlinkshareApi::Application.routes.draw do
   match "v1/category_subcategories/:id" => 'v1/categories#subcategories'
   match "v1/category_items/:id" => 'v1/categories#items'
   match "v1/item_categories/:id" => 'v1/items#item_categories'
+  match "v1/item_add_category" => 'v1/items#item_add_category'
+  match "v1/item_add_attendees" => 'v1/items#item_add_attendees'
+  match "v1/item_remove_attendees/:attendee_id" => 'v1/items#item_remove_attendees'
+  match "v1/custom_page_fields" => 'v1/custom_pages#custom_page_fields'
+  match "v1/custom_page_fields/:id" => 'v1/custom_pages#custom_page_fields',:via=>:put
+  match "v1/custom_page_fields/:id" => 'v1/custom_pages#custom_page_fields_remove',:via=>:delete
 
 
   # The priority is based upon order of creation:

@@ -19,7 +19,7 @@ Missing Parameter:
   2012: item_id - Required parameter missing
   2013: description - Required parameter missing
   2014: topi_name - Required parameter missing
-  2015: activity_type - Required parameter missing
+  2015: activity_cv  - Required parameter missing
   2016: activity_id - Required parameter missing
   2017: task_id - Required parameter missing
   2018: time - Required parameter missing
@@ -103,6 +103,9 @@ Invalid Parameter:
   3064: Not defined in template
   3065: id - Invalid Parameter
   3066: password - Blank Parameter
+  3067: field_name - Blank Parameter
+  3068: field_type - Blank Parameter
+  3069: custom_page_id - Blank Parameter
 Format Error:
   4001: email - Invalid email format
   4002: due_date - Invalid date format

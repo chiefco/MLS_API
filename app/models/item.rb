@@ -16,10 +16,12 @@ class Item
   validates_presence_of :template_id,:message=>'template_id - Blank Parameter',:code=>3025
   validates_presence_of :name,:message=>'name - Required parameter missing',:code=>2009
   validates_presence_of :template_id,:message=>'template_id - Required parameter missing',:code=>2011
+  validates_uniqueness_of :category_ids
   
   belongs_to  :template
   belongs_to  :location
   references_many :topics,:dependent => :destroy
+  references_many :attendees,:dependent => :destroy
   #~ has_many :bookmarked_contents,:as=>:bookmarkable
   has_many :bookmarked_contents, as: :bookmarkable
   referenced_in :user
@@ -43,6 +45,6 @@ class Item
   end
   
   def location_name
-    self.location.nil? ? "nil" : self.location.name
+    location=self.location.nil? ? "nil" : self.location.name
   end
 end

@@ -1,5 +1,6 @@
 class V1::ItemsController < ApplicationController
   before_filter :authenticate_request!
+  before_filter :get_item,:only=>([:update,:show,:item_categories,:destroy,:item_topics])
   respond_to :html, :xml, :json
   # GET /items
   # GET /items.xml
@@ -17,14 +18,13 @@ class V1::ItemsController < ApplicationController
     #~ @items = Item.paginate(conditions: {page: params[:page], per_page:params[:size]})
     respond_to do |format|
       format.xml  { render :xml => @items}
-      format.json {render :json =>{:items=>@items,:count=>@items.size}.merge(success)}
+      format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>:location_name),:count=>@items.size}.merge(success)}
     end
   end
 
   # GET /items/1
   # GET /items/1.xml
   def show
-    @item = Item.find(params[:id])
     respond_to do |format|
       format.xml  { render :xml => @item }
       format.json  { render :json =>{"item"=>{:item_id=>@item.id,:item_name=>@item.name,:location=>(@item.location.nil? ? "nil" : @item.location.name),:description=>@item.description,:current_category_name=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id).name),:created_at=>@item.created_at,:updated_at=>@item.updated_at}}.merge(success) }
@@ -51,7 +51,6 @@ class V1::ItemsController < ApplicationController
   # PUT /items/1
   # PUT /items/1.xml
   def update
-    @item = Item.find(params[:id])
     respond_to do |format|
       if @item.update_attributes(params[:item])
         if params[:item][:location]
@@ -69,7 +68,6 @@ class V1::ItemsController < ApplicationController
   # DELETE /items/1
   # DELETE /items/1.xml
   def destroy
-    @item = Item.find(params[:id])
     @item.destroy
     respond_to do |format|
       format.xml  { head :ok }
@@ -79,15 +77,29 @@ class V1::ItemsController < ApplicationController
   end
   
   def  item_topics
-    @item = Item.find(params[:id])
     @topics=@item.topics(:fields=>[:name,:_id])
     respond_to do |format| 
       format.json {render :json=>{:item=>@topics.to_a.to_json(:only=>[:name,:_id,:status]),:count=>@item.topics.count}.merge(success)}
  #~ format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>:location_name),:count=>@items.size}.merge(success)}
     end
   end
+  
+  def item_categories
+    categories=[]
+    respond_to do |format|
+      if @item
+        @item.categories.each do |category|
+          categories<<{:name=>category.name,:id=>category._id,:parent_id=>category.parent_id}
+        end
+        format.json{render :json=>{:item_categories=>categories}.merge(success)}
+      end
+    end
+  end
     
   def get_criteria(query)
     [ {name: query} , { description: query } ]
   end 
+  def get_item
+    @item=Item.where(:_id =>params[:id]).first
+  end
 end

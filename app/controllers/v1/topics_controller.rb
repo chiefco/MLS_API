@@ -6,9 +6,8 @@ class  V1::TopicsController < ApplicationController
   def show
     respond_to do |format|
       if @topic
-        format.xml  { render :xml => @topic }
-        item=:get_item
-        format.json  { render :json => {:topic=>@topic.to_json(:only=>[:name,:_id,:status],:methods=>item)}.merge(success) }
+        format.json  { render :json => {:topic=>@topic.to_json(:only=>[:name,:_id,:status],:methods=>:get_item)}.merge(success) }
+        format.xml  { render :xml => {:topic=>@topic.to_xml(:only=>[:name,:_id,:status],:methods=>item)} }
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
@@ -67,6 +66,6 @@ class  V1::TopicsController < ApplicationController
   
    #Find the Topic by param[:id]
   def find_topic
-    @topic = Topic.where(:_id=>params[:id]).first
+    @topic = Topic.find(params[:id])
   end
 end

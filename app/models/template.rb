@@ -10,5 +10,7 @@ class Template
   #~ embeds_many :template_definitions
   #~ recursively_embeds_many :template_definitions
   references_many :template_definitions, :dependent => :destroy
+  references_many :template_categories, :dependent => :destroy
   has_one :item
+  default_scope :without=>[:created_at,:updated_at,:template_category_id]
 end

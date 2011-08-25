@@ -3,7 +3,7 @@ class Category
   include Mongoid::Timestamps
   include Mongoid::Acts::Tree
   field :name,:type=>String
-  field :show_in_quick_links,:type=>Boolean
+  field :show_in_quick_links,:type=>Boolean,:default=>false
   field :parent_id, :type=>String
   field :user_id, :type=>String 
   acts_as_tree

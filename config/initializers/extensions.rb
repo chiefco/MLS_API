@@ -17,7 +17,7 @@ module Mongoid #:nodoc:
   module Document
   mattr_accessor :id
     def all_errors
-      self.errors.values.flatten
+      {:response=>:failure,:errors=>self.errors.values.flatten}
     end
     
     def as_json(options={})
@@ -32,10 +32,14 @@ module Mongoid #:nodoc:
     def id
       {:id=>self._id}
     end
+    
+    #~ def to_xml(options={})
+      #~ super({:root=>:result}.merge(options))
+    #~ end
   end
 end
 
-class Hash
+class Hash 
   def recursive_symbolize_keys!
     symbolize_keys!
     values.select{ | v | v.is_a?( Hash ) }.each{ | h | h.recursive_symbolize_keys! }
@@ -88,4 +92,3 @@ module ForDevise
     SecureRandom.base64(count).tr('+/=', 'xyz')
   end
 end
- 

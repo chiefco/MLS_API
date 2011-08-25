@@ -49,6 +49,7 @@ class ApplicationController < ActionController::Base
       rename.each do |key,value|
         response[value.to_s] = response.delete(key.to_s) if response.has_key?(key.to_s)
       end 
+      response
     end 
   end 
   
@@ -65,6 +66,7 @@ class ApplicationController < ActionController::Base
             response[value.to_s] = response.delete(key.to_s) if response.has_key?(key.to_s)
         end 
       end 
+      responses
     end 
   end 
   

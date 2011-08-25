@@ -45,7 +45,6 @@ class V1::CustomPagesController < ApplicationController
   #Adds the Custom Page Fields to the given Custom Page
   def custom_page_fields 
     @custom_page = CustomPage.find(params[:custom_page_field][:custom_page_id])
-    p @custom_page
     respond_to do |format|
       if @custom_page
         @custom_page_field=@custom_page.custom_page_fields.new(params[:custom_page_field])
@@ -62,8 +61,7 @@ class V1::CustomPagesController < ApplicationController
   
     #Updates the Custom Page Fields 
   def update_custom_page_fields 
-    p "FFFFFFFFFFFFFFFFFFFFFFFF"
-    @custom_page_field = CustomPageField.where(:_id=>params[:id]).first
+     @custom_page_field = CustomPageField.where(:_id=>params[:id]).first
     respond_to do |format|
       if @custom_page_field
         if @custom_page_field.update_attributes(params[:custom_page_field])

@@ -148,7 +148,7 @@ class V1::ItemsController < ApplicationController
   
   #Lists all attendees of the given item
   def list_item_attendees 
-    @item=Item.where(:_id =>params[:id]).first
+    @item=Item.find(params[:id])
     respond_to do |format|
       if @item
          @attendees=@item.attendees
@@ -166,6 +166,6 @@ class V1::ItemsController < ApplicationController
   
   def get_item
     params[:id]=params[:item_category][:item_id] if params[:item_category][:item_id]
-    @item=Item.where(:_id =>params[:id]).first
+    @item=Item.find(params[:id])
   end
 end

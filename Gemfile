@@ -14,7 +14,7 @@ gem 'bson_ext','1.3.1'
 gem 'devise','1.4.2'
 gem 'rspec-rails','2.6.1'
 gem 'acts_as_api','0.3.8'
-gem 'carrierwave','0.5.4'
+#gem 'carrierwave','0.5.4'
 #gem 'SystemTimer', '>= 1.2.0'
 gem 'exception_notifier','1.0.0'
 gem "aws-s3", "~> 0.6.2", :require => 'aws/s3'
@@ -22,6 +22,8 @@ gem 'builder','~> 2.1.2'
 gem 'will_paginate', '2.3.16'
 gem 'newrelic_rpm'
 gem 'mongoid_acts_as_tree'
+gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
+
 
 # Deploy with Capistrano
 # gem 'capistrano'

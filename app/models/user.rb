@@ -8,7 +8,7 @@ class User
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
   references_many :items
   references_many :categories
-  has_many :attachments, as: :attachable
+  has_many :attachments, as: :attachable, :dependent=>:destroy
   
   devise :confirmable, :database_authenticatable, :registerable, :recoverable, :rememberable, :token_authenticatable, :trackable
 

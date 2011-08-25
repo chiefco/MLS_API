@@ -22,7 +22,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
       end
     else
       respond_to do |format|
-        format.xml { render :xml=> resource.all_errors.to_xml(:root=>'errors') }
+        format.xml { render :xml=> resource.all_errors.to_xml(:root=>:result) }
         format.json { render :json=> resource.all_errors }
       end
     end
@@ -42,10 +42,10 @@ class V1::RegistrationsController < Devise::RegistrationsController
   end
   
   def show
-     respond_to do |format|
-        format.xml{ render_for_api :user_with_token, :xml => current_user, :root => :user}
-        format.json{render_for_api :user_with_token, :json => current_user, :root => :user}
-      end
+    respond_to do |format|
+      format.xml{ render_for_api :user_with_token, :xml => current_user, :root => :user}
+      format.json{render_for_api :user_with_token, :json => current_user, :root => :user}
+    end
   end 
   
   private
@@ -60,7 +60,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
     else
       respond_to do |format|
         format.html
-        format.xml { render :xml=> resource.all_errors.to_xml(:root=>'errors') }
+        format.xml { render :xml=> resource.all_errors.to_xml(:root=>:result) }
         format.json { render :json=> resource.all_errors }
       end
     end

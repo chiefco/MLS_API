@@ -28,7 +28,7 @@ class V1::TemplatesController < ApplicationController
     @template = Template.new(params[:template])
     respond_to do |format|
       if @template.save
-        value={:template=>@template.to_json(:except=>[:name,:_id,:description],:include=>:template_categories)}.to_success
+        value={:template=>@template.to_json(:only=>[:name,:_id,:description],:include=>:template_categories)}.to_success
         format.xml { render :xml => value.to_xml(FOR_XML) }
         format.json { render :json =>value}
       else

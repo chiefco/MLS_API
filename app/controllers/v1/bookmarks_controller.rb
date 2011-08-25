@@ -4,7 +4,7 @@ class V1::BookmarksController < ApplicationController
   # GET /v1/bookmarks
   # GET /v1/bookmarks.xml
   def index
-    @v1_bookmarks = Bookmark.all
+     @v1_bookmarks = @current_user.bookmarks
     bookmarks=[]
     respond_to do |format|
       @v1_bookmarks.each do |bookmark|
@@ -58,7 +58,7 @@ class V1::BookmarksController < ApplicationController
   # POST /v1/bookmarks
   # POST /v1/bookmarks.xml
   def create
-    @v1_bookmark = Bookmark.new(params[:bookmark])
+    @v1_bookmark = @current_user.bookmarks.new(params[:bookmark])
     respond_to do |format|
       if @v1_bookmark.save
         format.xml  { render :xml => @v1_bookmark, :status => :created, :location => @v1_bookmark }

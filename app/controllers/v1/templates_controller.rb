@@ -88,7 +88,7 @@ class V1::TemplatesController < ApplicationController
   #Updates the Template Definitions
   def update_template_definitions
     respond_to do |format|
-      @template_definition=TemplateDefinition.where(:_id=>params[:id]).first
+      @template_definition=TemplateDefinition.find(params[:id])
       if @template_definition
         @template_definition.update_attributes(params[:template_definition])
         format.json {render :json=>{:template_definition=>@template_definition.to_json(:except=>[:created_at,:updated_at])}.merge(success)}
@@ -101,6 +101,6 @@ class V1::TemplatesController < ApplicationController
   
   private
   def find_template
-    @template = Template.where(:_id=>params[:id]).first
+    @template = Template.find(params[:id])
   end
 end

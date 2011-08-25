@@ -131,7 +131,7 @@ class V1::ItemsController < ApplicationController
     end
   end
   
-  #remove the attendee of the item
+  #Removes the attendee of the item
   def item_remove_attendees
     @attendee=Attendee.where(:id=>params[:attendee_id])
     respond_to do |format|
@@ -145,6 +145,20 @@ class V1::ItemsController < ApplicationController
       end
     end
   end
+  
+  #Lists all attendees of the given item
+  def list_item_attendees 
+    @item=Item.find(params[:id])
+    respond_to do |format|
+      if @item
+         @attendees=@item.attendees
+        format.json{render :json=>{:item_attendees=>@attendees.to_a.to_json(:only=>[:_id,:first_name,:last_name])}}
+      else
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
+    end
+  end
     
   def get_criteria(query)
     [ {name: query} , { description: query } ]
@@ -152,7 +166,6 @@ class V1::ItemsController < ApplicationController
   
   def get_item
     params[:id]=params[:item_category][:item_id] if params[:item_category][:item_id]
-    #~ params[:id]=params[:item_attendee][:item_id] if params[:item_attendee][:item_id]
-    @item=Item.where(:_id =>params[:id]).first
+    @item=Item.find(params[:id])
   end
 end

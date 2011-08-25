@@ -16,7 +16,7 @@ class ApplicationController < ActionController::Base
       format.xml{render :xml=>UNAUTHORIZED,:root=>:error}
     end and return unless @current_user
   end  
-  
+    
   def success
     {:response=>:success}
   end
@@ -37,10 +37,7 @@ class ApplicationController < ActionController::Base
     params[:page] ? params[:page] : PAGE
   end 
   
-  def current_user
-    @current_user
-  end
-  
+ 
   #maps single object to hash with supplied attributes,attributes rename options
   def object_to_hash(object,selected_fields=nil,rename={})
     unless selected_fields.blank?

@@ -1,25 +1,25 @@
 class ApplicationController < ActionController::Base
   after_filter :clear_session
   RESET_TOKEN_SENT={:reset_token_sent=>true}
-  RESET_TOKEN_ERROR={:response=>:failure,:errors=>{:code=>5003,:message=>"Email not found"}}
-  UNAUTHORIZED={:response=>:failure,:errors=>{:code=>1004,:message=>"Authentication/Authorization Failed"}}
-  INVALID_PARAMETER_ID={:response=>:failure,:errors=>{:code=>3065,:message=>"id -Invalid Parameter"}}
-  RECORD_NOT_FOUND={:response=>:failure,:errors=>{:code=>2096,:message=>'Record does not exist'}}
+  RESET_TOKEN_ERROR={:code=>5003,:message=>"Email not found"}
+  UNAUTHORIZED={:code=>1004,:message=>"Authentication/Authorization Failed"}
+  INVALID_PARAMETER_ID={:code=>3065,:message=>"id -Invalid Parameter"}
+  RECORD_NOT_FOUND={:code=>2096,:message=>'Record does not exist'}
   USER_COLUMN=[:status,:remember_token,:remember_created_at,:created_at,:updated_at]
   PAGE_SIZE=10
   PAGE=1
-  
+  ROOT={:root=>:result}
   rescue_from Mongoid::Errors::DocumentNotFound do |exception|
     respond_to do |format|
-      format.json{render :json=>RECORD_NOT_FOUND}
-      format.xml{render :xml=>RECORD_NOT_FOUND,:root=>:result}
+      format.json{render :json=>{:response=>:failure,:errors=>[RECORD_NOT_FOUND]}}
+      format.xml{render :xml=>{:errors=>[RECORD_NOT_FOUND]}.to_failure,:root=>:result}
     end
   end
   
   rescue_from BSON::InvalidObjectId do |exception|
     respond_to do |format|
-      format.json{render :json=>INVALID_PARAMETER_ID}
-      format.xml{render :xml=>INVALID_PARAMETER_ID,:root=>:result}
+      format.json{render :json=>{:response=>:failure,:errors=>[INVALID_PARAMETER_ID]}}
+      format.xml{render :xml=>{:errors=>[INVALID_PARAMETER_ID]}.to_failure,:root=>:result}
     end
   end
   #~ protect_from_forgery

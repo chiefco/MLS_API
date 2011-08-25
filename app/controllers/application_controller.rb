@@ -1,15 +1,22 @@
 class ApplicationController < ActionController::Base
   after_filter :clear_session
   RESET_TOKEN_SENT={:reset_token_sent=>true}
-  RESET_TOKEN_ERROR={:code=>5003,:message=>"Email not found"}
-  UNAUTHORIZED={:code=>1004,:message=>"Authentication/Authorization Failed"}
+  RESET_TOKEN_ERROR={:response=>:failure,:errors=>{:code=>5003,:message=>"Email not found"}}
+  UNAUTHORIZED={:response=>:failure,:errors=>{:code=>1004,:message=>"Authentication/Authorization Failed"}}
   INVALID_PARAMETER_ID={:response=>:failure,:errors=>{:code=>3065,:message=>"id -Invalid Parameter"}}
-  RECORD_NOT_FOUND={:code=>2096,:message=>'Record does not exist in database'}
+  RECORD_NOT_FOUND={:response=>:failure,:errors=>{:code=>2096,:message=>'Record does not exist'}}
   USER_COLUMN=[:status,:remember_token,:remember_created_at,:created_at,:updated_at]
   PAGE_SIZE=10
   PAGE=1
   
   rescue_from Mongoid::Errors::DocumentNotFound do |exception|
+    respond_to do |format|
+      format.json{render :json=>RECORD_NOT_FOUND}
+      format.xml{render :xml=>RECORD_NOT_FOUND,:root=>:result}
+    end
+  end
+  
+  rescue_from BSON::InvalidObjectId do |exception|
     respond_to do |format|
       format.json{render :json=>INVALID_PARAMETER_ID}
       format.xml{render :xml=>INVALID_PARAMETER_ID,:root=>:result}
@@ -21,7 +28,7 @@ class ApplicationController < ActionController::Base
     @current_user=User.valid_user?(params[:access_token]) if params[:access_token]
     respond_to do |format|
       format.json{render :json=>UNAUTHORIZED}
-      format.xml{render :xml=>UNAUTHORIZED,:root=>:error}
+      format.xml{render :xml=>UNAUTHORIZED,:root=>:result}
     end and return unless @current_user
   end  
     

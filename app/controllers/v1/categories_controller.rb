@@ -25,8 +25,8 @@ class V1::CategoriesController < ApplicationController
         format.xml  { render :xml => @category }
         format.json  { render :json => success.merge(object_to_hash(@category,[:name,:parent_id, :show_in_quick_links]))  }
       else
-        format.xml  { render :xml => @category.all_errors, :root=>"errors" }
-        format.json  { render :json => { "errors"=> @category.all_errors}}
+        format.xml  { render :xml => @category.all_errors.to_xml(ROOT) }
+        format.json  { render :json => @category.all_errors}
       end
     end
   end
@@ -37,8 +37,8 @@ class V1::CategoriesController < ApplicationController
         format.xml  { render :xml => @category }
         format.json  { render :json => success.merge(object_to_hash(@category,[:_id,:name,:parent_id, :show_in_quick_links]))}
       else
-        format.xml  { render :xml => @category.all_errors , :root=>"errors"}
-        format.json  { render :json => { "errors"=> @category.all_errors}}
+        format.xml  { render :xml => @category.all_errors.to_xml(ROOT)}
+        format.json  { render :json =>@category.all_errors}
       end
     end
   end
@@ -47,7 +47,7 @@ class V1::CategoriesController < ApplicationController
     @category.destroy
     respond_to do |format|
       format.json { render :json=> success }
-      format.xml { render :xml=> success.to_xml(:root=>"result") }
+      format.xml { render :xml=> success.to_xml(ROOT) }
     end
   end
   
@@ -55,7 +55,7 @@ class V1::CategoriesController < ApplicationController
     @sub_categories = @category.children
     respond_to do |format| 
       format.json { render :json=> success.merge(subcategories_success) }
-      format.xml { render :xml=> success.merge(subcategories_success).to_xml(:root=>'result') }
+      format.xml { render :xml=> success.merge(subcategories_success).to_xml(ROOT) }
     end 
   end 
   
@@ -63,7 +63,7 @@ class V1::CategoriesController < ApplicationController
     @items = @category.items
     respond_to do |format| 
       format.json { render :json=> success.merge(items_success) }
-      format.xml { render :xml=> success.merge(items_success).to_xml(:root=>'result') }
+      format.xml { render :xml=> success.merge(items_success).to_xml(ROOT) }
     end 
   end 
   

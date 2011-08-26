@@ -38,12 +38,17 @@ class V1::ItemsController < ApplicationController
     @item = Item.new(params[:item])
     @template=Template.find(params[:item][:template_id]) if params[:item][:template_id]
     respond_to do |format|
-      if @item.save
-        format.xml  { render :xml => @item, :status => :created, :location => @item }
-        format.json  { render :json => {"item"=>{:item_id=>@item.id,:name=>@template.name}}.merge(success) }
+      if @template
+          if @item.save
+            format.xml  { render :xml => @item, :status => :created, :location => @item }
+            format.json  { render :json => {"item"=>{:item_id=>@item.id,:name=>@template.name}}.merge(success) }
+          else
+            format.xml  { render :xml => @item.errors, :status => :unprocessable_entity }
+            format.json  { render :json => {"errors"=>@item.all_errors } }
+          end
       else
-        format.xml  { render :xml => @item.errors, :status => :unprocessable_entity }
-        format.json  { render :json => {"errors"=>@item.all_errors } }
+          format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
+          format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
   end
@@ -58,7 +63,7 @@ class V1::ItemsController < ApplicationController
           @item.update_attributes(:location_id=>@location.id)
         end
         format.xml  { render :xml=>@item }
-        format.json  { render :json =>{"item"=>{"description"=>@item.description,"item_date"=>@item.item_date,"location"=>@location.name}}.merge(success) }
+        format.json  { render :json =>{"item"=>{:description=>@item.description,:item_date=>@item.item_date,:location=>@location.nil? ? @location.name : "nil"}}.merge(success) }
       else
         format.xml  { render :xml => @item.errors, :status => :unprocessable_entity }
       end
@@ -99,6 +104,7 @@ class V1::ItemsController < ApplicationController
   
   #Adds the category to the given item
   def item_add_category
+    @item=Item.find(params[:item_category][:item_id])
     @category=Category.where(:_id=>params[:item_category][:category_id]).first
     respond_to do  |format| 
       if @item && @category
@@ -165,7 +171,6 @@ class V1::ItemsController < ApplicationController
   end 
   
   def get_item
-    params[:id]=params[:item_category][:item_id] if params[:item_category][:item_id]
     @item=Item.find(params[:id])
   end
 end

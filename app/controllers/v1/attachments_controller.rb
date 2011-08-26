@@ -5,10 +5,10 @@ class V1::AttachmentsController < ApplicationController
   # GET /v1/attachments
   # GET /v1/attachments.xml
     def index
-    @attachments = Attachment.all
+    @attachments = @current_user.attachments
 
     respond_to do |format|
-      format.html # index.html.erb
+      format.json  { render :json => @attachments }
       format.xml  { render :xml => @attachments }
     end
   end
@@ -74,12 +74,16 @@ class V1::AttachmentsController < ApplicationController
   # DELETE /v1/attachments/1
   # DELETE /v1/attachments/1.xml
   def destroy
-    @attachment = Attachment.find(params[:id])
-    @attachment.destroy
 
     respond_to do |format|
-      format.html { redirect_to(attachments_url) }
-      format.xml  { head :ok }
+      if @attachment
+        @attachment.destroy
+        format.json { render :json=> success }
+        format.xml { render :xml=> success.to_xml(:root=>"result") }
+      else
+        format.json { render :json=> failure.merge(INVALID_PARAMETER_ID) }
+        format.xml { render :xml=> failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'error') }
+      end 
     end
   end
   

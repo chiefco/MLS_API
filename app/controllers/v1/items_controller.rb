@@ -63,7 +63,7 @@ class V1::ItemsController < ApplicationController
           @item.update_attributes(:location_id=>@location.id)
         end
         format.xml  { render :xml=>@item }
-        format.json  { render :json =>{"item"=>{:description=>@item.description,:item_date=>@item.item_date,:location=>@location.nil? ? @location.name : "nil"}}.merge(success) }
+        format.json  { render :json =>{"item"=>{:description=>@item.description,:item_date=>@item.item_date,:location=>@location.nil? ?  "nil" :@location.name}}.merge(success) }
       else
         format.xml  { render :xml => @item.errors, :status => :unprocessable_entity }
       end

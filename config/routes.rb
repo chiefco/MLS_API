@@ -9,14 +9,16 @@ MeetlinkshareApi::Application.routes.draw do
     post "v1/reset_password", :to => "v1/passwords#update"
     get "v1/user/:id", :to=>"v1/registrations#show"
     get "v1/users", :to=> "v1/registrations#index"
+    get "users/confirmation",:to=>"v1/confirmations#show"
   end
   match "v1/item_topics/:id"=> 'v1/items#item_topics'
   match "v1/category_subcategories/:id" => 'v1/categories#subcategories'
   match "v1/category_items/:id" => 'v1/categories#items'
-  match "v1/item_categories/:id" => 'v1/items#item_categories'
+  match "v1/items/:id/item_categories" => 'v1/items#item_categories'
   match "v1/item_add_category" => 'v1/items#item_add_category'
   match "v1/item_add_attendees" => 'v1/items#item_add_attendees'
   match "v1/item_remove_attendees/:attendee_id" => 'v1/items#item_remove_attendees'
+  match "v1/items/:id/list_item_attendees" => 'v1/items#list_item_attendees'
   match "v1/custom_page_fields" => 'v1/custom_pages#custom_page_fields'
   match "v1/custom_page_fields/:id" => 'v1/custom_pages#update_custom_page_fields',:via=>:put
   match "v1/custom_page_fields/:id" => 'v1/custom_pages#custom_page_fields_remove',:via=>:delete

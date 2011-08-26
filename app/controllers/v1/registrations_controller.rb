@@ -73,10 +73,6 @@ class V1::RegistrationsController < Devise::RegistrationsController
   def v1_params
     
   end
- 
-  #~ def get_criteria(query)
-    #~ [ {first_name: query} , { last_name: query }, { email: query }, { job_title: query }, { company: query}, { business_unit: query } ]
-  #~ end 
 
 end
 

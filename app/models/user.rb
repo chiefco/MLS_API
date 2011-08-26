@@ -10,6 +10,7 @@ class User
   references_many :categories
   references_many :bookmarks, :dependent=>:destroy
   has_many :attachments, as: :attachable, :dependent=>:destroy
+  attr_accessor :set_password
   
   devise :confirmable, :database_authenticatable, :registerable, :recoverable, :rememberable, :token_authenticatable, :trackable
 
@@ -18,11 +19,11 @@ class User
   validates_presence_of   :email, :message=>"email - Blank Parameter", :code=>2032
   validates_uniqueness_of :email, :message=>"email - Already exist", :code=>2035, :case_sensitive => (case_insensitive_keys != false), :allow_blank => true
   validates_format_of     :email, :message=>"email - Invalid email format", :code=>2033, :with  => /\A([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})\z/i, :allow_blank => true
-  validates_presence_of     :password, :message=>"password - Blank Parameter",:code=>2003,:on=>:create
-  validates_presence_of     :password_confirmation, :message=>"password_confirmation - Blank Parameter",:code=>2004,:on=>:create
-  validates_confirmation_of :password, :message=>"password and password_confimation does not match", :code=>2040,:on=>:create
-  validates_length_of       :password, :message=>"Too short(Minimum is 6 characters)", :minimum => 6, :code=>2038, :allow_blank => true,:on=>:create
-  validates_length_of       :password, :message=>"Too long(Maximum is 128 characters)", :maximum =>128, :code=>2039, :allow_blank => true,:on=>:create
+  validates_presence_of     :password, :message=>"password - Blank Parameter",:code=>2003, :if=>:pass_create_or_update?  
+  validates_presence_of     :password_confirmation, :message=>"password_confirmation - Blank Parameter",:code=>2004, :if=>:pass_create_or_update?
+  validates_confirmation_of :password, :message=>"password and password_confimation does not match", :code=>2040, :if=>:pass_create_or_update?
+  validates_length_of       :password, :message=>"password- Too short(Minimum is 6 characters)", :minimum => 6, :code=>2038, :allow_blank => true, :if=>:pass_create_or_update?
+  validates_length_of       :password, :message=>"password- Too long(Maximum is 128 characters)", :maximum =>128, :code=>2039, :allow_blank => true, :if=>:pass_create_or_update?
 
   field :first_name, :type=> String
   field :last_name, :type=>String
@@ -54,6 +55,10 @@ class User
     self.where(:authentication_token=>token,:status=>true).first
   end
   
+  def pass_create_or_update?
+    set_password || new_record?
+  end 
+    
   def build_confirm_success_json
     { "response" => "success", "confirmed" => true }.to_json
   end 

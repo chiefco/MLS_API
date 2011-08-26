@@ -14,7 +14,7 @@ class V1::TemplatesController < ApplicationController
   def show
     respond_to do |format|
       if @template
-        value={:template=>@template,:template_definitions=>@template.template_definitions.attributes}.to_success
+        value={:template=>@template.to_json(:include=>:template_categories),:template_definitions=>@template.template_definitions.attributes}.to_success
         format.xml  { render :xml => value.to_xml(FOR_XML) }
         format.json  { render :json =>value.to_json}
       else
@@ -28,7 +28,7 @@ class V1::TemplatesController < ApplicationController
     @template = Template.new(params[:template])
     respond_to do |format|
       if @template.save
-        value={:template=>@template}.to_success
+        value={:template=>@template.to_json(:only=>[:name,:_id,:description],:include=>:template_categories)}.to_success
         format.xml { render :xml => value.to_xml(FOR_XML) }
         format.json { render :json =>value}
       else
@@ -42,7 +42,7 @@ class V1::TemplatesController < ApplicationController
     respond_to do |format|
       if @template
         if @template.update_attributes(params[:template])
-          value={:template=>@template}.to_success
+          value={:template=>@template.to_json(:only=>[:name,:_id,:description],:include=>:template_categories)}.to_success
           format.xml { render :xml => value.to_xml(FOR_XML) }
           format.json { render :json =>value}
         else

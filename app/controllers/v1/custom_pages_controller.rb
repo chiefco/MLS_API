@@ -8,7 +8,7 @@ class V1::CustomPagesController < ApplicationController
     @custom_page = CustomPage.new(params[:custom_page])
     respond_to do |format|
       if @custom_page.save
-        format.json  { render :json =>{:custom_page=>{:page_data=>@custom_page.page_data}}.merge(success)}
+        format.json  { render :json =>{:custom_page=>@custom_page.to_json(:only=>[:_id,:page_data])}.merge(success)}
       end
     end
   end
@@ -19,7 +19,7 @@ class V1::CustomPagesController < ApplicationController
     respond_to do |format|
       if @custom_page
         @custom_page.update_attributes(params[:custom_page])
-        format.json  { render :json =>{:custom_page=>{:page_data=>@custom_page.page_data}}.merge(success)}
+        format.json  { render :json =>{:custom_page=>@custom_page.to_json(:only=>[:_id,:page_data])}.merge(success)}
       else 
         format.xml  {render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
         format.json  {render :json=> failure.merge(INVALID_PARAMETER_ID)}
@@ -44,7 +44,7 @@ class V1::CustomPagesController < ApplicationController
   
   #Adds the Custom Page Fields to the given Custom Page
   def custom_page_fields 
-    @custom_page = CustomPage.where(:_id=>params[:custom_page_field][:custom_page_id]).first
+    @custom_page = CustomPage.find(params[:custom_page_field][:custom_page_id])
     respond_to do |format|
       if @custom_page
         @custom_page_field=@custom_page.custom_page_fields.new(params[:custom_page_field])
@@ -60,8 +60,8 @@ class V1::CustomPagesController < ApplicationController
   end
   
     #Updates the Custom Page Fields 
-  def custom_page_fields 
-    @custom_page_field = CustomPageField.where(:_id=>params[:id]).first
+  def update_custom_page_fields 
+     @custom_page_field = CustomPageField.where(:_id=>params[:id]).first
     respond_to do |format|
       if @custom_page_field
         if @custom_page_field.update_attributes(params[:custom_page_field])

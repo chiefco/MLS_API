@@ -4,16 +4,31 @@ class ApplicationController < ActionController::Base
   RESET_TOKEN_ERROR={:code=>5003,:message=>"Email not found"}
   UNAUTHORIZED={:code=>1004,:message=>"Authentication/Authorization Failed"}
   INVALID_PARAMETER_ID={:code=>3065,:message=>"id -Invalid Parameter"}
+  RECORD_NOT_FOUND={:code=>2096,:message=>'Record does not exist'}
   USER_COLUMN=[:status,:remember_token,:remember_created_at,:created_at,:updated_at]
   PAGE_SIZE=10
   PAGE=1
+  ROOT={:root=>:result}
+  rescue_from Mongoid::Errors::DocumentNotFound do |exception|
+    respond_to do |format|
+      format.json{render :json=>{:response=>:failure,:errors=>[RECORD_NOT_FOUND]}}
+      format.xml{render :xml=>{:errors=>[RECORD_NOT_FOUND]}.to_failure,:root=>:result}
+    end
+  end
+  
+  rescue_from BSON::InvalidObjectId do |exception|
+    respond_to do |format|
+      format.json{render :json=>{:response=>:failure,:errors=>[INVALID_PARAMETER_ID]}}
+      format.xml{render :xml=>{:errors=>[INVALID_PARAMETER_ID]}.to_failure,:root=>:result}
+    end
+  end
   #~ protect_from_forgery
   
   def authenticate_request!
     @current_user=User.valid_user?(params[:access_token]) if params[:access_token]
     respond_to do |format|
       format.json{render :json=>UNAUTHORIZED}
-      format.xml{render :xml=>UNAUTHORIZED,:root=>:error}
+      format.xml{render :xml=>UNAUTHORIZED,:root=>:result}
     end and return unless @current_user
   end  
     

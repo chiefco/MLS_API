@@ -13,7 +13,7 @@ MeetlinkshareApi::Application.routes.draw do
   match "v1/item_topics/:id"=> 'v1/items#item_topics'
   match "v1/category_subcategories/:id" => 'v1/categories#subcategories'
   match "v1/category_items/:id" => 'v1/categories#items'
-  match "v1/item_categories/:id" => 'v1/items#item_categories'
+  match "v1/items/:id/item_categories" => 'v1/items#item_categories'
   match "v1/item_add_category" => 'v1/items#item_add_category'
   match "v1/item_add_attendees" => 'v1/items#item_add_attendees'
   match "v1/item_remove_attendees/:attendee_id" => 'v1/items#item_remove_attendees'

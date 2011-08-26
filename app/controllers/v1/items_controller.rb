@@ -1,6 +1,6 @@
 class V1::ItemsController < ApplicationController
   before_filter :authenticate_request!
-  before_filter :get_item,:only=>([:update,:show,:item_categories,:destroy,:item_topics,:item_add_category])
+  before_filter :get_item,:only=>([:update,:show,:item_categories,:destroy,:item_topics])
   respond_to :html, :xml, :json
   # GET /items
   # GET /items.xml
@@ -97,15 +97,18 @@ class V1::ItemsController < ApplicationController
         @item.categories.each do |category|
           categories<<{:name=>category.name,:id=>category._id,:parent_id=>category.parent_id}
         end
-        format.json{render :json=>{:item_categories=>categories}.merge(success)}
+        format.json{render :json=>{:item_categories=>categories,:count=>categories.count}.merge(success)}
       end
     end
   end
   
   #Adds the category to the given item
   def item_add_category
+        p    params[:item_category][:item_id]
+    p   params[:item_category][:category_id]
     @item=Item.find(params[:item_category][:item_id])
-    @category=Category.where(:_id=>params[:item_category][:category_id]).first
+    @category=Category.find(params[:item_category][:category_id])
+
     respond_to do  |format| 
       if @item && @category
         @item.categories<<@category
@@ -139,7 +142,7 @@ class V1::ItemsController < ApplicationController
   
   #Removes the attendee of the item
   def item_remove_attendees
-    @attendee=Attendee.where(:id=>params[:attendee_id])
+    @attendee=Attendee.find(params[:attendee_id])
     respond_to do |format|
       if @attendee
         @attendee.destroy

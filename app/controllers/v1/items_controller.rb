@@ -1,6 +1,6 @@
 class V1::ItemsController < ApplicationController
   before_filter :authenticate_request!
-  before_filter :get_item,:only=>([:update,:show,:item_categories,:destroy,:item_topics,:item_add_category])
+  before_filter :get_item,:only=>([:update,:show,:item_categories,:destroy,:item_topics])
   respond_to :html, :xml, :json
   # GET /items
   # GET /items.xml
@@ -38,12 +38,17 @@ class V1::ItemsController < ApplicationController
     @item = Item.new(params[:item])
     @template=Template.find(params[:item][:template_id]) if params[:item][:template_id]
     respond_to do |format|
-      if @item.save
-        format.xml  { render :xml => @item, :status => :created, :location => @item }
-        format.json  { render :json => {"item"=>{:item_id=>@item.id,:name=>@template.name}}.merge(success) }
+      if @template
+          if @item.save
+            format.xml  { render :xml => @item, :status => :created, :location => @item }
+            format.json  { render :json => {"item"=>{:item_id=>@item.id,:name=>@template.name}}.merge(success) }
+          else
+            format.xml  { render :xml => @item.errors, :status => :unprocessable_entity }
+            format.json  { render :json => {"errors"=>@item.all_errors } }
+          end
       else
-        format.xml  { render :xml => @item.errors, :status => :unprocessable_entity }
-        format.json  { render :json => {"errors"=>@item.all_errors } }
+          format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
+          format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
   end
@@ -58,7 +63,7 @@ class V1::ItemsController < ApplicationController
           @item.update_attributes(:location_id=>@location.id)
         end
         format.xml  { render :xml=>@item }
-        format.json  { render :json =>{"item"=>{"description"=>@item.description,"item_date"=>@item.item_date,"location"=>@location.name}}.merge(success) }
+        format.json  { render :json =>{"item"=>{:description=>@item.description,:item_date=>@item.item_date,:location=>@location.nil? ?  "nil" :@location.name}}.merge(success) }
       else
         format.xml  { render :xml => @item.errors, :status => :unprocessable_entity }
       end
@@ -92,14 +97,18 @@ class V1::ItemsController < ApplicationController
         @item.categories.each do |category|
           categories<<{:name=>category.name,:id=>category._id,:parent_id=>category.parent_id}
         end
-        format.json{render :json=>{:item_categories=>categories}.merge(success)}
+        format.json{render :json=>{:item_categories=>categories,:count=>categories.count}.merge(success)}
       end
     end
   end
   
   #Adds the category to the given item
   def item_add_category
-    @category=Category.where(:_id=>params[:item_category][:category_id]).first
+        p    params[:item_category][:item_id]
+    p   params[:item_category][:category_id]
+    @item=Item.find(params[:item_category][:item_id])
+    @category=Category.find(params[:item_category][:category_id])
+
     respond_to do  |format| 
       if @item && @category
         @item.categories<<@category
@@ -133,7 +142,7 @@ class V1::ItemsController < ApplicationController
   
   #Removes the attendee of the item
   def item_remove_attendees
-    @attendee=Attendee.where(:id=>params[:attendee_id])
+    @attendee=Attendee.find(params[:attendee_id])
     respond_to do |format|
       if @attendee
         @attendee.destroy
@@ -165,7 +174,6 @@ class V1::ItemsController < ApplicationController
   end 
   
   def get_item
-    params[:id]=params[:item_category][:item_id] if params[:item_category][:item_id]
     @item=Item.find(params[:id])
   end
 end

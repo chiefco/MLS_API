@@ -14,9 +14,6 @@ class Item
   
   validates_presence_of :name,:message=>'name - Required parameter missing',:code=>2009
   validates_presence_of :template_id,:message=>'template_id - Blank Parameter',:code=>3025
-  validates_presence_of :name,:message=>'name - Required parameter missing',:code=>2009
-  validates_presence_of :template_id,:message=>'template_id - Required parameter missing',:code=>2011
-  validates_uniqueness_of :category_ids
   
   belongs_to  :template
   belongs_to  :location

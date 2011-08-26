@@ -9,6 +9,7 @@ MeetlinkshareApi::Application.routes.draw do
     post "v1/reset_password", :to => "v1/passwords#update"
     get "v1/user/:id", :to=>"v1/registrations#show"
     get "v1/users", :to=> "v1/registrations#index"
+    get "users/confirmation",:to=>"v1/confirmations#show"
   end
   match "v1/item_topics/:id"=> 'v1/items#item_topics'
   match "v1/category_subcategories/:id" => 'v1/categories#subcategories'

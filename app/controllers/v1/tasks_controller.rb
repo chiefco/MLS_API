@@ -8,7 +8,7 @@ class V1::TasksController < ApplicationController
   def show
     respond_to do |format|
       if @task
-        format.json  { render :json => {:task=>@task.to_json(:only=>[:_id,:description,:due_date,:is_completed]),:item=>@task.item.nil? ? nil : @task.item.to_json(:only=>[:_id,:name]) }.to_success}
+          format.json  { render :json => {:task=>@task.to_json(:only=>[:_id,:description,:due_date,:is_completed],:include=>{:item=>{:only =>[ :_id,:name]}})}.to_success}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
@@ -171,7 +171,7 @@ class V1::TasksController < ApplicationController
   end
   
   def reminder_parameters
-    {:reminder=>{:id=>@reminder._id,:task=>{:id=>@reminder.task._id,:description=>@reminder.task.description},:time=>@reminder.time}.to_success}
+    {:reminder=>{:id=>@reminder._id,:task=>{:id=>@reminder.task._id,:description=>@reminder.task.description},:time=>@reminder.time}}.to_success
   end
 	
 end

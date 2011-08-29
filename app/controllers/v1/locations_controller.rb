@@ -6,8 +6,8 @@ class V1::LocationsController < ApplicationController
   def index
     @locations = @current_user.locations
     respond_to do |format|
-      format.xml  { render :xml => @locations,:root=>:result }
-      format.json  { render :json => @locations }
+      format.xml  { render :xml => multi_result.to_xml,:root=>:result }
+      format.json  { render :json =>multi_result.to_json }
     end
   end
 

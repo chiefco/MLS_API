@@ -20,6 +20,7 @@ MeetlinkshareApi::Application.routes.draw do
     match "reminder/:id" => 'tasks#delete_reminder',:via=>:delete
     match "reminder/:id" => 'tasks#update_reminder',:via=>:put
     match "reminders/:task_id" => 'tasks#get_all_reminders'
+    match "/item_tasks/:id" => 'items#get_all_tasks'
   end
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
     post "v1/forgot_password", :to => "v1/passwords#create"

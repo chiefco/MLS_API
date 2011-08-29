@@ -19,7 +19,7 @@ class Item
   belongs_to  :location
   references_many :topics,:dependent => :destroy
   references_many :attendees,:dependent => :destroy
-  #~ references_many :tasks,:dependent => :destroy
+  references_many :tasks,:dependent => :destroy
   #~ has_many :bookmarked_contents,:as=>:bookmarkable
   has_many :bookmarked_contents, as: :bookmarkable
   referenced_in :user

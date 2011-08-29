@@ -2,7 +2,13 @@ class V1::TasksController < ApplicationController
   before_filter :authenticate_request!
   before_filter :find_task,:only=>([:update,:show,:destroy])
   before_filter :find_reminder,:only=>([:get_reminder,:delete_reminder,:update_reminder])
-  
+  	#Retrieves the tasks of the current_user
+	def index
+		@tasks=@current_user.tasks
+			respond_to do |format|
+				format.json {render :json=>{:tasks=>@tasks.to_a.to_json(:only=>[:_id,:due_date,:is_completed,:description],:include=>{:item=>{:only=>[:_id,:name]}})}}
+			end
+	end
   # GET /v1/tasks/1
   # GET /v1/tasks/1.xml
   def show
@@ -44,11 +50,6 @@ class V1::TasksController < ApplicationController
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
-  end
-  
-  # finds the task
-  def find_task
-    @task = Task.find(params[:id])
   end
   
   def validate_item(value)
@@ -99,6 +100,7 @@ class V1::TasksController < ApplicationController
    end
  end
  
+	#Adds the reminder to the task 
   def add_reminder
 		@task=Task.find(params[:reminder][:task_id])
 		respond_to do |format|
@@ -117,7 +119,8 @@ class V1::TasksController < ApplicationController
 			end
 		end
   end
-  
+	
+	#Updates the single Reminder
   def update_reminder
     respond_to do |format|
       if @reminder
@@ -134,7 +137,8 @@ class V1::TasksController < ApplicationController
       end
     end  
   end
-  
+	
+  #Deletes the single Reminder
   def delete_reminder
     respond_to do |format|
       if @reminder
@@ -148,6 +152,7 @@ class V1::TasksController < ApplicationController
     end
   end
 
+	#Retrieves the single Reminder
   def get_reminder
     respond_to do |format|
       if @reminder
@@ -158,14 +163,15 @@ class V1::TasksController < ApplicationController
       end
     end
   end
-  
+	
+  #Retrieves all reminders of the given task
   def get_all_reminders
     respond_to do |format|
 			@task=Task.find(params[:task_id])
 			format.json  { render :json=> {:reminders=>@task.reminders.to_a.to_json(:only=>[:_id,:time],:include=>{:task=>{:only=>[:_id,:description]}})}.to_success}
     end
   end
-  
+
   def find_reminder
     @reminder=Reminder.find(params[:id])
   end
@@ -174,4 +180,8 @@ class V1::TasksController < ApplicationController
     {:reminder=>{:id=>@reminder._id,:task=>{:id=>@reminder.task._id,:description=>@reminder.task.description},:time=>@reminder.time}}.to_success
   end
 	
+	  # finds the task
+  def find_task
+    @task = Task.find(params[:id])
+  end
 end

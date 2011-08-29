@@ -2,31 +2,34 @@ MeetlinkshareApi::Application.routes.draw do
 
   API_VERSION1="v1"
   namespace :v1 do
-    resources :topics, :template_categories, :templates, :items, :bookmarks, :categories, :searches, :attachments, :custom_pages,:tasks
+    resources :topics, :template_categories, :templates, :items, :bookmarks, :categories, :searches, :attachments, :custom_pages,:tasks,:locations
+    
+    match "item_add_attendees" => 'items#item_add_attendees',:via=>:post
+    match "item_topics/:id"=> 'items#item_topics'
+    match "category_subcategories/:id" => 'categories#subcategories'
+    match "category_items/:id" => 'categories#items'
+    match "items/:id/item_categories" => 'items#item_categories'
+    match "item_add_category" => 'items#item_add_category'
+    match "item_remove_attendees/:attendee_id" => 'items#item_remove_attendees'
+    match "items/:id/list_item_attendees" => 'items#list_item_attendees'
+    match "custom_page_fields" => 'custom_pages#custom_page_fields'
+    match "custom_page_fields/:id" => 'custom_pages#update_custom_page_fields',:via=>:put
+    match "custom_page_fields/:id" => 'custom_pages#custom_page_fields_remove',:via=>:delete
+    match "reminders" => 'tasks#add_reminder',:via=>:post
+    match "reminder/:id" => 'tasks#get_reminder',:via=>:get
+    match "reminder/:id" => 'tasks#delete_reminder',:via=>:delete
+    match "reminder/:id" => 'tasks#update_reminder',:via=>:put
+    match "reminders/:task_id" => 'tasks#get_all_reminders'
   end
-  devise_for 'v1/users', :controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
+  devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
     post "v1/forgot_password", :to => "v1/passwords#create"
+    post "v1/users/sign_in", :to => "v1/sessions#create"
+    post "v1/users", :to => "v1/registrations#create"
     post "v1/reset_password", :to => "v1/passwords#update"
     get "v1/user/:id", :to=>"v1/registrations#show"
     get "v1/users", :to=> "v1/registrations#index"
+    get "users/confirmation",:to=>"v1/confirmations#show"
   end
-  match "v1/item_topics/:id"=> 'v1/items#item_topics'
-  match "v1/category_subcategories/:id" => 'v1/categories#subcategories'
-  match "v1/category_items/:id" => 'v1/categories#items'
-  match "v1/items/:id/item_categories" => 'v1/items#item_categories'
-  match "v1/item_add_category" => 'v1/items#item_add_category'
-  match "v1/item_add_attendees" => 'v1/items#item_add_attendees'
-  match "v1/item_remove_attendees/:attendee_id" => 'v1/items#item_remove_attendees'
-  match "v1/items/:id/list_item_attendees" => 'v1/items#list_item_attendees'
-  match "v1/custom_page_fields" => 'v1/custom_pages#custom_page_fields'
-  match "v1/custom_page_fields/:id" => 'v1/custom_pages#update_custom_page_fields',:via=>:put
-  match "v1/custom_page_fields/:id" => 'v1/custom_pages#custom_page_fields_remove',:via=>:delete
-  match "v1/reminders" => 'v1/tasks#add_reminder',:via=>:post
-  match "v1/reminder/:id" => 'v1/tasks#get_reminder',:via=>:get
-  match "v1/reminder/:id" => 'v1/tasks#delete_reminder',:via=>:delete
-  match "v1/reminder/:id" => 'v1/tasks#update_reminder',:via=>:put
-  match "v1/reminders/:task_id" => 'v1/tasks#get_all_reminders'
-
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

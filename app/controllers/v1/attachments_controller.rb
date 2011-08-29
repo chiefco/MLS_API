@@ -4,12 +4,15 @@ class V1::AttachmentsController < ApplicationController
   before_filter :find_resource, :except=>[:create, :index]
   # GET /v1/attachments
   # GET /v1/attachments.xml
-    def index
-    @attachments = @current_user.attachments
-
+  def index
+    paginate_options = {} 
+    paginate_options.store(:page,set_page)
+    paginate_options.store(:per_page,set_page_size)
+    @attachments = Attachment.list(@current_user.attachments,params,paginate_options)
+    
     respond_to do |format|
-      format.json  { render :json => @attachments }
-      format.xml  { render :xml => @attachments }
+      format.json  { render :json => success.merge(:attachments=>JSON.parse(@attachments.to_json(:only=>[:id, :file_name, :file_type, :size, :content_type, :file_link])))}
+      format.xml  { render :xml => @attachments.to_xml(:root=>'attachments', :only=>[:_id, :file_type, :file_name, :size,  :content_type, :file_link]) }
     end
   end
 
@@ -19,10 +22,8 @@ class V1::AttachmentsController < ApplicationController
 
     respond_to do |format|
       if @attachment 
-        fields = [:_id, :file_type, :file_name, :size,  :content_type, :file_link]
-        rename_options = {:_id=>:id}
-        format.json  { render :json => success.merge(:attachment=>object_to_hash(@attachment,fields,rename_options)) }
-        format.xml  { render :xml => @attachment.to_xml(:only=>fields) }
+        format.json  { render :json => success.merge(:attachment=>JSON.parse(@attachment.to_json(:only=>[:_id, :file_type, :file_name, :size,  :content_type, :file_link]))) }
+        format.xml  { render :xml => @attachment.to_xml(:only=>[:_id, :file_type, :file_name, :size,  :content_type, :file_link]) }
       else
         format.json { render :json=> failure.merge(INVALID_PARAMETER_ID) }
         format.xml { render :xml=>  failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>"error") } 
@@ -50,23 +51,6 @@ class V1::AttachmentsController < ApplicationController
       else
         format.json  { render :json => { "errors"=> @attachment.all_errors}}
         format.xml  { render :xml => @attachment.all_errors, :root=>"errors" }
-      end
-    end
-  end
-  
-
-  # PUT /v1/attachments/1
-  # PUT /v1/attachments/1.xml
-  def update
-    @attachment = Attachment.find(params[:id])
-
-    respond_to do |format|
-      if @attachment.update_attributes(params[:attachment])
-        format.html { redirect_to(@attachment, :notice => 'Attachment was successfully updated.') }
-        format.xml  { head :ok }
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @attachment.errors, :status => :unprocessable_entity }
       end
     end
   end

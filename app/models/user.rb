@@ -10,10 +10,16 @@ class User
   references_many :categories
   references_many :bookmarks, :dependent=>:destroy
   has_many :attachments, as: :attachable, :dependent=>:destroy
+<<<<<<< HEAD
   references_many :tasks,:dependent => :destroy
+=======
+  references_many :locations
+>>>>>>> fd8df068f9a789e69053b4ce9bb5280dcbf87e74
   attr_accessor :set_password
   
   devise :confirmable, :database_authenticatable, :registerable, :recoverable, :rememberable, :token_authenticatable, :trackable
+  attr_protected :authentication_token,:is_admin,:reset_password_token,:confirmation_token
+  attr_accessible :email,:password,:password_confirmation,:first_name,:last_name,:company,:business_unit,:job_title
 
   validates_presence_of :first_name, :message=>"first_name - Blank Parameter", :code=>2041
   validates_presence_of :last_name, :message=>"last_name - Blank Parameter", :code=>2043

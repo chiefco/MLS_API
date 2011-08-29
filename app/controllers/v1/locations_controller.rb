@@ -2,11 +2,11 @@ class V1::LocationsController < ApplicationController
   before_filter :authenticate_request!
   before_filter :find_location,:only=>[:show,:update,:destroy]
   LOCATION=[:id,:name,:latitude,:longitude]
-  
+  before_filter :paginate_params,:only=>[:index]
   def index
-    @locations = @current_user.locations
+    @locations = @current_user.locations.paginate(:page=>params[:page],:per_page=>params[:page_size])
     respond_to do |format|
-      format.xml  { render :xml => multi_result.to_xml,:root=>:result }
+      format.xml  { render :xml => multi_result.to_xml(:root=>:result) }
       format.json  { render :json =>multi_result.to_json }
     end
   end

@@ -82,4 +82,10 @@ class ApplicationController < ActionController::Base
     end 
   end 
   
+  def paginate_params
+    page=params[:page].to_i
+    page_size=params[:page_size].to_i
+    params[:page]=PAGE if page.zero?
+    params[:page_size]=PAGE_SIZE if page_size.zero?
+  end
 end

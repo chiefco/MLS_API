@@ -12,7 +12,8 @@ class Location
   before_save :find_co_ordinates
   ALLOWED_FIELDS=[:_id,:name,:latitude,:longitude]
   default_scope :only=>ALLOWED_FIELDS
-
+  SORT_BY_ALLOWED = [:name,:created_at,:updated_at]
+  ORDER_BY_ALLOWED =  [:asc,:desc]
   
   def find_co_ordinates
     latitude,longitude=Geocoder.coordinates(self.name) if self.latitude.nil? || self.longitude.nil?
@@ -35,4 +36,18 @@ class Location
     options[:methods]=[:id]
     super(options)
   end
+  
+  def self.list(params,paginate_options)
+    params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
+    params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
+    if params[:q]
+      Location.any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
+    else
+      Location.order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
+    end 
+  end
+  
+  def self.get_criteria(query)
+    [ {name: query} ]
+  end 
 end

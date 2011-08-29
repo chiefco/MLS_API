@@ -10,6 +10,7 @@ class User
   references_many :categories
   references_many :bookmarks, :dependent=>:destroy
   has_many :attachments, as: :attachable, :dependent=>:destroy
+  references_many :locations
   attr_accessor :set_password
   
   devise :confirmable, :database_authenticatable, :registerable, :recoverable, :rememberable, :token_authenticatable, :trackable

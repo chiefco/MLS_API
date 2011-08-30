@@ -9,6 +9,5 @@ class Topic
   has_many :activities, as: :activity, :dependent=>:destroy
   def get_item
     item=self.item.to_json(:only=>[:_id,:name,:description])
-    return item
   end
 end

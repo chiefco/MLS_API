@@ -35,7 +35,7 @@ class V1::AttachmentsController < ApplicationController
   # POST /v1/attachments.xml
   def create
     set_attachment_options
-    if params[:attachable_id] || params[:attachable_type]
+    if params[:attachment][:attachable_id] || params[:attachment][:attachable_type]
       @attachment = Attachment.new(params[:attachment])
     else
       @attachment = @current_user.attachments.new(params[:attachment])
@@ -71,6 +71,10 @@ class V1::AttachmentsController < ApplicationController
   end
   
   private
+  
+  def find_resource
+    @attachment = Attachment.where(:_id=>params[:id]).first
+  end 
    
   def set_attachment_options
     params[:attachment][:size] = params[:attachment][:file].size

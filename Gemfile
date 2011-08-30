@@ -21,7 +21,7 @@ gem 'builder','~> 2.1.2'
 gem 'will_paginate', '2.3.16'
 gem 'newrelic_rpm'
 gem 'mongoid_acts_as_tree'
-gem 'acts_as_full_text_searchable', :path => "vendor/gems/acts_as_full_text_searchable"
+#gem 'acts_as_full_text_searchable', :path => "vendor/gems/acts_as_full_text_searchable"
 #gem 'mongoid_search'
 #gem 'mongoid_fulltext'
 #gem 'mongoid_taggable'

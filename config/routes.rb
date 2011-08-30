@@ -2,7 +2,8 @@ MeetlinkshareApi::Application.routes.draw do
   API_VERSION1="v1"
 
   namespace :v1 do
-    resources :topics, :template_categories, :templates, :items, :bookmarks, :categories, :searches, :attachments, :custom_pages, :locations
+    resources :topics, :template_categories, :templates, :items, :bookmarks, :categories, :searches, :attachments, :custom_pages,:tasks,:locations, :pages
+    
     match "item_add_attendees" => 'items#item_add_attendees',:via=>:post
     match "item_topics/:id"=> 'items#item_topics'
     match "category_subcategories/:id" => 'categories#subcategories'
@@ -14,6 +15,12 @@ MeetlinkshareApi::Application.routes.draw do
     match "custom_page_fields" => 'custom_pages#custom_page_fields'
     match "custom_page_fields/:id" => 'custom_pages#update_custom_page_fields',:via=>:put
     match "custom_page_fields/:id" => 'custom_pages#custom_page_fields_remove',:via=>:delete
+    match "reminders" => 'tasks#add_reminder',:via=>:post
+    match "reminder/:id" => 'tasks#get_reminder',:via=>:get
+    match "reminder/:id" => 'tasks#delete_reminder',:via=>:delete
+    match "reminder/:id" => 'tasks#update_reminder',:via=>:put
+    match "reminders/:task_id" => 'tasks#get_all_reminders'
+    match "/item_tasks/:id" => 'items#get_all_tasks'
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
@@ -24,9 +31,8 @@ MeetlinkshareApi::Application.routes.draw do
     get "v1/user/:id", :to=>"v1/registrations#show"
     get "v1/users", :to=> "v1/registrations#index"
     get "users/confirmation",:to=>"v1/confirmations#show"
+    get "v1/activities",:to=> 'v1/registrations#get_activities'
   end
-
-
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

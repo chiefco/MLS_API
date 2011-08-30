@@ -19,7 +19,7 @@ Missing Parameter:
   2012: item_id - Required parameter missing
   2013: description - Required parameter missing
   2014: topi_name - Required parameter missing
-  2015: activity_cv  - Required parameter missing
+  2015: activity_type  - Required parameter missing
   2016: activity_id - Required parameter missing
   2017: task_id - Required parameter missing
   2018: time - Required parameter missing

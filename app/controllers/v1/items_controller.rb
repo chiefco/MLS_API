@@ -1,6 +1,6 @@
 class V1::ItemsController < ApplicationController
   before_filter :authenticate_request!
-  before_filter :get_item,:only=>([:update,:show,:item_categories,:destroy,:item_topics])
+  before_filter :get_item,:only=>([:update,:show,:item_categories,:destroy,:item_topics,:get_all_tasks,:list_item_attendees])
   respond_to :html, :xml, :json
   # GET /items
   # GET /items.xml
@@ -35,7 +35,7 @@ class V1::ItemsController < ApplicationController
   # POST /items.xml
 
   def create
-    @item = Item.new(params[:item])
+    @item = @current_user.items.new(params[:item])
     @template=Template.find(params[:item][:template_id]) if params[:item][:template_id]
     respond_to do |format|
       if @template
@@ -154,11 +154,22 @@ class V1::ItemsController < ApplicationController
   
   #Lists all attendees of the given item
   def list_item_attendees 
-    @item=Item.find(params[:id])
     respond_to do |format|
       if @item
          @attendees=@item.attendees
         format.json{render :json=>{:item_attendees=>@attendees.to_a.to_json(:only=>[:_id,:first_name,:last_name])}}
+      else
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
+    end
+  end
+  
+  #Get all tasks of the desired Item
+  def get_all_tasks
+    respond_to do |format|
+      if @item
+        format.json{ render :json=>{:item_task=>@item.tasks.to_a.to_json(:only=>[:description,:due_date,:_id,:is_completed],:include=>{:item=>{:only=>[:_id,:name]}})}}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}

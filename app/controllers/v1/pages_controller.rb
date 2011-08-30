@@ -27,12 +27,12 @@ class V1::PagesController < ApplicationController
   # POST /v1/pages.xml
   def create
     set_position;set_page_order;set_attachment
-    @page = @item.pages.new(params[:page])
+    @page = @item.pages.new(:page_order=>params[:page][:page_order])
 
     respond_to do |format|
       if @page.save
         @page.create_attachment(params[:attachment])
-        @page.page_texts.create(:content=>params[:page][:page_text][:content], :position=>params[:page][:page_text][:position]) if params[:page][:page_text]
+        @page.page_texts.create(params[:page][:page_text]) if params[:page][:page_text]
 
         success_json =  success.merge(:item_id=>@item.id, :page=>@page.to_json(:only=>[:_id, :page_order]).parse)
         success_json[:page].store(:page_texts,@page.page_texts.to_a.to_json(:only=>[:_id, :position, :content]).parse) unless @page.page_texts.empty?

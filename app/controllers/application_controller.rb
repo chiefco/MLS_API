@@ -88,4 +88,13 @@ class ApplicationController < ActionController::Base
     params[:page]=PAGE if page.zero?
     params[:page_size]=PAGE_SIZE if page_size.zero?
   end
+  
+  #sets values to attchment to be created
+  def set_attachment_options
+    params[:attachment][:size] = params[:attachment][:file].size
+    params[:attachment][:content_type] = params[:attachment][:file].content_type
+    params[:attachment][:file_name] =  params[:attachment][:file].original_filename if params[:attachment][:file_name].blank?
+    params[:attachment][:file_type] =  params[:attachment][:file].content_type.split('/').last if params[:attachment][:file_type].blank?
+  end 
+  
 end

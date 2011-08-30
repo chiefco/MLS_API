@@ -5,8 +5,7 @@ class PageText
   #fields
   field :position , type: Array
   field :content , type: String
-  field :page_id , type: String
-  
+   
   #associations
   referenced_in :page
   

@@ -15,12 +15,12 @@ class V1::BookmarksController < ApplicationController
             @item=Item.where(:_id=> content.bookmarkable_id).first
             bookmark_v1={:name=>@item.name,:id=>@item._id,:location=>(@item.location.nil? ? "nil" : @item.location.name)} if @item
             item<<bookmark_v1
-            sample=sample.merge({:items=>item.compact.to_json}) if sample.is_a?(Hash) 
+            sample=sample.merge({:items=>item.compact.to_json}) if sample.is_a?(Hash)
           end
         end
         bookmarks<<{:id=>bookmark._id,:name=>bookmark.name}.merge(sample).to_json
-        format.json {render :json=>{:bookmarks=>bookmarks}.merge(success).merge({:count=>@v1_bookmarks.count})} 
-        format.xml {render :xml=>{:bookmarks=>bookmarks}.merge(success).merge({:count=>@v1_bookmarks.count}).to_xml(:root=>'xml')} 
+        format.json {render :json=>{:bookmarks=>bookmarks}.merge(success).merge({:count=>@v1_bookmarks.count})}
+        format.xml {render :xml=>{:bookmarks=>bookmarks}.merge(success).merge({:count=>@v1_bookmarks.count}).to_xml(:root=>'xml')}
       end
     end
   end
@@ -103,7 +103,7 @@ class V1::BookmarksController < ApplicationController
       end
     end
   end
-  
+
   #Find the Bookmark by param[:id]
   def find_bookmark
     @v1_bookmark = Bookmark.where(:_id=>params[:id]).first

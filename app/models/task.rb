@@ -15,7 +15,7 @@ class Task
   def task_item
     {:item=>self.item.nil?  ? "nil" : self.item.to_json(:only=>[:_id,:name])}
   end
-  
+
   def self.list(params,paginate_options,user)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
@@ -23,10 +23,10 @@ class Task
       user.tasks.any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
     else
       user.tasks.order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
-    end 
+    end
   end
-  
+
   def self.get_criteria(query)
     [ {due_date: query} , { description: query }, { is_completed: query }]
-  end 
+  end
  end

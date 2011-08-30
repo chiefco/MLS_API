@@ -1,15 +1,15 @@
 class V1::AttachmentsController < ApplicationController
-  
+
   before_filter :authenticate_request!
   before_filter :find_resource, :except=>[:create, :index]
   # GET /v1/attachments
   # GET /v1/attachments.xml
   def index
-    paginate_options = {} 
+    paginate_options = {}
     paginate_options.store(:page,set_page)
     paginate_options.store(:per_page,set_page_size)
     @attachments = Attachment.list(@current_user.attachments,params,paginate_options)
-    
+
     respond_to do |format|
       format.json  { render :json => success.merge(:attachments=>JSON.parse(@attachments.to_json(:only=>[:id, :file_name, :file_type, :size, :content_type, :file_link])))}
       format.xml  { render :xml => @attachments.to_xml(:root=>'attachments', :only=>[:_id, :file_type, :file_name, :size,  :content_type, :file_link]) }
@@ -21,13 +21,13 @@ class V1::AttachmentsController < ApplicationController
   def show
 
     respond_to do |format|
-      if @attachment 
+      if @attachment
         format.json  { render :json => success.merge(:attachment=>JSON.parse(@attachment.to_json(:only=>[:_id, :file_type, :file_name, :size,  :content_type, :file_link]))) }
         format.xml  { render :xml => @attachment.to_xml(:only=>[:_id, :file_type, :file_name, :size,  :content_type, :file_link]) }
       else
         format.json { render :json=> failure.merge(INVALID_PARAMETER_ID) }
-        format.xml { render :xml=>  failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>"error") } 
-      end 
+        format.xml { render :xml=>  failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>"error") }
+      end
     end
   end
 
@@ -39,8 +39,8 @@ class V1::AttachmentsController < ApplicationController
       @attachment = Attachment.new(params[:attachment])
     else
       @attachment = @current_user.attachments.new(params[:attachment])
-    end 
-    
+    end
+
     respond_to do |format|
       if @attachment.save
         fields = [:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]
@@ -66,22 +66,22 @@ class V1::AttachmentsController < ApplicationController
       else
         format.json { render :json=> failure.merge(INVALID_PARAMETER_ID) }
         format.xml { render :xml=> failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'error') }
-      end 
+      end
     end
   end
-  
+
   private
-  
+
   def find_resource
     @attachment = Attachment.find(params[:id])
-  end 
-   
+  end
+
   #sets values to attchment to be created
   def set_attachment_options
     params[:attachment][:size] = params[:attachment][:file].size
     params[:attachment][:content_type] = params[:attachment][:file].content_type
     params[:attachment][:file_name] =  params[:attachment][:file].original_filename if params[:attachment][:file_name].blank?
     params[:attachment][:file_type] =  params[:attachment][:file].content_type.split('/').last if params[:attachment][:file_type].blank?
-  end 
-  
+  end
+
 end

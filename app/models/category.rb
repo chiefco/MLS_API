@@ -8,6 +8,7 @@ class Category
   field :user_id, :type=>String 
   acts_as_tree
   references_and_referenced_in_many :items
+  has_many :attachments, as: :attachable, :dependent=>:destroy
   referenced_in :user
   validates_presence_of :name,:message=>'name - Blank Parameter',:code=>3013
 end

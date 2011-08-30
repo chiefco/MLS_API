@@ -15,11 +15,11 @@ end
 
 module Mongoid #:nodoc:
   module Document
-  mattr_accessor :id
+    mattr_accessor :id
     def all_errors
       {:response=>:failure,:errors=>self.errors.values.flatten}
     end
-    
+
     def as_json(options={})
       attrs = super(options)
       if attrs.has_key?("_id")
@@ -28,28 +28,24 @@ module Mongoid #:nodoc:
       end
       attrs
     end
-    
+
     def id
       {:id=>self._id}
     end
-    
-    #~ def to_xml(options={})
-      #~ super({:root=>:result}.merge(options))
-    #~ end
   end
 end
 
-class Hash 
+class Hash
   def recursive_symbolize_keys!
     symbolize_keys!
     values.select{ | v | v.is_a?( Hash ) }.each{ | h | h.recursive_symbolize_keys! }
     self
   end
-  
+
   def to_success
     {:response=>:success}.merge(self)
   end
-  
+
   def to_failure
     {:response=>:failure}.merge(self)
   end

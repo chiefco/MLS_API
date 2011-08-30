@@ -20,7 +20,13 @@ class Item
   references_many :topics,:dependent => :destroy
   references_many :attendees,:dependent => :destroy
   references_many :tasks,:dependent => :destroy
+<<<<<<< HEAD
   references_many :pages,:dependent => :destroy
+=======
+  has_many :attachments, as: :attachable, :dependent=>:destroy
+  has_many :activities, as: :activity, :dependent=>:destroy
+  #~ has_many :bookmarked_contents,:as=>:bookmarkable
+>>>>>>> 9dac7166f824b138a5b8491e3cc4192320ffdb66
   has_many :bookmarked_contents, as: :bookmarkable
   referenced_in :user
   references_and_referenced_in_many :categories

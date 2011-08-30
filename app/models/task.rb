@@ -8,6 +8,7 @@ class Task
   field :assignee_id,:type=> String
   field :description,:type=> String
   references_many :reminders
+  has_many :activities, as: :activity, :dependent=>:destroy
   referenced_in :user
   referenced_in :item
   validates_presence_of :description,:code=>"3014",:message=>"description - Blank Parameter"

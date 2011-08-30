@@ -1,5 +1,5 @@
 class V1::ConfirmationsController < Devise::ConfirmationsController
-  
+
   def show
     self.resource = resource_class.confirm_by_token(params[:confirmation_token])
     if resource.errors.empty?
@@ -7,12 +7,12 @@ class V1::ConfirmationsController < Devise::ConfirmationsController
       respond_to  do |format|
         format.json { render :json=> resource.build_confirm_success_json }
         format.xml { render :xml=> resource.build_confirm_success_xml }
-      end 
+      end
     else
       respond_to  do |format|
         format.json { render :json=> resource.build_confirm_failure_json }
         format.xml { render :xml=> resource.build_confirm_failure_xml }
-      end 
+      end
     end
   end
 end

@@ -45,9 +45,9 @@ class FileUploader < CarrierWave::Uploader::Base
   def filename
      File.basename(self.url)
   end
-   
+
   def filetype
     CarrierWave::SanitizedFile.new(Attachment.last.file.url).extension
-  end     
+  end
 
 end

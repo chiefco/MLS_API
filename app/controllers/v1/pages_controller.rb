@@ -1,10 +1,10 @@
 class V1::PagesController < ApplicationController
   # GET /v1/pages
   # GET /v1/pages.xml
-  
+
   before_filter :authenticate_request!
-  before_filter :find_item 
-  
+  before_filter :find_item
+
   def index
     @pages = Page.all
 
@@ -70,25 +70,26 @@ class V1::PagesController < ApplicationController
       format.xml  { head :ok }
     end
   end
-  
+
   private
-  
+
   def find_item
     params[:item_id]="" unless params.has_key?(:item_id)
     @item = Item.find(params[:item_id])
-  end 
-  
+  end
+
   def set_position
-    if params[:page][:page_text] 
+    if params[:page][:page_text]
       return params[:page][:page_text][:position] =  eval(params[:page][:page_text][:position])  unless params[:page][:page_text][:position].blank?
       params[:page][:page_text][:position] = [0,0]
-    end 
-  end 
-  
+    end
+  end
+
   def set_page_order
-      return params[:page][:page_order] = 1 if @item.pages.empty? 
+      return params[:page][:page_order] = 1 if @item.pages.empty?
       current_page = @item.pages.order_by(:page_order, :desc).first.page_order
       return params[:page][:page_order] = current_page+=1 if params[:page][:page_order].blank?
+<<<<<<< HEAD
       params[:page][:page_order] = params[:page][:page_order].to_i > current_page ?  params[:page][:page_order] : current_page+=1  
   end 
   
@@ -98,4 +99,9 @@ class V1::PagesController < ApplicationController
     set_attachment_options
   end 
   
+=======
+      params[:page][:page_order] = params[:page][:page_order].to_i > current_page ?  params[:page][:page_order] : current_page+=1
+  end
+
+>>>>>>> d88c5742df9178c0ef03c98d47832c88da7890a1
 end

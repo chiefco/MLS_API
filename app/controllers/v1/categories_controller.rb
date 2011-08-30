@@ -18,7 +18,7 @@ class V1::CategoriesController < ApplicationController
     end
   end
 
-  def create 
+  def create
     @category = @current_user.categories.build(params[:category])
     respond_to do |format|
       if @category.save
@@ -50,39 +50,39 @@ class V1::CategoriesController < ApplicationController
       format.xml { render :xml=> success.to_xml(ROOT) }
     end
   end
-  
+
   def subcategories
     @sub_categories = @category.children
-    respond_to do |format| 
+    respond_to do |format|
       format.json { render :json=> success.merge(subcategories_success) }
       format.xml { render :xml=> success.merge(subcategories_success).to_xml(ROOT) }
-    end 
-  end 
-  
+    end
+  end
+
   def items
     @items = @category.items
-    respond_to do |format| 
+    respond_to do |format|
       format.json { render :json=> success.merge(items_success) }
       format.xml { render :xml=> success.merge(items_success).to_xml(ROOT) }
-    end 
-  end 
-  
-  private 
-  
+    end
+  end
+
+  private
+
   def subcategories_success
     {:id => params[:id] , :count=>@sub_categories.count, :sub_categories => all_objects_to_hash(@sub_categories,[:_id,:name],{:_id=>:category_id}) }
-  end 
-  
+  end
+
   def items_success
     {:id => params[:id] , :count=>@items.count, :items => all_objects_to_hash(@items,[:_id,:name],{:_id=>:item_id}) }
-  end 
-  
+  end
+
   def find_category
     @category= @current_user.categories.find(params[:id])
-  end 
-  
+  end
+
   def find_parent_category
     @parent_category=@current_user.categories.find(params[:category][:parent_id]) if params[:category] && params[:category][:parent_id]
   end
-  
+
 end

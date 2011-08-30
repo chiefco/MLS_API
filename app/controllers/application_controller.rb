@@ -15,7 +15,7 @@ class ApplicationController < ActionController::Base
       format.xml{render :xml=>{:errors=>[RECORD_NOT_FOUND]}.to_failure,:root=>:result}
     end
   end
-  
+
   rescue_from BSON::InvalidObjectId do |exception|
     respond_to do |format|
       format.json{render :json=>{:response=>:failure,:errors=>[INVALID_PARAMETER_ID]}}
@@ -23,15 +23,15 @@ class ApplicationController < ActionController::Base
     end
   end
   #~ protect_from_forgery
-  
+
   def authenticate_request!
     @current_user=User.valid_user?(params[:access_token]) if params[:access_token]
     respond_to do |format|
       format.json{render :json=>UNAUTHORIZED}
       format.xml{render :xml=>UNAUTHORIZED,:root=>:result}
     end and return unless @current_user
-  end  
-    
+  end
+
   def success
     {:response=>:success}
   end
@@ -39,20 +39,20 @@ class ApplicationController < ActionController::Base
   def failure
     {:response=>:failure}
   end
-    
+
   def clear_session
     session.clear
   end
-  
+
   def set_page_size
     params[:page_size] ? params[:page_size] : PAGE_SIZE
-  end 
+  end
 
   def set_page
     params[:page] ? params[:page] : PAGE
-  end 
-  
- 
+  end
+
+
   #maps single object to hash with supplied attributes,attributes rename options
   def object_to_hash(object,selected_fields=nil,rename={})
     unless selected_fields.blank?
@@ -60,28 +60,28 @@ class ApplicationController < ActionController::Base
       return response if rename.blank?
       rename.each do |key,value|
         response[value.to_s] = response.delete(key.to_s) if response.has_key?(key.to_s)
-      end 
+      end
       response
-    end 
-  end 
-  
+    end
+  end
+
   #maps object array to hash array with supplied attributes,attributes rename options
   def all_objects_to_hash(objects,selected_fields=nil,rename={})
     responses = []
     unless selected_fields.blank? && objects.blank?
       objects.each do |object|
         responses << object.attributes.select { |key,value| selected_fields.include?(key.to_sym) }
-      end 
+      end
       return responses if rename.blank?
       responses.each do |response|
         rename.each do |key,value|
             response[value.to_s] = response.delete(key.to_s) if response.has_key?(key.to_s)
-        end 
-      end 
+        end
+      end
       responses
-    end 
-  end 
-  
+    end
+  end
+
   def paginate_params
     page=params[:page].to_i
     page_size=params[:page_size].to_i

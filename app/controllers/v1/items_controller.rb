@@ -5,13 +5,13 @@ class V1::ItemsController < ApplicationController
   # GET /items
   # GET /items.xml
   def index
-    paginate_options = {} 
+    paginate_options = {}
     paginate_options.store(:page,set_page)
     paginate_options.store(:per_page,set_page_size)
     if params[:sort_by] && params[:order_by]
      @items = params[:q] ? Item.any_of(get_criteria(params[:q])).order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)  : Item.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)
-    elsif params[:sort_by] 
-      @items = params[:q] ? Item.any_of(get_criteria(params[:q])).order_by([params[:sort_by],:desc]).paginate(paginate_options) : Item.order_by([params[:sort_by],:desc]).paginate(paginate_options) 
+    elsif params[:sort_by]
+      @items = params[:q] ? Item.any_of(get_criteria(params[:q])).order_by([params[:sort_by],:desc]).paginate(paginate_options) : Item.order_by([params[:sort_by],:desc]).paginate(paginate_options)
     else
       @items = params[:q] ? Item.any_of(get_criteria(params[:q])).order_by(['created_at', :desc]).paginate(paginate_options) : Item.order_by(['created_at', :desc]).paginate(paginate_options)
       end
@@ -35,7 +35,7 @@ class V1::ItemsController < ApplicationController
   # POST /items.xml
 
   def create
-    @item = Item.new(params[:item])
+    @item = @current_user.items.new(params[:item])
     @template=Template.find(params[:item][:template_id]) if params[:item][:template_id]
     respond_to do |format|
       if @template
@@ -59,7 +59,7 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       if @item.update_attributes(params[:item])
         if params[:item][:location]
-          @location=Location.create(:name=>params[:item][:location]) 
+          @location=Location.create(:name=>params[:item][:location])
           @item.update_attributes(:location_id=>@location.id)
         end
         format.xml  { render :xml=>@item }
@@ -80,15 +80,15 @@ class V1::ItemsController < ApplicationController
       format.json  { render :json=> success}
     end
   end
-  
+
   def  item_topics
     @topics=@item.topics(:fields=>[:name,:_id])
-    respond_to do |format| 
+    respond_to do |format|
       format.json {render :json=>{:item=>@topics.to_a.to_json(:only=>[:name,:_id,:status]),:count=>@item.topics.count}.merge(success)}
  #~ format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>:location_name),:count=>@items.size}.merge(success)}
     end
   end
-  
+
   #finds categories of the item
   def item_categories
     categories=[]
@@ -101,7 +101,7 @@ class V1::ItemsController < ApplicationController
       end
     end
   end
-  
+
   #Adds the category to the given item
   def item_add_category
         p    params[:item_category][:item_id]
@@ -109,7 +109,7 @@ class V1::ItemsController < ApplicationController
     @item=Item.find(params[:item_category][:item_id])
     @category=Category.find(params[:item_category][:category_id])
 
-    respond_to do  |format| 
+    respond_to do  |format|
       if @item && @category
         @item.categories<<@category
         format.json{render :json=>{:item_category=>{:category_id=>@category._id,:item_id=>@item._id}}}
@@ -119,7 +119,7 @@ class V1::ItemsController < ApplicationController
       end
     end
   end
-  
+
   #Adds the attendee to the given item
   def item_add_attendees
     @item=Item.find(params[:item_attendee][:item_id])
@@ -136,7 +136,7 @@ class V1::ItemsController < ApplicationController
       end
     end
   end
-  
+
   #Removes the attendee of the item
   def item_remove_attendees
     @attendee=Attendee.find(params[:attendee_id])
@@ -151,9 +151,9 @@ class V1::ItemsController < ApplicationController
       end
     end
   end
-  
+
   #Lists all attendees of the given item
-  def list_item_attendees 
+  def list_item_attendees
     respond_to do |format|
       if @item
          @attendees=@item.attendees
@@ -164,7 +164,7 @@ class V1::ItemsController < ApplicationController
       end
     end
   end
-  
+
   #Get all tasks of the desired Item
   def get_all_tasks
     respond_to do |format|
@@ -176,11 +176,11 @@ class V1::ItemsController < ApplicationController
       end
     end
   end
-    
+
   def get_criteria(query)
     [ {name: query} , { description: query } ]
-  end 
-  
+  end
+
   def get_item
     @item=Item.find(params[:id])
   end

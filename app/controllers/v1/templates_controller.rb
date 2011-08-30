@@ -10,7 +10,7 @@ class V1::TemplatesController < ApplicationController
       format.json  { render :json =>value}
     end
   end
-  
+
   def show
     respond_to do |format|
       if @template
@@ -68,7 +68,7 @@ class V1::TemplatesController < ApplicationController
       end
     end
   end
-  
+
   #Adds Template Definition to the given template
   def add_template_definitions
     respond_to do |format|
@@ -98,7 +98,7 @@ class V1::TemplatesController < ApplicationController
       end
     end
   end
-  
+
   private
   def find_template
     @template = Template.find(params[:id])

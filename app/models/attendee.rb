@@ -7,12 +7,12 @@ class Attendee
   validates_presence_of :first_name,:code=>"3010",:message=>"first_name - Blank Parameter"
   validates_presence_of :item_id,:code=>"3026",:message=>"item_id - Blank Parameter"
 
-  
+
   def to_json(options={})
     options[:only]=[:_id,:first_name,:last_name]
     super(options)
   end
-  
+
   def to_xml(options={})
     options[:only]=[:_id,:first_name,:last_name]
     super(options)

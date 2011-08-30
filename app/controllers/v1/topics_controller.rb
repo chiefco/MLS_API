@@ -37,7 +37,7 @@ class  V1::TopicsController < ApplicationController
       if @topic
         if @topic.update_attributes(params[:topic])
           format.xml  { render :xml => @topic }
-          format.json  { render :json => {:topic=>@topic.to_json(:only=>[:name,:status,:item_id,:_id]) }.merge(success)}    
+          format.json  { render :json => {:topic=>@topic.to_json(:only=>[:name,:status,:item_id,:_id]) }.merge(success)}
         else
           format.xml  { render :xml => @topic.errors.to_xml(:root=>'xml')}
           format.json  { render :json => {"errors"=>@topic.all_errors }.merge(failure)}
@@ -63,7 +63,7 @@ class  V1::TopicsController < ApplicationController
       end
     end
   end
-  
+
    #Find the Topic by param[:id]
   def find_topic
     @topic = Topic.find(params[:id])

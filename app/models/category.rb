@@ -5,7 +5,7 @@ class Category
   field :name,:type=>String
   field :show_in_quick_links,:type=>Boolean,:default=>false
   field :parent_id, :type=>String
-  field :user_id, :type=>String 
+  field :user_id, :type=>String
   acts_as_tree
   references_and_referenced_in_many :items
   has_many :activities, as: :activity, :dependent=>:destroy

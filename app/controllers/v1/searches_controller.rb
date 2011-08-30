@@ -1,48 +1,42 @@
 class V1::SearchesController < ApplicationController
   before_filter :authenticate_request!
+  before_filter :find_search,:only=>[:show,:update,:destroy]
   def index
-    @v1_searches = Search.all
-
+    @searches = Search.all
     respond_to do |format|
-      format.xml  { render :xml => @v1_searches }
+      format.xml  { render :xml => @searches }
     end
   end
 
   def show
-    @v1_search = Search.find(params[:id])
-
     respond_to do |format|
-      format.xml  { render :xml => @v1_search }
+      format.xml  { render :xml => @search }
     end
   end
 
   def create
-    @v1_search = Search.new(params[:v1_search])
+    @search = Search.new(params[:search])
     respond_to do |format|
-      if @v1_search.save
-        format.xml  { render :xml => @v1_search, :status => :created, :location => @v1_search }
+      if @search.save
+        format.xml  { render :xml => @search, :status => :created, :location => @search }
       else
-        format.xml  { render :xml => @v1_search.errors, :status => :unprocessable_entity }
+        format.xml  { render :xml => @search.errors, :status => :unprocessable_entity }
       end
     end
   end
 
   def update
-    @v1_search = Search.find(params[:id])
-
     respond_to do |format|
-      if @v1_search.update_attributes(params[:v1_search])
+      if @search.update_attributes(params[:search])
         format.xml  { head :ok }
       else
-        format.xml  { render :xml => @v1_search.errors, :status => :unprocessable_entity }
+        format.xml  { render :xml => @search.errors, :status => :unprocessable_entity }
       end
     end
   end
 
   def destroy
-    @v1_search = Search.find(params[:id])
-    @v1_search.destroy
-
+    @search.destroy
     respond_to do |format|
       format.xml  { head :ok }
     end
@@ -50,5 +44,11 @@ class V1::SearchesController < ApplicationController
 
   def search
 
+  end
+  
+  private 
+  
+  def find_search
+    @search = Search.find(params[:id])
   end
 end

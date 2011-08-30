@@ -50,15 +50,15 @@ class V1::LocationsController < ApplicationController
       format.json  {render :json=>success }
     end
   end
-  
+
   def find_location
     @location = @current_user.locations.find(params[:id])
   end
-  
+
   def single_response
     {:response=>:success,:location=>@location}
   end
-  
+
   def multi_result
     {:response=>:success,:location=>@locations}
   end

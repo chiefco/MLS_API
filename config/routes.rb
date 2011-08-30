@@ -1,6 +1,6 @@
 MeetlinkshareApi::Application.routes.draw do
-
   API_VERSION1="v1"
+
   namespace :v1 do
     resources :topics, :template_categories, :templates, :items, :bookmarks, :categories, :searches, :attachments, :custom_pages, :locations
     match "item_add_attendees" => 'items#item_add_attendees',:via=>:post
@@ -15,6 +15,7 @@ MeetlinkshareApi::Application.routes.draw do
     match "custom_page_fields/:id" => 'custom_pages#update_custom_page_fields',:via=>:put
     match "custom_page_fields/:id" => 'custom_pages#custom_page_fields_remove',:via=>:delete
   end
+
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
     post "v1/forgot_password", :to => "v1/passwords#create"
     post "v1/users/sign_in", :to => "v1/sessions#create"

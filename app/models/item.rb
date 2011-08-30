@@ -2,7 +2,7 @@ class Item
   include Mongoid::Document
   include Mongoid::Timestamps
   acts_as_api
-  
+  include Sunspot::Mongoid
   field :name, :type => String
   field :description, :type => String
   field :item_date, :type => Time
@@ -11,10 +11,10 @@ class Item
   field :template_id, :type => String
   field :location_id, :type => String
   field :current_category_id, :type => String
-  
+
   validates_presence_of :name,:message=>'name - Required parameter missing',:code=>2009
   validates_presence_of :template_id,:message=>'template_id - Blank Parameter',:code=>3025
-  
+
   belongs_to  :template
   belongs_to  :location
   references_many :topics,:dependent => :destroy
@@ -24,11 +24,16 @@ class Item
   referenced_in :user
   references_and_referenced_in_many :categories
   referenced_in :template
+  
+  searchable :auto_index => true do
+    text :name
+    text :description
+  end
 
   def template_fields
     true
   end
-  
+
   api_accessible :item_with_user do |t|
     t.add :name
     t.add :description
@@ -36,11 +41,11 @@ class Item
     t.add :_id
     t.add :frequency_count
   end
-  
+
   api_accessible :item_detail,:extend=>:item_with_user do |t|
     t.add 'user'
   end
-  
+
   def location_name
     location=self.location.nil? ? "nil" : self.location.name
   end

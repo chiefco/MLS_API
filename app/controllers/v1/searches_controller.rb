@@ -45,9 +45,9 @@ class V1::SearchesController < ApplicationController
   def search
 
   end
-  
-  private 
-  
+
+  private
+
   def find_search
     @search = Search.find(params[:id])
   end

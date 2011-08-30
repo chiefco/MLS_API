@@ -35,7 +35,7 @@ class V1::ItemsController < ApplicationController
   # POST /items.xml
 
   def create
-    @item = Item.new(params[:item])
+    @item = @current_user.items.new(params[:item])
     @template=Template.find(params[:item][:template_id]) if params[:item][:template_id]
     respond_to do |format|
       if @template

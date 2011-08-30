@@ -30,6 +30,7 @@ MeetlinkshareApi::Application.routes.draw do
     get "v1/user/:id", :to=>"v1/registrations#show"
     get "v1/users", :to=> "v1/registrations#index"
     get "users/confirmation",:to=>"v1/confirmations#show"
+    get "v1/activities",:to=> 'v1/registrations#get_activities'
   end
 
   # The priority is based upon order of creation:

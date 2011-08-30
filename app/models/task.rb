@@ -17,7 +17,6 @@ class Task
   end
   
   def self.list(params,paginate_options,user)
-    p @current_user
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
     if params[:q]
@@ -26,4 +25,8 @@ class Task
       user.tasks.order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
     end 
   end
+  
+  def self.get_criteria(query)
+    [ {due_date: query} , { description: query }, { is_completed: query }]
+  end 
  end

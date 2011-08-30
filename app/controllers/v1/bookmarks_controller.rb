@@ -4,7 +4,7 @@ class V1::BookmarksController < ApplicationController
   # GET /v1/bookmarks
   # GET /v1/bookmarks.xml
   def index
-     @v1_bookmarks = @current_user.bookmarks
+    @v1_bookmarks = @current_user.bookmarks
     bookmarks=[]
     respond_to do |format|
       @v1_bookmarks.each do |bookmark|

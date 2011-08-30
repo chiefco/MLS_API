@@ -74,19 +74,6 @@ class V1::AttachmentsController < ApplicationController
 
   def find_resource
     @attachment = Attachment.find(params[:id])
-<<<<<<< HEAD
   end 
   
-=======
-  end
-
-  #sets values to attchment to be created
-  def set_attachment_options
-    params[:attachment][:size] = params[:attachment][:file].size
-    params[:attachment][:content_type] = params[:attachment][:file].content_type
-    params[:attachment][:file_name] =  params[:attachment][:file].original_filename if params[:attachment][:file_name].blank?
-    params[:attachment][:file_type] =  params[:attachment][:file].content_type.split('/').last if params[:attachment][:file_type].blank?
-  end
-
->>>>>>> d88c5742df9178c0ef03c98d47832c88da7890a1
 end

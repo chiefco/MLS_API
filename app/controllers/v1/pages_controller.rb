@@ -89,7 +89,6 @@ class V1::PagesController < ApplicationController
       return params[:page][:page_order] = 1 if @item.pages.empty?
       current_page = @item.pages.order_by(:page_order, :desc).first.page_order
       return params[:page][:page_order] = current_page+=1 if params[:page][:page_order].blank?
-<<<<<<< HEAD
       params[:page][:page_order] = params[:page][:page_order].to_i > current_page ?  params[:page][:page_order] : current_page+=1  
   end 
   
@@ -99,9 +98,4 @@ class V1::PagesController < ApplicationController
     set_attachment_options
   end 
   
-=======
-      params[:page][:page_order] = params[:page][:page_order].to_i > current_page ?  params[:page][:page_order] : current_page+=1
-  end
-
->>>>>>> d88c5742df9178c0ef03c98d47832c88da7890a1
 end

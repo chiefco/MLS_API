@@ -34,12 +34,11 @@ class V1::AttachmentsController < ApplicationController
   # POST /v1/attachments
   # POST /v1/attachments.xml
   def create
-    file_name,file_type = set_file_name,set_file_type
-
+    set_attachment_options
     if params[:attachable_id] || params[:attachable_type]
-      @attachment = Attachment.new(:file=>params[:file], :file_name=>file_name, :file_type=>file_type, :size=>params[:file].size, :attachable_id=>params[:attachable_id], :attachable_type=> params[:attachable_type].camelcase, :content_type=>params[:file].content_type)
+      @attachment = Attachment.new(params[:attachment])
     else
-      @attachment = @current_user.attachments.new(:file=>params[:file], :file_name=>file_name, :file_type=>file_type, :size=>params[:file].size, :content_type=>params[:file].content_type )
+      @attachment = @current_user.attachments.new(params[:attachment])
     end 
     
     respond_to do |format|
@@ -72,17 +71,12 @@ class V1::AttachmentsController < ApplicationController
   end
   
   private
-  
-  def find_resource
-    @attachment = Attachment.where(:_id=>params[:id]).first
-  end 
-  
-  def set_file_name
-    params[:file_name].blank? ? params[:file].original_filename : params[:file_name]
-  end 
-  
-  def set_file_type
-     params[:file_type].blank? ? params[:file].content_type.split('/').last : params[:file_type]
+   
+  def set_attachment_options
+    params[:attachment][:size] = params[:attachment][:file].size
+    params[:attachment][:content_type] = params[:attachment][:file].content_type
+    params[:attachment][:file_name] =  params[:attachment][:file].original_filename if params[:attachment][:file_name].blank?
+    params[:attachment][:file_type] =  params[:attachment][:file].content_type.split('/').last if params[:attachment][:file_type].blank?
   end 
   
 end

@@ -20,7 +20,7 @@ class V1::CustomPagesController < ApplicationController
       if @custom_page
         @custom_page.update_attributes(params[:custom_page])
         format.json  { render :json =>{:custom_page=>@custom_page.to_json(:only=>[:_id,:page_data])}.merge(success)}
-      else 
+      else
         format.xml  {render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
         format.json  {render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
@@ -41,9 +41,9 @@ class V1::CustomPagesController < ApplicationController
       end
     end
   end
-  
+
   #Adds the Custom Page Fields to the given Custom Page
-  def custom_page_fields 
+  def custom_page_fields
     @custom_page = CustomPage.find(params[:custom_page_field][:custom_page_id])
     respond_to do |format|
       if @custom_page
@@ -53,14 +53,14 @@ class V1::CustomPagesController < ApplicationController
         else
           format.json{render :json=>{:errors=>@custom_page_field.all_errors}.merge(failure)}
         end
-      else  
+      else
         format.json {render :json=>{:code=>"3069",:message=>"custom_page_id - Blank Parameter"}.merge(failure)}
       end
     end
   end
-  
-    #Updates the Custom Page Fields 
-  def update_custom_page_fields 
+
+    #Updates the Custom Page Fields
+  def update_custom_page_fields
      @custom_page_field = CustomPageField.where(:_id=>params[:id]).first
     respond_to do |format|
       if @custom_page_field
@@ -69,13 +69,13 @@ class V1::CustomPagesController < ApplicationController
         else
           format.json{render :json=>{:errors=>@custom_page_field.all_errors}.merge(failure)}
         end
-      else  
+      else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
   end
-  
+
     def custom_page_fields_remove
     @custom_page_field = CustomPageField.where(:_id=>params[:id]).first
     respond_to do |format|
@@ -83,16 +83,16 @@ class V1::CustomPagesController < ApplicationController
         @custom_page_field.destroy
         format.xml  { render :xml => success.to_xml(:root=>'xml') }
         format.json{render :json=>success}
-      else  
+      else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
   end
-  
+
   #finds the custompage
   def find_custom_page
    @custom_page = CustomPage.where(:_id=>params[:id]).first
   end
- 
+
 end

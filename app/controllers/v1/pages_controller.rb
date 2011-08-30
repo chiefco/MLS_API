@@ -28,12 +28,12 @@ class V1::PagesController < ApplicationController
   def create
     set_position;set_page_order;set_attachment
     @page = @item.pages.new(params[:page])
-    
+
     respond_to do |format|
       if @page.save
         @page.create_attachment(params[:attachment])
         @page.page_texts.create(:content=>params[:page][:page_text][:content], :position=>params[:page][:page_text][:position]) if params[:page][:page_text]
-        
+
         success_json =  success.merge(:item_id=>@item.id, :page=>@page.to_json(:only=>[:_id, :page_order]).parse)
         success_json[:page].store(:page_texts,@page.page_texts.to_a.to_json(:only=>[:_id, :position, :content]).parse) unless @page.page_texts.empty?
         format.json  { render :json => success_json }
@@ -89,13 +89,13 @@ class V1::PagesController < ApplicationController
       return params[:page][:page_order] = 1 if @item.pages.empty?
       current_page = @item.pages.order_by(:page_order, :desc).first.page_order
       return params[:page][:page_order] = current_page+=1 if params[:page][:page_order].blank?
-      params[:page][:page_order] = params[:page][:page_order].to_i > current_page ?  params[:page][:page_order] : current_page+=1  
-  end 
-  
+      params[:page][:page_order] = params[:page][:page_order].to_i > current_page ?  params[:page][:page_order] : current_page+=1
+  end
+
   def set_attachment
     params.store(:attachment,{})
     params[:attachment][:file] =params[:page].delete(:file)
     set_attachment_options
-  end 
-  
+  end
+
 end

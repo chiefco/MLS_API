@@ -74,6 +74,6 @@ class V1::AttachmentsController < ApplicationController
 
   def find_resource
     @attachment = Attachment.find(params[:id])
-  end 
-  
+  end
+
 end

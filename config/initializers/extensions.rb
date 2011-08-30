@@ -67,6 +67,10 @@ class String
   def decode_credentials
     Base64.decode64(self).split #decodes the credentials as [email,password]
   end
+  
+  def parse
+    JSON.parse(self)
+  end 
 end
 
 #~ #Error code for routing errors

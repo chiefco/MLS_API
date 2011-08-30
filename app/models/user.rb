@@ -11,6 +11,7 @@ class User
   references_many :bookmarks, :dependent=>:destroy
   has_many :attachments, as: :attachable, :dependent=>:destroy
   references_many :tasks,:dependent => :destroy
+  references_many :activities,:dependent => :destroy
   references_many :locations
   attr_accessor :set_password
   

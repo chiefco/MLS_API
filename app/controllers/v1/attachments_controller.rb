@@ -48,7 +48,7 @@ class V1::AttachmentsController < ApplicationController
         format.json  { render :json=> success.merge(:attachment=>object_to_hash(@attachment,fields,rename_options)) }
         format.xml  { render :xml => @attachment.to_xml(:only=>fields) }
       else
-        format.json  { render :json => { "errors"=> @attachment.all_errors}}
+        format.json  { render :json => failure.merge(:errors=> @attachment.all_errors)}
         format.xml  { render :xml => @attachment.all_errors, :root=>"errors" }
       end
     end
@@ -73,9 +73,10 @@ class V1::AttachmentsController < ApplicationController
   private
   
   def find_resource
-    @attachment = Attachment.where(:_id=>params[:id]).first
+    @attachment = Attachment.find(params[:id])
   end 
    
+  #sets values to attchment to be created
   def set_attachment_options
     params[:attachment][:size] = params[:attachment][:file].size
     params[:attachment][:content_type] = params[:attachment][:file].content_type

@@ -20,7 +20,7 @@ class Item
   references_many :topics,:dependent => :destroy
   references_many :attendees,:dependent => :destroy
   references_many :tasks,:dependent => :destroy
-  #~ has_many :bookmarked_contents,:as=>:bookmarkable
+  references_many :pages,:dependent => :destroy
   has_many :bookmarked_contents, as: :bookmarkable
   referenced_in :user
   references_and_referenced_in_many :categories

@@ -2,7 +2,7 @@ class Item
   include Mongoid::Document
   include Mongoid::Timestamps
   acts_as_api
-  #~ include Sunspot::Mongoid
+  include Sunspot::Mongoid
   field :name, :type => String
   field :description, :type => String
   field :item_date, :type => Time

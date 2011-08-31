@@ -3,23 +3,29 @@ class V1::PagesController < ApplicationController
   # GET /v1/pages.xml
 
   before_filter :authenticate_request!
-  before_filter :find_item
+  before_filter :find_page, :except=>[:create, :index]
+  before_filter :find_item, :only=>[:index, :create]
 
   def index
-    @pages = Page.all
 
+    paginate_options = {}
+    paginate_options.store(:page,set_page)
+    paginate_options.store(:per_page,set_page_size)
+    @pages = Page.list(@item.pages,params,paginate_options)
+    
     respond_to do |format|
-      format.xml  { render :xml => @pages }
+      format.json { render :json=> success.merge(:pages=>@pages.to_json(:only=>[:_id, :page_order], :include=>{:page_texts=>{:only=>[:_id, :content, :position]}, :attachment=>{:only=>[:file_link]}}).parse) }
+      format.xml { render :xml => @pages.to_xml(:only=>[:_id, :page_order])}
     end
   end
 
   # GET /v1/pages/1
   # GET /v1/pages/1.xml
   def show
-    @page = Page.find(params[:id])
-
+  
     respond_to do |format|
-      format.xml  { render :xml => @page }
+      format.json { render :json=> @page.to_json(:only=>[:_id, :page_order], :include=>{:page_texts=>{:only=>[:_id, :content, :position]}, :attachment=>{:only=>[:file_link]}}).parse.to_success }
+      format.xml { render :xml => @page.to_xml(:only=>[:_id, :page_order])}
     end
   end
 
@@ -27,14 +33,14 @@ class V1::PagesController < ApplicationController
   # POST /v1/pages.xml
   def create
     set_position;set_page_order;set_attachment
-    @page = @item.pages.new(params[:page])
+    @page = @item.pages.new(:page_order=>params[:page][:page_order])
 
     respond_to do |format|
       if @page.save
+        @page.page_texts.create(params[:page][:page_text]) if params[:page][:page_text]
         @page.create_attachment(params[:attachment])
-        @page.page_texts.create(:content=>params[:page][:page_text][:content], :position=>params[:page][:page_text][:position]) if params[:page][:page_text]
-
-        success_json =  success.merge(:item_id=>@item.id, :page=>@page.to_json(:only=>[:_id, :page_order]).parse)
+        
+        success_json =  success.merge(:item_id=>@item.id, :page=>@page.to_json(:only=>[:_id, :page_order], :include=>{:attachment=>{:only=>:file_link}}).parse)
         success_json[:page].store(:page_texts,@page.page_texts.to_a.to_json(:only=>[:_id, :position, :content]).parse) unless @page.page_texts.empty?
         format.json  { render :json => success_json }
         format.xml  { render :xml => @page.to_xml(:root=>:page, :except=>[:created_at, :updated_at]) }
@@ -48,14 +54,13 @@ class V1::PagesController < ApplicationController
   # PUT /v1/pages/1
   # PUT /v1/pages/1.xml
   def update
-    @page = Page.find(params[:id])
-
+    
     respond_to do |format|
       if @page.update_attributes(params[:page])
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @page.errors, :status => :unprocessable_entity }
+        format.json  { render :json => failure.merge(:errors=>@page.all_errors) }
+        format.xml  { render :xml => @page.all_errors, :root=>:errors}
       end
     end
   end
@@ -63,20 +68,23 @@ class V1::PagesController < ApplicationController
   # DELETE /v1/pages/1
   # DELETE /v1/pages/1.xml
   def destroy
-    @page = Page.find(params[:id])
     @page.destroy
 
     respond_to do |format|
-      format.xml  { head :ok }
+      format.json  { render :json=> success }
+      format.xml  { render :xml=> success.to_xml(:root=>:result) }
     end
   end
 
   private
 
-  def find_item
-    params[:item_id]="" unless params.has_key?(:item_id)
-    @item = Item.find(params[:item_id])
+  def find_page
+    @page = Page.find(params[:id])
   end
+
+  def find_item
+    @item = Item.find(params[:item_id])
+  end 
 
   def set_position
     if params[:page][:page_text]

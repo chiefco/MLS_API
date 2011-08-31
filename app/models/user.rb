@@ -13,6 +13,7 @@ class User
   references_many :tasks,:dependent => :destroy
   references_many :activities,:dependent => :destroy
   references_many :locations
+  references_many :searches
   attr_accessor :set_password
 
   devise :confirmable, :database_authenticatable, :registerable, :recoverable, :rememberable, :token_authenticatable, :trackable

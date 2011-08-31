@@ -6,8 +6,9 @@ class Page
   field :page_order, type: Integer
   field :item_id , type: String
 
-  #associations
+#associations
   references_many :page_texts, :dependent=>:destroy
+  has_many :bookmarked_contents, as: :bookmarkable
   belongs_to :item
   has_one :attachment, :as=>:attachable, :dependent=>:destroy
 

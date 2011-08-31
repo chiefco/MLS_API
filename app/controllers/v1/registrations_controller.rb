@@ -54,7 +54,6 @@ class V1::RegistrationsController < Devise::RegistrationsController
     paginate_options.store(:page,set_page)
     paginate_options.store(:per_page,set_page_size)
     @activities = Activity.list(params,paginate_options,@current_user)
-    p @activities.count
     respond_to do |format|
       format.json{ render :json=>{:activities=>@activities.to_json(:only=>[:_id,:description,:activity_type],:include=>{:activity=>{:only=>[:_id,:name,:description,:item_date,:is_completed,:due_date,:show_in_quick_links,:status]}})}.to_success}
     end

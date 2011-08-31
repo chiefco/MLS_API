@@ -31,10 +31,10 @@ Missing Parameter:
   2024: page_order - Required parameter missing
   2025: category_id - Required parameter missing
   2026: attachable_id - Required parameter missing
-  2027:  attachable_type - Required parameter missing
+  2027: attachable_type - Required parameter missing
   2028: attachment_id - Required parameter missing
-  2029:  file_name - Required parameter missing
-  2030:  file_type - Required parameter missing
+  2029: file_name - Required parameter missing
+  2030: file_type - Required parameter missing
   2031: Search value - Required parameter missing
 Invalid Parameter:
   3001: A Parameter is Invalid  Unable to identify parameter
@@ -122,4 +122,4 @@ Upload Error:
   6005: File size too large
 Conditions Failed:
   7001: Conditions not satisfied
-  name : name-already exist
+  7002: name-already exist

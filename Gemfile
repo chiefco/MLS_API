@@ -25,9 +25,9 @@ gem 'mongoid_acts_as_tree'
 #gem 'mongoid_search'
 #gem 'mongoid_fulltext'
 #gem 'mongoid_taggable'
-#gem 'sunspot_mongoid'
-#gem 'sunspot'
-#gem 'sunspot_rails'
+gem 'sunspot_mongoid'
+gem 'sunspot'
+gem 'sunspot_rails'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 
 

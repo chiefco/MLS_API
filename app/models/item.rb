@@ -28,10 +28,10 @@ class Item
   references_and_referenced_in_many :categories
   referenced_in :template
 
-  #~ searchable :auto_index => true do
-    #~ text :name
-    #~ text :description
-  #~ end
+  searchable :auto_index => true do
+    text :name
+    text :description
+  end
 
   def template_fields
     true

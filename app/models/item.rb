@@ -55,4 +55,14 @@ class Item
   def location_name
     location=self.location.nil? ? "nil" : self.location.name
   end
+  
+  def self.list(params,paginate_options,user)
+    params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
+    params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
+    if params[:q]
+      user.items.any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
+    else
+      user.items.order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
+    end
+  end
 end

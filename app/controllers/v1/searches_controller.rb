@@ -50,7 +50,10 @@ class V1::SearchesController < ApplicationController
   end
 
   def search
-    @searches=Sunspot.search(Item, Category, Location, Bookmark){keywords params[:q]; with(:user_id,@current_user.id)}
+    @searches=Sunspot.search(Item, Category, Location, Bookmark) do |search|
+      search.keywords params[:q]
+      search.with(:user_id,@current_user.id)
+    end
     #~ @searches=@current_user.items.solr_search do |search|
       #~ search.keywords params[:q]
     #~ end

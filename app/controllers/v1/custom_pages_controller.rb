@@ -1,6 +1,7 @@
 class V1::CustomPagesController < ApplicationController
     before_filter :authenticate_request!
     before_filter :find_custom_page,:only=>([:update,:destroy])
+    before_filter :find_custom_page_field,:only=>([:update_custom_page_fields,:custom_page_fields_remove])
 
   # POST /custom_pages
   # POST /custom_pages.xml
@@ -61,7 +62,6 @@ class V1::CustomPagesController < ApplicationController
 
     #Updates the Custom Page Fields
   def update_custom_page_fields
-     @custom_page_field = CustomPageField.where(:_id=>params[:id]).first
     respond_to do |format|
       if @custom_page_field
         if @custom_page_field.update_attributes(params[:custom_page_field])
@@ -77,7 +77,6 @@ class V1::CustomPagesController < ApplicationController
   end
 
     def custom_page_fields_remove
-    @custom_page_field = CustomPageField.where(:_id=>params[:id]).first
     respond_to do |format|
       if @custom_page_field
         @custom_page_field.destroy
@@ -94,5 +93,7 @@ class V1::CustomPagesController < ApplicationController
   def find_custom_page
    @custom_page = CustomPage.where(:_id=>params[:id]).first
   end
-
+  def find_custom_page_field
+     @custom_page_field = CustomPageField.find(params[:id])
+  end
 end

@@ -2,6 +2,7 @@ class Category
   include Mongoid::Document
   include Mongoid::Timestamps
   include Mongoid::Acts::Tree
+  include Sunspot::Mongoid
   field :name,:type=>String
   field :show_in_quick_links,:type=>Boolean,:default=>false
   field :parent_id, :type=>String
@@ -12,4 +13,9 @@ class Category
   has_many :attachments, as: :attachable, :dependent=>:destroy
   referenced_in :user
   validates_presence_of :name,:message=>'name - Blank Parameter',:code=>3013
+  after_save :sunspot_index
+  searchable do
+    text :name
+    string :user_id
+  end
 end

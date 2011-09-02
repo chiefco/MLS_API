@@ -1,6 +1,7 @@
 class Task
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Sunspot::Mongoid
   SORT_BY_ALLOWED = [ :due_date, :is_completed, :description]
   ORDER_BY_ALLOWED =  [:asc,:desc]
   field :due_date, :type => Time
@@ -12,6 +13,13 @@ class Task
   referenced_in :user
   referenced_in :item
   validates_presence_of :description,:code=>"3014",:message=>"description - Blank Parameter"
+  after_save :sunspot_index
+  searchable do
+    text :description
+    date :due_date
+    string :user_id
+  end
+  
   def task_item
     {:item=>self.item.nil?  ? "nil" : self.item.to_json(:only=>[:_id,:name])}
   end

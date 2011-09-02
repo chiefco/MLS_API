@@ -27,16 +27,19 @@ class Item
   referenced_in :user
   references_and_referenced_in_many :categories
   referenced_in :template
-
-  searchable :auto_index => true do
+  
+  after_save :sunspot_index
+  
+  searchable do
     text :name
     text :description
+    string :user_id
   end
-
+  
   def template_fields
     true
   end
-
+  
   api_accessible :item_with_user do |t|
     t.add :name
     t.add :description

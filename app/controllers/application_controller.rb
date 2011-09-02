@@ -96,5 +96,9 @@ class ApplicationController < ActionController::Base
     params[:attachment][:file_name] =  params[:attachment][:file].original_filename if params[:attachment][:file_name].blank?
     params[:attachment][:file_type] =  params[:attachment][:file].content_type.split('/').last if params[:attachment][:file_type].blank?
   end
-
+  def add_pagination
+    @paginate_options = {}
+    @paginate_options.store(:page,set_page)
+    @paginate_options.store(:per_page,set_page_size)  
+  end
 end

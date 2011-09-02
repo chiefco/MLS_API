@@ -32,6 +32,10 @@ module Mongoid #:nodoc:
     def id
       {:id=>self._id}
     end
+    
+    def sunspot_index
+      Sunspot.index!(self)
+    end
   end
 end
 

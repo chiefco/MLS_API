@@ -1,12 +1,9 @@
 class V1::RegistrationsController < Devise::RegistrationsController
   before_filter :authenticate_request!,:except=>[:create]
   before_filter :change_params,:only=>[:update,:reset_password]
-
+  before_filter :add_pagination,:only=>[:index,:get_activities]
   def index
-    paginate_options = {}
-    paginate_options.store(:page,set_page)
-    paginate_options.store(:per_page,set_page_size)
-    @users = User.list(params,paginate_options)
+    @users = User.list(params,@paginate_options)
     respond_to do |format|
       format.xml{ render_for_api :user_with_out_token, :xml => @users, :root => :users}
       format.json{render_for_api :user_with_out_token, :json => @users, :root => :users}
@@ -50,10 +47,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
 
     #Retrieves the Activities of the User
   def get_activities
-    paginate_options = {}
-    paginate_options.store(:page,set_page)
-    paginate_options.store(:per_page,set_page_size)
-    @activities = Activity.list(params,paginate_options,@current_user)
+    @activities = Activity.list(params,@paginate_options,@current_user)
     respond_to do |format|
       format.json{ render :json=>{:activities=>@activities.to_json(:only=>[:_id,:description,:activity_type],:include=>{:activity=>{:only=>[:_id,:name,:description,:item_date,:is_completed,:due_date,:show_in_quick_links,:status]}})}.to_success}
     end

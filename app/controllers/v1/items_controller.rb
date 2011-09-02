@@ -2,24 +2,16 @@ class V1::ItemsController < ApplicationController
   before_filter :authenticate_request!
   before_filter :get_item,:only=>([:update,:show,:item_categories,:destroy,:item_topics,:get_all_tasks,:list_item_attendees])
   respond_to :html, :xml, :json
+  before_filter :add_pagination,:only=>[:index]
+
   # GET /items
   # GET /items.xml
   def index
-    paginate_options = {}
-    paginate_options.store(:page,set_page)
-    paginate_options.store(:per_page,set_page_size)
-    if params[:sort_by] && params[:order_by]
-     @items = params[:q] ? Item.any_of(get_criteria(params[:q])).order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)  : Item.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)
-    elsif params[:sort_by]
-      @items = params[:q] ? Item.any_of(get_criteria(params[:q])).order_by([params[:sort_by],:desc]).paginate(paginate_options) : Item.order_by([params[:sort_by],:desc]).paginate(paginate_options)
-    else
-      @items = params[:q] ? Item.any_of(get_criteria(params[:q])).order_by(['created_at', :desc]).paginate(paginate_options) : Item.order_by(['created_at', :desc]).paginate(paginate_options)
-      end
-    #~ @items = Item.paginate(conditions: {page: params[:page], per_page:params[:size]})
+    @items = Item.list(params,@paginate_options,@current_user)
     respond_to do |format|
       format.xml  { render :xml => @items}
-      format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>:location_name),:count=>@items.size}.merge(success)}
-    end
+      format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>:location_name).parse,:count=>@items.size}.merge(success)}
+  end
   end
 
   # GET /items/1

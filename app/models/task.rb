@@ -4,6 +4,7 @@ class Task
   include Sunspot::Mongoid
   SORT_BY_ALLOWED = [ :due_date, :is_completed, :description]
   ORDER_BY_ALLOWED =  [:asc,:desc]
+  #~ STATUS_TASK=[:current_task,:late_task,:pending_task]
   field :due_date, :type => Time
   field :is_completed,:type=> Boolean,:default=>false
   field :assignee_id,:type=> String
@@ -29,9 +30,9 @@ class Task
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
     query = 'user.tasks'
     query += '.any_of(self.get_criteria(params[:q]))' if params[:q]
-    query +='.where(:due_date.gt=>params[:current_task].to_time,:due_date.lt=>params[:current_task].to_time.tomorrow)' if params[:current_task]
-    query +='.where(:due_date.lt=>Date.today)' if params[:late_task]
-    query +='.where(:due_date.gt=>Date.today)' if params[:pending_task]
+    query +='.where(:due_date.gt=>Date.today,:due_date.lt=>Date.tomorrow)' if params.include? "current_task" 
+    query +='.where(:due_date.lt=>Date.today)' if params.include? "late_task" 
+    query +='.where(:due_date.gt=>Date.today)' if params.include? "pending_task" 
     query +='.where(:activity_type=>params[:activity_type])' if params[:activity_type]
     query += '.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)'
     eval(query)

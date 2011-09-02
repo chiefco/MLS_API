@@ -135,14 +135,7 @@ class V1::PagesController < ApplicationController
     return true if params[:page] && params[:page].has_key?(:file) && !params[:page][:file].blank?
     false 
   end 
-  
-  def render_invalid_file
-    respond_to do |format|
-      format.json { render :json=> {:message=>"The file was not correctly uploaded", :code=>"6001"}.to_failure }
-      format.xml { render :xml=> {:message=>"The file was not correctly uploaded", :code=>"6001"}.to_failure.to_xml(:root=>"error") }
-    end 
-  end 
-  
+   
   def  update_page_texts     
     params[:page][:page_text].each do |page_txt|
       page_txt_to_update = @page.page_texts.find(page_txt["id"])

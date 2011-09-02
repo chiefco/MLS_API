@@ -27,11 +27,14 @@ class Task
   def self.list(params,paginate_options,user)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
-    if params[:q]
-      user.tasks.any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
-    else
-      user.tasks.order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
-    end
+    query = 'user.tasks'
+    query += '.any_of(self.get_criteria(params[:q]))' if params[:q]
+    query +='.where(:due_date.gt=>params[:current_task].to_time,:due_date.lt=>params[:current_task].to_time.tomorrow)' if params[:current_task]
+    query +='.where(:due_date.lt=>Date.today)' if params[:late_task]
+    query +='.where(:due_date.gt=>Date.today)' if params[:pending_task]
+    query +='.where(:activity_type=>params[:activity_type])' if params[:activity_type]
+    query += '.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)'
+    eval(query)
   end
 
   def self.get_criteria(query)

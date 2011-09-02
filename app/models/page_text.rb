@@ -5,12 +5,8 @@ class PageText
   #fields
   field :position , type: Array
   field :content , type: String
-  field :page_id , type: String
 
   #associations
-  referenced_in :page
-
-  #validations
-  validates_presence_of :page_id, :message=>"page_id - Blank Parameter", :code=>3031
+  embedded_in :page
 
 end

@@ -1,53 +1,22 @@
 class V1::BookmarksController < ApplicationController
   before_filter :authenticate_request!
-  before_filter :find_bookmark,:only=>([:update,:show,:destroy])
+  before_filter :find_bookmark,:only=>([:update,:show,:destroy,:add_bookmark])
+  #~ before_filter :validate_bookmark,:only=>([:add_bookmark])
   # GET /v1/bookmarks
   # GET /v1/bookmarks.xml
   def index
-    @v1_bookmarks = @current_user.bookmarks
-    bookmarks=[]
+    @bookmark=Bookmark.all
     respond_to do |format|
-      @v1_bookmarks.each do |bookmark|
-        sample={}
-        item=[]
-        bookmark.bookmarked_contents.each do |content|
-          if content.bookmarkable_type=="Item"
-            @item=Item.where(:_id=> content.bookmarkable_id).first
-            bookmark_v1={:name=>@item.name,:id=>@item._id,:location=>(@item.location.nil? ? "nil" : @item.location.name)} if @item
-            item<<bookmark_v1
-            sample=sample.merge({:items=>item.compact.to_json}) if sample.is_a?(Hash)
-          end
-        end
-        bookmarks<<{:id=>bookmark._id,:name=>bookmark.name}.merge(sample).to_json
-        format.json {render :json=>{:bookmarks=>bookmarks}.merge(success).merge({:count=>@v1_bookmarks.count})}
-        format.xml {render :xml=>{:bookmarks=>bookmarks}.merge(success).merge({:count=>@v1_bookmarks.count}).to_xml(:root=>'xml')}
-      end
+      format.json{render :json=>{:bookmarks=>@bookmark.to_json(:only=>[:_id,:name],:include=>{:bookmarked_contents=>{:include=>{:bookmarkable=>{:only=>[:_id,:name,:description,:page_order,:attachable_type,:attachable_id,:file_name,:file_type]}},:only=>[:_id,:bookmarkable_type,:bookmarkable_id]}}).parse}}
     end
   end
 
   # GET /v1/bookmarks/1
   # GET /v1/bookmarks/1.xml
   def show
-    item=[]
-    attachments=[]
-    sample={}
     respond_to do |format|
-      if  @v1_bookmark
-        bookmarks={:bookmark=>{:name=>@v1_bookmark.name,:id=>@v1_bookmark._id}}
-        @v1_bookmark.bookmarked_contents.each do |bookmark|
-          if bookmark.bookmarkable_type=="Item"
-            @item=Item.where(:_id=> bookmark.bookmarkable_id).first
-            bookmark_v1={:name=>@item.name,:id=>@item._id,:location=>(@item.location.nil? ? "nil" : @item.location.name)} if @item
-            item<<bookmark_v1
-            sample=sample.merge({:items=>item.to_json}) if sample.is_a?(Hash)
-            #~ elsif bookmark.bookmarkable_type=="item1"
-            #~ @item=Item.where(:_id=> bookmark.bookmarkable_id).first
-            #~ bookmark_v2={:name=>@item.name,:id=>@item._id,:location=>(@item.location.nil? ? "nil" : @item.location.name)}    if @item
-            #~ attachments<<bookmark_v2
-            #~ sample=sample.merge({:attachments=>attachments.to_json}) if sample.is_a?(Hash)
-          end
-        end
-        format.json {render :json=>sample.merge(bookmarks).merge(success)}
+      if @v1_bookmark
+        format.json{render :json=>{:bookmark=>@v1_bookmark.to_json(:only=>[:_id,:name],:include=>{:bookmarked_contents=>{:include=>{:bookmarkable=>{:only=>[:_id,:name,:description,:page_order,:attachable_type,:attachable_id,:file_name,:file_type]}},:only=>[:_id,:bookmarkable_type,:bookmarkable_id]}}).parse}}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
@@ -103,9 +72,45 @@ class V1::BookmarksController < ApplicationController
       end
     end
   end
-
+  
+  #Add items in the bookmark
+  def add_bookmark
+    if @v1_bookmark
+        @v1_bookmark.user==@current_user ? process_in_bookmark_content : failure_save
+    else
+      failure_save
+    end
+  end
+  
+  def save_bookmark_content
+    @v1_bookmark.save
+    respond_to do |format|
+      format.json {render :json => success}
+    end
+  end
   #Find the Bookmark by param[:id]
   def find_bookmark
     @v1_bookmark = Bookmark.where(:_id=>params[:id]).first
+  end
+  
+  def process_in_bookmark_content
+    @v1_bookmark=@v1_bookmark.bookmarked_contents.new(params[:add_bookmark])
+    @v1_bookmark.bookmarkable.nil? ? failure_save : validate_in_bookmark_content
+  end
+
+  def validate_in_bookmark_content
+    @bookmarkable=@v1_bookmark.bookmarkable
+      if @bookmarkable.class.to_s == "Page"
+        @bookmarkable.item.user != @current_user ? failure_save : save_bookmark_content
+      else
+        @bookmarkable.user != @current_user ? failure_save : save_bookmark_content
+      end
+  end
+
+  def  failure_save
+    respond_to do |format|
+      format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
+      format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+    end
   end
 end

@@ -21,7 +21,12 @@ MeetlinkshareApi::Application.routes.draw do
     match "reminder/:id" => 'tasks#update_reminder',:via=>:put
     match "reminders/:task_id" => 'tasks#get_all_reminders'
     match "/item_tasks/:id" => 'items#get_all_tasks'
+<<<<<<< HEAD:config/routes.rb
     match "/generic_search" => 'searches#search'
+=======
+    match "/add_bookmark/:id" => 'bookmarks#add_bookmark'    
+    match "/generic_search" => 'search#search'
+>>>>>>> 4f6d55123f07854a3b79874067287517c17e72c7:config/routes.rb
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do

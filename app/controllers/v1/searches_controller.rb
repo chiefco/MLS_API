@@ -50,7 +50,14 @@ class V1::SearchesController < ApplicationController
   end
 
   def search
-
+    @searches=Sunspot.search(Item, Category, Location, Bookmark){keywords params[:q]; with(:user_id,@current_user.id)}
+    #~ @searches=@current_user.items.solr_search do |search|
+      #~ search.keywords params[:q]
+    #~ end
+    respond_to do |format|
+      format.xml  { render :xml => @searches.results.to_xml(:root=>:result) }
+      format.json  { render :json => @searches.results }
+    end
   end
 
   private

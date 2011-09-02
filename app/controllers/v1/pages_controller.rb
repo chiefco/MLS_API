@@ -60,11 +60,12 @@ class V1::PagesController < ApplicationController
   # PUT /v1/pages/1.xml
   def update
     if valid_file? 
-      set_position; set_page_order; set_attachment
-
+      set_position; set_attachment
+      
       respond_to do |format|
         if @page.update_attributes(:page_order=>params[:page][:page_order], :item_id=>params[:item_id])
-          update_page_texts
+          @page.attachment.update_attributes(params[:attachment])
+          update_page_texts  unless params[:page][:page_text].blank?
           
           success_json =  success.merge(:item_id=>@item.id, :page=>@page.to_json(:only=>[:_id, :page_order], :include=>{:attachment=>{:only=>:file_link}}).parse)
           success_json[:page].store(:page_texts,@page.page_texts.to_a.to_json(:only=>[:_id, :position, :content]).parse) unless @page.page_texts.empty?
@@ -122,7 +123,7 @@ class V1::PagesController < ApplicationController
       current_page = @item.pages.order_by(:page_order, :desc).first.page_order
       current_pages = @item.pages.map(&:page_order)
       return params[:page][:page_order] = current_page+=1 if params[:page][:page_order].blank?
-      params[:page][:page_order] = !current_pages.include?(params[:page][:page_order].to_i) ?  params[:page][:page_order] : current_page+=1
+      params[:page][:page_order] = !current_pages.include?(params[:page][:page_order].to_i) ?  params[:page][:page_order].to_i : current_page+=1
   end
 
   def set_attachment
@@ -132,13 +133,13 @@ class V1::PagesController < ApplicationController
   end
   
   def valid_file?
-    return true if params[:page] && params[:page].has_key?(:file) && !params[:page][:file].blank?
+    return true if params[:page] && params[:page].has_key?(:file) && !params[:page][:file].blank? 
     false 
   end 
    
   def  update_page_texts     
     params[:page][:page_text].each do |page_txt|
-      page_txt_to_update = @page.page_texts.find(page_txt["id"])
+      page_txt_to_update = @page.page_texts.find(page_txt["id"]) if page_txt["id"]
       page_txt_to_update.update_attributes(:content=>page_txt["content"], :position=>page_txt["position"]) if page_txt_to_update
     end 
   end 

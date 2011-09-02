@@ -97,7 +97,7 @@ class ApplicationController < ActionController::Base
     params[:attachment][:file_type] =  params[:attachment][:file].content_type.split('/').last if params[:attachment][:file_type].blank?
   end
   
-  #renders missing parameter respose 
+  #renders missing parameter response 
   def render_missing(parameter,code)
     respond_to do |format|
       format.json { render :json=> {:message=>"#{parameter} - Required parameter missing", :code=>code}.to_failure }

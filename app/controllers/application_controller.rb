@@ -100,9 +100,19 @@ class ApplicationController < ActionController::Base
     params[:attachment][:file_name] =  params[:attachment][:file].original_filename if params[:attachment][:file_name].blank?
     params[:attachment][:file_type] =  params[:attachment][:file].content_type.split('/').last if params[:attachment][:file_type].blank?
   end
+  
+  #renders missing parameter respose 
+  def render_missing(parameter,code)
+    respond_to do |format|
+      format.json { render :json=> {:message=>"#{parameter} - Required parameter missing", :code=>code}.to_failure }
+      format.xml { render :xml=> {:message=>"#{parameter} - Required parameter missing", :code=>code}.to_failure.to_xml(:root=>"error") }
+    end 
+  end 
+
   def add_pagination
     @paginate_options = {}
     @paginate_options.store(:page,set_page)
     @paginate_options.store(:per_page,set_page_size)  
   end
+ 
 end

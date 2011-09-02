@@ -108,6 +108,7 @@ Invalid Parameter:
   3068: field_type - Blank Parameter
   3069: custom_page_id - Blank Parameter
   3070: password reset token - Invalid Parameter
+  3071: name-already exist
 Format Error:
   4001: email - Invalid email format
   4002: due_date - Invalid date format
@@ -123,4 +124,4 @@ Upload Error:
   6005: File size too large
 Conditions Failed:
   7001: Conditions not satisfied
-  7002: name-already exist
+  7002: Bad request

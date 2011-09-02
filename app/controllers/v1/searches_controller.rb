@@ -1,6 +1,7 @@
 class V1::SearchesController < ApplicationController
   before_filter :authenticate_request!
   before_filter :find_search,:only=>[:show,:update,:destroy]
+  SEARCH_FIELDS=[:response,:searches,:name,:description,:_type,:_id]
   def index
     @searches = @current_user.searches.all
     respond_to do |format|
@@ -58,8 +59,8 @@ class V1::SearchesController < ApplicationController
       #~ search.keywords params[:q]
     #~ end
     respond_to do |format|
-      format.xml  { render :xml => @searches.results.to_xml(:root=>:result) }
-      format.json  { render :json => @searches.results }
+      format.xml  { render :xml => {:response=>:success,:searches=>@searches.results}.to_xml(:root=>:result,:only=>SEARCH_FIELDS) }
+      format.json  { render :json => {:response=>:success,:searches=>@searches.results}.to_json(:only=>SEARCH_FIELDS) }
     end
   end
 

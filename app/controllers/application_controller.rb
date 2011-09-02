@@ -22,6 +22,10 @@ class ApplicationController < ActionController::Base
       format.xml{render :xml=>{:errors=>[INVALID_PARAMETER_ID]}.to_failure,:root=>:result}
     end
   end
+  
+  rescue_from Exception do |exception|
+    logger.info exception.inspect
+  end
   #~ protect_from_forgery
 
   def authenticate_request!

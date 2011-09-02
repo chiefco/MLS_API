@@ -4,12 +4,10 @@ class V1::TasksController < ApplicationController
   before_filter :find_reminder,:only=>([:get_reminder,:delete_reminder,:update_reminder])
   	#Retrieves the tasks of the current_user
 	def index
-		p @current_user.tasks.count
 		paginate_options = {}
     paginate_options.store(:page,set_page)
     paginate_options.store(:per_page,set_page_size)
     @tasks = Task.list(params,paginate_options,@current_user)
-		p @tasks.count
 			respond_to do |format|
 				format.json {render :json=>{:tasks=>@tasks.to_a.to_json(:only=>[:_id,:due_date,:is_completed,:description],:include=>{:item=>{:only=>[:_id,:name]}})}}
 			end

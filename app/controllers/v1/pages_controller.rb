@@ -61,7 +61,8 @@ class V1::PagesController < ApplicationController
   def update
     if valid_file? 
       set_position; set_attachment
-      
+      params[:page][:page_order] = @page.page_order if params[:page][:page_order].blank?
+
       respond_to do |format|
         if @page.update_attributes(:page_order=>params[:page][:page_order], :item_id=>params[:item_id])
           @page.attachment.update_attributes(params[:attachment])
@@ -143,5 +144,4 @@ class V1::PagesController < ApplicationController
       page_txt_to_update.update_attributes(:content=>page_txt["content"], :position=>page_txt["position"]) if page_txt_to_update
     end 
   end 
-
 end

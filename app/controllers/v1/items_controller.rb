@@ -91,7 +91,7 @@ class V1::ItemsController < ApplicationController
       @topics=@item.topics
         @topic={:item=>@topics.serializable_hash(:only=>[:name,:_id,:status]),:count=>@item.topics.count}.to_success
         format.json {render :json=>@topic}
-        format.json {render :json=>@topic.to_xml(:root=>:xml)}
+        format.xml {render :xml=>@topic.to_xml(:root=>:xml)}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}

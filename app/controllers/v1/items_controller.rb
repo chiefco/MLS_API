@@ -18,7 +18,7 @@ class V1::ItemsController < ApplicationController
   def show
     respond_to do |format|
       if @item 
-        @item={"item"=>{:item_id=>@item.id,:item_name=>@item.name,:location=>(@item.location.nil? ? "nil" : @item.location.name),:description=>@item.description,:current_category_name=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id).name),:created_at=>@item.created_at,:updated_at=>@item.updated_at}}.to_success
+        @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date],:include=>{:location=>{:only=>[:_id,:name]}}),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id)}.to_success
         format.xml  { render :xml => @item.to_xml(ROOT) }
         format.json  { render :json => @item}
       else
@@ -86,10 +86,16 @@ class V1::ItemsController < ApplicationController
   end
 
   def  item_topics
-    @topics=@item.topics(:fields=>[:name,:_id])
     respond_to do |format|
-      format.json {render :json=>{:item=>@topics.to_a.to_json(:only=>[:name,:_id,:status]),:count=>@item.topics.count}.merge(success)}
- #~ format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>:location_name),:count=>@items.size}.merge(success)}
+      if @item
+      @topics=@item.topics
+        @topic={:item=>@topics.serializable_hash(:only=>[:name,:_id,:status]),:count=>@item.topics.count}.to_success
+        format.json {render :json=>@topic}
+        format.json {render :json=>@topic.to_xml(:root=>:xml)}
+      else
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
     end
   end
 

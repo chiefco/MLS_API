@@ -96,3 +96,22 @@ module ForDevise
     SecureRandom.base64(count).tr('+/=', 'xyz')
   end
 end
+
+#to customize authentication_token length 
+module Devise
+  def self.friendly_token(len=15)
+    SecureRandom.base64(len).tr('+/=', 'xyz')
+  end
+  module Models
+    module Authenticatable
+      module ClassMethods
+        def generate_token(column)
+          loop do
+            token = column.eql?(:authentication_token) ? Devise.friendly_token(24) : Devise.friendly_token
+            break token unless to_adapter.find_first({ column => token })
+          end
+        end
+      end 
+    end 
+  end 
+end 

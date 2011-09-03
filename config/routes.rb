@@ -29,6 +29,7 @@ MeetlinkshareApi::Application.routes.draw do
     post "v1/forgot_password", :to => "v1/passwords#create"
     post "v1/users/sign_in", :to => "v1/sessions#create"
     post "v1/users", :to => "v1/registrations#create"
+    put "v1/users/:id", :to => "v1/registrations#update"
     post "v1/reset_password", :to => "v1/passwords#update"
     get "v1/user/:id", :to=>"v1/registrations#show"
     get "v1/users", :to=> "v1/registrations#index"

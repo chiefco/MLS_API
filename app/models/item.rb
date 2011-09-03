@@ -17,6 +17,7 @@ class Item
 
   belongs_to  :template
   belongs_to  :location
+  has_one :item
   references_many :topics,:dependent => :destroy
   references_many :attendees,:dependent => :destroy
   references_many :tasks,:dependent => :destroy

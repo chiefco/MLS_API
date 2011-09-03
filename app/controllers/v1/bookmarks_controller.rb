@@ -20,7 +20,7 @@ class V1::BookmarksController < ApplicationController
         format.json{render :json=>@v1_bookmark}
         format.xml{render :xml=>@v1_bookmark.to_xml(:root=>:xml)}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
@@ -54,7 +54,7 @@ class V1::BookmarksController < ApplicationController
         format.json  { render :json => @v1_bookmark.all_errors }
         end
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
@@ -66,10 +66,10 @@ class V1::BookmarksController < ApplicationController
      respond_to do |format|
       if  @v1_bookmark
         @v1_bookmark.destroy
-        format.xml  { render :xml => success.to_xml(:root=>'xml') }
+        format.xml  { render :xml => success.to_xml(ROOT) }
         format.json  { render :json=> success}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
@@ -113,7 +113,7 @@ class V1::BookmarksController < ApplicationController
 
   def  failure_save
     respond_to do |format|
-      format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
+      format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
       format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
     end
   end

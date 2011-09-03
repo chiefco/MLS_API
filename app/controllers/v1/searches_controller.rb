@@ -1,6 +1,7 @@
 class V1::SearchesController < ApplicationController
   before_filter :authenticate_request!
   before_filter :find_search,:only=>[:show,:update,:destroy]
+  before_filter :paginate_params,:only=>:search
   SEARCH_FIELDS=[:response,:searches,:name,:description,:_type,:_id]
   def index
     @searches = @current_user.searches.all
@@ -54,13 +55,15 @@ class V1::SearchesController < ApplicationController
     @searches=Sunspot.search(Item, Category, Location, Bookmark) do |search|
       search.keywords params[:q]
       search.with(:user_id,@current_user.id)
+      search.paginate :page =>params[:page], :per_page=>params[:page_size]
     end
+    results=@searches.results
     #~ @searches=@current_user.items.solr_search do |search|
       #~ search.keywords params[:q]
     #~ end
     respond_to do |format|
-      format.xml  { render :xml => {:response=>:success,:searches=>@searches.results}.to_xml(:root=>:result,:only=>SEARCH_FIELDS) }
-      format.json  { render :json => {:response=>:success,:searches=>@searches.results}.to_json(:only=>SEARCH_FIELDS) }
+      format.xml  { render :xml => {:response=>:success,:searches=>results}.to_xml(:root=>:result,:only=>SEARCH_FIELDS) }
+      format.json  { render :json => {:response=>:success,:searches=>results}.to_json(:only=>SEARCH_FIELDS) }
     end
   end
 

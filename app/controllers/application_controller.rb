@@ -8,18 +8,18 @@ class ApplicationController < ActionController::Base
   USER_COLUMN=[:status,:remember_token,:remember_created_at,:created_at,:updated_at]
   PAGE_SIZE=10
   PAGE=1
-  ROOT={:root=>:result}
+  ROOT={:root=>:xml}
   rescue_from Mongoid::Errors::DocumentNotFound do |exception|
     respond_to do |format|
       format.json{render :json=>{:response=>:failure,:errors=>[RECORD_NOT_FOUND]}}
-      format.xml{render :xml=>{:errors=>[RECORD_NOT_FOUND]}.to_failure,:root=>:result}
+      format.xml{render :xml=>{:errors=>[RECORD_NOT_FOUND]}.to_failure,:root=>:xml}
     end
   end
 
   rescue_from BSON::InvalidObjectId do |exception|
     respond_to do |format|
       format.json{render :json=>{:response=>:failure,:errors=>[INVALID_PARAMETER_ID]}}
-      format.xml{render :xml=>{:errors=>[INVALID_PARAMETER_ID]}.to_failure,:root=>:result}
+      format.xml{render :xml=>{:errors=>[INVALID_PARAMETER_ID]}.to_failure,:root=>:xml}
     end
   end
   
@@ -32,7 +32,7 @@ class ApplicationController < ActionController::Base
     @current_user=User.valid_user?(params[:access_token]) if params[:access_token]
     respond_to do |format|
       format.json{render :json=>UNAUTHORIZED}
-      format.xml{render :xml=>UNAUTHORIZED,:root=>:result}
+      format.xml{render :xml=>UNAUTHORIZED,:root=>:xml}
     end and return unless @current_user
   end
 

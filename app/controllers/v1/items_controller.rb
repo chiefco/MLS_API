@@ -89,7 +89,7 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       if @item
       @topics=@item.topics
-        @topic={:item=>@topics.serializable_hash(:only=>[:name,:_id,:status]),:count=>@item.topics.count}.to_success
+        @topic={:item_topics=>@topics.serializable_hash(:only=>[:name,:_id,:status]),:count=>@item.topics.count}.to_success
         format.json {render :json=>@topic}
         format.xml {render :xml=>@topic.to_xml(:root=>:xml)}
       else

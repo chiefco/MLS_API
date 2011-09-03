@@ -114,5 +114,27 @@ class ApplicationController < ActionController::Base
     @paginate_options.store(:page,set_page)
     @paginate_options.store(:per_page,set_page_size)  
   end
+  
+  #renders missing parameter response 
+  def render_missing_params(missing_params,errors = [])
+    missing_params.each do |param|
+      errors << { :code=>missing_error_code(param), :message=>"#{param} - Required parameter missing"}
+    end 
+    respond_to do |format|
+      format.json { render :json=> {:errors=>errors}.to_failure.to_json }
+      format.xml { render :xml=> {:errors=>errors}.to_failure.to_xml(:root=>:result) }
+    end 
+  end
+  
+  #gived error code of missing parameter
+  def missing_error_code(parameter)
+    API_ERRORS["Missing Parameter"].select { |code,message| message.include?(parameter.to_s) }.keys.first
+  end 
+  
+  #ensures absence of nil,NULL,null strings
+  def not_null(value)
+    true unless value.blank? && ['nil', 'NULL', 'null'].include?(value)
+    false 
+  end 
  
 end

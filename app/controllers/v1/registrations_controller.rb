@@ -30,7 +30,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
 
   def update
     self.resource = resource_class.to_adapter.get!(send(:"current_#{resource_name}").to_key)
-    if params.has_key?(:user) && not_null(params[:user])
+    if params.has_key?(:user) && params[:user]
       update_password=params[:user][:password] || params[:user][:password_confirmation] || params[:user][:current_password] 
       updated= update_password ? resource.update_with_password(params[resource_name]) : resource.update_without_password(params[resource_name])
       render_results(updated,resource)
@@ -84,10 +84,10 @@ class V1::RegistrationsController < Devise::RegistrationsController
   
   #detects missing parameters in users CRUD
   def detect_missing_params
-    if params.has_key?(:user) && not_null(params[:user])
-      missing_params = PARAM_MUST[params[:action].to_sym].select { |param| !params[:user].has_key?(param.to_s) }
+    if params.has_key?(:user) && !null?(params[:user])
+      missing_params = PARAM_MUST[:create].select { |param| !params[:user].has_key?(param.to_s) }
     else
-      missing_params = PARAM_MUST[params[:action].to_sym] 
+      missing_params = PARAM_MUST[:create] 
     end 
     render_missing_params(missing_params) unless missing_params.blank?
   end

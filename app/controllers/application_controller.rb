@@ -132,7 +132,7 @@ class ApplicationController < ActionController::Base
   end 
   
   #ensures absence of nil,NULL,null strings
-  def not_null(value)
+  def null?(value)
     true unless value.blank? && ['nil', 'NULL', 'null'].include?(value)
     false 
   end 

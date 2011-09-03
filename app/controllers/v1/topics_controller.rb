@@ -6,8 +6,9 @@ class  V1::TopicsController < ApplicationController
   def show
     respond_to do |format|
       if @topic
-        format.json  { render :json => {:topic=>@topic.to_json(:only=>[:name,:_id,:status],:methods=>:get_item)}.merge(success) }
-        format.xml  { render :xml => {:topic=>@topic.to_xml(:only=>[:name,:_id,:status],:methods=>item)} }
+        @topic={:topic=>@topic.serializable_hash(:only=>[:name,:_id,:status],:methods=>:topic_item)}.merge(success)
+        format.json  { render :json =>@topic}
+        format.xml  { render :xml =>@topic.to_xml(:root=>:xml)}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
@@ -37,11 +38,12 @@ class  V1::TopicsController < ApplicationController
     respond_to do |format|
       if @topic
         if @topic.update_attributes(params[:topic])
-          format.xml  { render :xml => @topic }
-          format.json  { render :json => {:topic=>@topic.to_json(:only=>[:name,:status,:item_id,:_id]) }.merge(success)}
+        @topic={:topic=>@topic.serializable_hash(:only=>[:name,:status,:item_id,:_id]) }.to_success
+        format.xml  { render :xml => @topic.to_xml(:root=>:xml)}
+        format.json  { render :json => @topic}
         else
-          format.xml  { render :xml => @topic.errors.to_xml(:root=>'xml')}
-          format.json  { render :json => {"errors"=>@topic.all_errors }.merge(failure)}
+          format.xml  { render :xml => failure.merge(@topic.all_errors).to_xml(:root=>:xml)}
+          format.json  { render :json => @topic.all_errors }
         end
       else
       format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }

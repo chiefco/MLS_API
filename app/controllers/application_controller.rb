@@ -130,11 +130,4 @@ class ApplicationController < ActionController::Base
   def missing_error_code(parameter)
     API_ERRORS["Missing Parameter"].select { |code,message| message.include?(parameter.to_s) }.keys.first
   end 
-  
-  #ensures absence of nil,NULL,null strings
-  def null?(value)
-    true if value.blank? || !['nil', 'NULL', 'null'].include?(value)
-    false 
-  end 
- 
 end

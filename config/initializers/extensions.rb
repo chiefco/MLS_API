@@ -73,23 +73,6 @@ class String
   end
 end
 
-#~ #Error code for routing errors
-
-#~ module ActionDispatch
-  #~ class ShowExceptions
-    #~ def render_exception(env, exception)
-      #~ error=[{:message=>'bad request',:code=>9001}]
-      #~ method='.to_json'
-      #~ method='.to_xml(:root=>"errors")' if env['HTTP_ACCEPT']=='application/xml'
-      #~ if exception.kind_of? ActionController::RoutingError
-        #~ render(404, eval("#{error}#{method}"))
-      #~ else
-        #~ render(500, 'Something went wrong')
-      #~ end
-    #~ end
-  #~ end
-#~ end
-
 #generate the token value
 module ForDevise
   def self.friendly_token(count=15)
@@ -102,7 +85,7 @@ Devise.instance_eval do
 	def friendly_token(len=15)
 		SecureRandom.base64(len).tr('+/=', 'xyz')
 	end
-end 
+end if defined? Devise
 
 #added to customize authentication_token length 
 Devise::Models::Authenticatable::ClassMethods.module_exec do
@@ -112,4 +95,4 @@ Devise::Models::Authenticatable::ClassMethods.module_exec do
       break token unless to_adapter.find_first({ column => token })
     end
 	end
-end
+end if defined? Devise

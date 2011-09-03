@@ -6,9 +6,8 @@ class V1::BookmarksController < ApplicationController
   def index
     @bookmark=@current_user.bookmarks
     respond_to do |format|
-      @bookmark={:bookmark=>@bookmark.to_a.to_json(:only=>[:_id,:name],:include=>{:bookmarked_contents=>{:include=>{:bookmarkable=>{:only=>[:_id,:name,:description,:page_order,:attachable_type,:attachable_id,:file_name,:file_type]}},:only=>[:_id,:bookmarkable_type,:bookmarkable_id]}}).parse}
-      format.json{render :json=>@bookmark}
-      format.xml{render :json=>@bookmark}
+      format.json{render :json=>{:bookmarks=>@bookmark.to_a.to_json(:only=>[:_id,:name],:include=>{:bookmarked_contents=>{:include=>{:bookmarkable=>{:only=>[:_id,:name,:description,:page_order,:attachable_type,:attachable_id,:file_name,:file_type]}},:only=>[:_id,:bookmarkable_type,:bookmarkable_id]}}).parse}}
+      format.xml
     end
   end
 
@@ -17,9 +16,9 @@ class V1::BookmarksController < ApplicationController
   def show
     respond_to do |format|
       if @v1_bookmark
-        @v1_bookmark={:bookmarks=>@v1_bookmark.serializable_hash(:only=>[:_id,:name],:include=>{:bookmarked_contents=>{:include=>{:bookmarkable=>{:only=>[:_id,:name,:description,:page_order,:attachable_type,:attachable_id,:file_name,:file_type]}},:only=>[:_id,:bookmarkable_type,:bookmarkable_id]}})}
+        @v1_bookmark={:bookmarks=>@v1_bookmark.serializable_hash(:only=>[:_id,:name],:include=>{:bookmarked_contents=>{:include=>{:bookmarkable=>{:only=>[:_id,:name,:description,:page_order,:attachable_type,:attachable_id,:file_name,:file_type]}},:only=>[:_id,:bookmarkable_type,:bookmarkable_id]}})}.to_success
         format.json{render :json=>@v1_bookmark}
-        format.xml{render :xml=>@v1_bookmark}
+        format.xml{render :xml=>@v1_bookmark.to_xml(:root=>:xml)}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}

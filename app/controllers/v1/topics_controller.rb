@@ -21,11 +21,12 @@ class  V1::TopicsController < ApplicationController
     @topic = Topic.new(params[:topic])
     respond_to do |format|
       if @topic.save
-        format.xml  { render :xml => @topic}
-        format.json  { render :json => {:topic=>@topic.to_json(:only=>[:name,:status,:item_id,:_id]) }.merge(success) }
+        @topic={:topic=>@topic.serializable_hash(:only=>[:name,:status,:item_id,:_id]) }.to_success
+        format.xml  { render :xml => @topic.to_xml(:root=>:xml)}
+        format.json  { render :json => @topic}
       else
-        format.xml  { render :xml => @topic.errors, :status => :unprocessable_entity }
-        format.json  { render :json => {"errors"=>@topic.all_errors }}
+        format.xml  { render :xml => failure.merge(@topic.all_errors).to_xml(:root=>:xml)}
+        format.json  { render :json => @topic.all_errors }
       end
     end
   end

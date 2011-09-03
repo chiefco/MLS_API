@@ -23,9 +23,9 @@ class ApplicationController < ActionController::Base
     end
   end
   
-  rescue_from Exception do |exception|
-    logger.info exception.inspect
-  end
+  #~ rescue_from Exception do |exception|
+    #~ logger.info exception.inspect
+  #~ end
   #~ protect_from_forgery
 
   def authenticate_request!

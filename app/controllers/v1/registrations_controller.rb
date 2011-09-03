@@ -3,8 +3,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
   before_filter :change_params,:only=>[:update,:reset_password]
   before_filter :add_pagination,:only=>[:index,:get_activities]
   before_filter :detect_missing_params, :only=>[:create]
-  PARAM_MUST = { :create=> [:email, :password, :password_confirmation, :first_name, :last_name]
-                          }
+  PARAM_MUST = { :create=> [:email, :password, :password_confirmation, :first_name, :last_name] }
   def index
     @users = User.list(params,@paginate_options)
     respond_to do |format|

@@ -8,7 +8,7 @@ class Topic
   validates_presence_of :name, :message=>"name - Required parameter missing", :code=>"2009"
   validates_inclusion_of :status, :in=>[1,2,3], :message=>"invalid-status", :code=>3072
   has_many :activities, as: :activity, :dependent=>:destroy
-  def get_item
-    item=self.item.to_json(:only=>[:_id,:name,:description])
+  def topic_item
+    item=self.item.to_json(:only=>[:_id,:name,:description]).parse
   end
 end

@@ -120,7 +120,9 @@ class V1::ItemsController < ApplicationController
     respond_to do  |format|
       if @item && @category
         @item.categories<<@category
-        format.json{render :json=>{:item_category=>{:category_id=>@category._id,:item_id=>@item._id}}}
+        add_category={:item_category=>{:category_id=>@category._id,:item_id=>@item._id}}.to_success
+        format.json{render :json=>add_category}
+        format.xml{render :xml=>add_category.to_xml(ROOT)}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}

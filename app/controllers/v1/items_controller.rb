@@ -101,13 +101,14 @@ class V1::ItemsController < ApplicationController
 
   #finds categories of the item
   def item_categories
-    categories=[]
     respond_to do |format|
       if @item
-        @item.categories.each do |category|
-          categories<<{:name=>category.name,:id=>category._id,:parent_id=>category.parent_id}
-        end
-        format.json{render :json=>{:item_categories=>categories,:count=>categories.count}.merge(success)}
+        @categories={:item_categories=>@item.categories.serializable_hash(:only=>[:_id,:name,:parent_id]),:count=>@item.categories.count}.to_success
+        format.json{render :json=>@categories}
+        format.xml{render :xml=>@categories.to_xml(ROOT)}
+      else
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
   end

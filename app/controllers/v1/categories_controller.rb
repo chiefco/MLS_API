@@ -24,10 +24,11 @@ class V1::CategoriesController < ApplicationController
 
   def create
     @category = @current_user.categories.build(params[:category])
+    
     respond_to do |format|
       if @category.save
         format.xml  { render :xml => @category.to_xml(:only=>[:_id,:name,:parent_id,:show_in_quick_links]).as_hash.to_success.to_xml(:root=>:result)}
-        format.json  { render :json => @category.to_json(:only=>[:_id,:name,:parent_id,:show_in_quick_links]).parse.to_success }
+        format.json  { render :json => {:category=>@category.to_json(:only=>[:_id,:name,:parent_id,:show_in_quick_links]).parse }.to_success }
       else
         format.xml  { render :xml => @category.all_errors.to_xml(ROOT) }
         format.json  { render :json => @category.all_errors}
@@ -38,8 +39,8 @@ class V1::CategoriesController < ApplicationController
   def update
     respond_to do |format|
       if @category.update_attributes(params[:category])
-        format.xml  { render :xml => @category }
-        format.json  { render :json => success.merge(object_to_hash(@category,[:_id,:name,:parent_id, :show_in_quick_links]))}
+        format.xml  { render :xml => @category.to_xml(:only=>[:_id,:name,:parent_id,:show_in_quick_links]).as_hash.to_success.to_xml(:root=>:result)}
+        format.json  { render :json => {:category=>@category.to_json(:only=>[:_id,:name,:parent_id,:show_in_quick_links]).parse }.to_success }
       else
         format.xml  { render :xml => @category.all_errors.to_xml(ROOT)}
         format.json  { render :json =>@category.all_errors}
@@ -49,6 +50,7 @@ class V1::CategoriesController < ApplicationController
 
   def destroy
     @category.destroy
+    
     respond_to do |format|
       format.json { render :json=> success }
       format.xml { render :xml=> success.to_xml(ROOT) }
@@ -57,6 +59,7 @@ class V1::CategoriesController < ApplicationController
 
   def subcategories
     @sub_categories = @category.children
+
     respond_to do |format|
       format.json { render :json=> success.merge(subcategories_success) }
       format.xml { render :xml=> success.merge(subcategories_success).to_xml(ROOT) }

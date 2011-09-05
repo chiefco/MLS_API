@@ -6,6 +6,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
 	
   def index
     @users = User.list(params,@paginate_options)
+    
     respond_to do |format|
       format.xml{ render_for_api :user_with_out_token, :xml => @users, :root => :users}
       format.json{render_for_api :user_with_out_token, :json => @users, :root => :users}
@@ -14,6 +15,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
 
   def create
     resource=User.new(params[:user])
+    
     if resource.save
      respond_to do |format|
         format.xml{ render :xml=> success}
@@ -29,6 +31,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
 
   def update
     self.resource = resource_class.to_adapter.get!(send(:"current_#{resource_name}").to_key)
+    
     if params.has_key?(:user) && params[:user]
       if params[:user][:password] || params[:user][:password_confirmation] || params[:user][:current_password] 
 				resource.set_password = true
@@ -52,6 +55,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
     #Retrieves the Activities of the User
   def get_activities
     @activities = Activity.list(params,@paginate_options,@current_user)
+    
     respond_to do |format|
       format.json{ render :json=>{:activities=>@activities.to_json(:only=>[:_id,:description,:activity_type],:include=>{:activity=>{:only=>[:_id,:name,:description,:item_date,:is_completed,:due_date,:show_in_quick_links,:status]}})}.to_success}
     end

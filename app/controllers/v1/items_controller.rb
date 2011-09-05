@@ -180,7 +180,9 @@ class V1::ItemsController < ApplicationController
   def get_all_tasks
     respond_to do |format|
       if @item
-        format.json{ render :json=>{:item_task=>@item.tasks.to_a.to_json(:only=>[:description,:due_date,:_id,:is_completed],:include=>{:item=>{:only=>[:_id,:name]}})}}
+        @item={:item_task=>@item.tasks.serializable_hash(:only=>[:description,:due_date,:_id,:is_completed],:include=>{:item=>{:only=>[:_id,:name]}})}
+        format.json{ render :json=>@item}
+        format.xml{ render :xml=>@item.to_xml(ROOT)}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}

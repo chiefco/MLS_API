@@ -69,23 +69,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  #maps object array to hash array with supplied attributes,attributes rename options
-  def all_objects_to_hash(objects,selected_fields=nil,rename={})
-    responses = []
-    unless selected_fields.blank? && objects.blank?
-      objects.each do |object|
-        responses << object.attributes.select { |key,value| selected_fields.include?(key.to_sym) }
-      end
-      return responses if rename.blank?
-      responses.each do |response|
-        rename.each do |key,value|
-            response[value.to_s] = response.delete(key.to_s) if response.has_key?(key.to_s)
-        end
-      end
-      responses
-    end
-  end
-
   def paginate_params
     page=params[:page].to_i
     page_size=params[:page_size].to_i

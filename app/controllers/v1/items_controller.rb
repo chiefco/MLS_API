@@ -135,14 +135,13 @@ class V1::ItemsController < ApplicationController
     @item=Item.find(params[:item_attendee][:item_id])
     respond_to do |format|
       @attendee=@item.attendees.build(params[:item_attendee])
-      puts @attendee.valid?
-      puts @attendee.errors.inspect
       if @attendee.save
-        format.json {render :json=>{:response=>:success,:item_attendee=>@attendee}.to_json}
-        format.xml {render :xml=>{:response=>:success,:item_attendee=>@attendee}.to_xml}
+        @attendee={:item_attendee=>@attendee.serializable_hash(:only=>[:_id,:first_name,:last_name])}.to_success
+        format.json {render :json=>@attendee}
+        format.xml {render :xml=>@attendee.to_xml(ROOT)}
       else
         format.json {render :json=>@attendee.all_errors}
-        format.xml {render :xml=>@attendee.all_errors}
+        format.xml {render :xml=>failure.merge(@attendee.all_errors).to_xml(ROOT)}
       end
     end
   end
@@ -154,7 +153,7 @@ class V1::ItemsController < ApplicationController
       if @attendee
         @attendee.destroy
         format.json{render :json=>success}
-        format.xml{render :json=>failure}
+        format.xml{render :xml=>success}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
@@ -167,7 +166,9 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       if @item
          @attendees=@item.attendees
-        format.json{render :json=>{:item_attendees=>@attendees.to_a.to_json(:only=>[:_id,:first_name,:last_name])}}
+         @attendees={:item_attendees=>@attendees.serializable_hash(:only=>[:_id,:first_name,:last_name]),:count=>@item.attendees.count}.to_success
+        format.json{render :json=>@attendees}
+        format.xml{render :xml=>@attendees.to_xml(ROOT)}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}

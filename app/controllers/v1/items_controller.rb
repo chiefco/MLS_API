@@ -89,9 +89,9 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       if @item
       @topics=@item.topics
-        @topic={:item=>@topics.serializable_hash(:only=>[:name,:_id,:status]),:count=>@item.topics.count}.to_success
+        @topic={:item_topics=>@topics.serializable_hash(:only=>[:name,:_id,:status]),:count=>@item.topics.count}.to_success
         format.json {render :json=>@topic}
-        format.json {render :json=>@topic.to_xml(:root=>:xml)}
+        format.xml {render :xml=>@topic.to_xml(:root=>:xml)}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
@@ -101,13 +101,14 @@ class V1::ItemsController < ApplicationController
 
   #finds categories of the item
   def item_categories
-    categories=[]
     respond_to do |format|
       if @item
-        @item.categories.each do |category|
-          categories<<{:name=>category.name,:id=>category._id,:parent_id=>category.parent_id}
-        end
-        format.json{render :json=>{:item_categories=>categories,:count=>categories.count}.merge(success)}
+        @categories={:item_categories=>@item.categories.serializable_hash(:only=>[:_id,:name,:parent_id]),:count=>@item.categories.count}.to_success
+        format.json{render :json=>@categories}
+        format.xml{render :xml=>@categories.to_xml(ROOT)}
+      else
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
   end
@@ -119,7 +120,9 @@ class V1::ItemsController < ApplicationController
     respond_to do  |format|
       if @item && @category
         @item.categories<<@category
-        format.json{render :json=>{:item_category=>{:category_id=>@category._id,:item_id=>@item._id}}}
+        add_category={:item_category=>{:category_id=>@category._id,:item_id=>@item._id}}.to_success
+        format.json{render :json=>add_category}
+        format.xml{render :xml=>add_category.to_xml(ROOT)}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
@@ -132,14 +135,13 @@ class V1::ItemsController < ApplicationController
     @item=Item.find(params[:item_attendee][:item_id])
     respond_to do |format|
       @attendee=@item.attendees.build(params[:item_attendee])
-      puts @attendee.valid?
-      puts @attendee.errors.inspect
       if @attendee.save
-        format.json {render :json=>{:response=>:success,:item_attendee=>@attendee}.to_json}
-        format.xml {render :xml=>{:response=>:success,:item_attendee=>@attendee}.to_xml}
+        @attendee={:item_attendee=>@attendee.serializable_hash(:only=>[:_id,:first_name,:last_name])}.to_success
+        format.json {render :json=>@attendee}
+        format.xml {render :xml=>@attendee.to_xml(ROOT)}
       else
         format.json {render :json=>@attendee.all_errors}
-        format.xml {render :xml=>@attendee.all_errors}
+        format.xml {render :xml=>failure.merge(@attendee.all_errors).to_xml(ROOT)}
       end
     end
   end
@@ -151,7 +153,7 @@ class V1::ItemsController < ApplicationController
       if @attendee
         @attendee.destroy
         format.json{render :json=>success}
-        format.xml{render :json=>failure}
+        format.xml{render :xml=>success}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
@@ -164,7 +166,9 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       if @item
          @attendees=@item.attendees
-        format.json{render :json=>{:item_attendees=>@attendees.to_a.to_json(:only=>[:_id,:first_name,:last_name])}}
+         @attendees={:item_attendees=>@attendees.serializable_hash(:only=>[:_id,:first_name,:last_name]),:count=>@item.attendees.count}.to_success
+        format.json{render :json=>@attendees}
+        format.xml{render :xml=>@attendees.to_xml(ROOT)}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
@@ -176,7 +180,9 @@ class V1::ItemsController < ApplicationController
   def get_all_tasks
     respond_to do |format|
       if @item
-        format.json{ render :json=>{:item_task=>@item.tasks.to_a.to_json(:only=>[:description,:due_date,:_id,:is_completed],:include=>{:item=>{:only=>[:_id,:name]}})}}
+        @item={:item_task=>@item.tasks.serializable_hash(:only=>[:description,:due_date,:_id,:is_completed],:include=>{:item=>{:only=>[:_id,:name]}})}
+        format.json{ render :json=>@item}
+        format.xml{ render :xml=>@item.to_xml(ROOT)}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}

@@ -1,9 +1,9 @@
 class V1::RegistrationsController < Devise::RegistrationsController
-  before_filter :authenticate_request!,:except=>[:create]
+  skip_before_filter :authenticate_scope!
   before_filter :change_params,:only=>[:update,:reset_password]
+  before_filter :authenticate_request!,:except=>[:create]
   before_filter :add_pagination,:only=>[:index,:get_activities]
   before_filter :detect_missing_params, :only=>[:create]
-  PARAM_MUST = [:email, :password, :password_confirmation, :first_name, :last_name] 
   def index
     @users = User.list(params,@paginate_options)
     respond_to do |format|
@@ -83,10 +83,11 @@ class V1::RegistrationsController < Devise::RegistrationsController
   
   #detects missing parameters in users CRUD
   def detect_missing_params
+    param_must = [:email, :password, :password_confirmation, :first_name, :last_name] 
     if params.has_key?(:user) && !params[:user].blank? && !['nil', 'NULL', 'null'].include?(params[:user])
-      missing_params = PARAM_MUST.select { |param| !params[:user].has_key?(param.to_s) }
+      missing_params = param_must.select { |param| !params[:user].has_key?(param.to_s) }
     else
-      missing_params = PARAM_MUST
+      missing_params = param_must
     end 
     render_missing_params(missing_params) unless missing_params.blank?
   end

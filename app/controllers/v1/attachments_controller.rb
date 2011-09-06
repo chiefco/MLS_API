@@ -2,7 +2,8 @@ class V1::AttachmentsController < ApplicationController
 
   before_filter :authenticate_request!
   before_filter :find_resource, :except=>[:create, :index]
-  before_filter :detect_missing_params, :set_attachment_options, :only=>[:create]
+  before_filter :detect_missing_file, :only=>[:create]
+  before_filter :set_attachment_options, :only=>[:create]
   # GET /v1/attachments
   # GET /v1/attachments.xml
   def index
@@ -63,18 +64,15 @@ class V1::AttachmentsController < ApplicationController
     @attachment = Attachment.find(params[:id])
   end
   
-  def detect_missing_params
-    if params.has_key?(:attachment) && !params[:attachment].blank? && !['nil', 'NULL', 'null'].include?(params[:attachment])
-      missing_params = [:file]  unless params[:attachment].has_key?("file") 
-    else
-      missing_params = [:file] 
-    end 
-   unless missing_params.blank?
+  def detect_missing_file
+    file_missing = true
+    file_missing = false if params.has_key?(:attachment) && params[:attachment].is_a?(Hash) && params[:attachment].has_key?("file")
+    if file_missing
       respond_to do |format|
         format.json { render :json=> {:error=>{:code=>6001, :message=>"The file was not correctly uploaded"}}.to_failure }
         format.xml { render :xml=> {:error=>{:code=>6001, :message=>"The file was not correctly uploaded"}}.to_failure.to_xml(ROOT) }
       end 
-   end 
+    end 
   end
-
+  
 end

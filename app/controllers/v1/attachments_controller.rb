@@ -69,7 +69,12 @@ class V1::AttachmentsController < ApplicationController
     else
       missing_params = [:file] 
     end 
-    render_missing_params(missing_params) unless missing_params.blank?
+   unless missing_params.blank?
+      respond_to do |format|
+        format.json { render :json=> {:error=>{:code=>6001, :message=>"The file was not correctly uploaded"}}.to_failure }
+        format.xml { render :xml=> {:error=>{:code=>6001, :message=>"The file was not correctly uploaded"}}.to_failure.to_xml(ROOT) }
+      end 
+   end 
   end
 
 end

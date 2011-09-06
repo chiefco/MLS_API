@@ -12,23 +12,17 @@ class V1::AttachmentsController < ApplicationController
     @attachments = Attachment.list(@current_user.attachments,params,paginate_options)
 
     respond_to do |format|
-      format.json  { render :json => success.merge(:attachments=>JSON.parse(@attachments.to_json(:only=>[:id, :file_name, :file_type, :size, :content_type, :file_link])))}
-      format.xml  { render :xml => @attachments.to_xml(:root=>'attachments', :only=>[:_id, :file_type, :file_name, :size,  :content_type, :file_link]) }
+      format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:id, :file_name, :file_type, :size, :content_type, :file_link]).parse }.to_success }
+      format.xml  { render :xml => @attachments.to_xml(:only=>[:_id, :file_type, :file_name, :size,  :content_type, :file_link]).as_hash.to_success.to_xml(ROOT) }
     end
   end
 
   # GET /v1/attachments/1
   # GET /v1/attachments/1.xml
   def show
-
     respond_to do |format|
-      if @attachment
-        format.json  { render :json => success.merge(:attachment=>JSON.parse(@attachment.to_json(:only=>[:_id, :file_type, :file_name, :size,  :content_type, :file_link]))) }
-        format.xml  { render :xml => @attachment.to_xml(:only=>[:_id, :file_type, :file_name, :size,  :content_type, :file_link]) }
-      else
-        format.json { render :json=> failure.merge(INVALID_PARAMETER_ID) }
-        format.xml { render :xml=>  failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>"error") }
-      end
+      format.json  { render :json => { :attachment=>@attachment.to_json(:only=>[:_id, :file_type, :file_name, :size,  :content_type, :file_link]).parse }.to_success }
+      format.xml  { render :xml => @attachment.to_xml(:only=>[:_id, :file_type, :file_name, :size,  :content_type, :file_link]).as_hash.to_success.to_xml(ROOT) }
     end
   end
 
@@ -55,16 +49,11 @@ class V1::AttachmentsController < ApplicationController
   # DELETE /v1/attachments/1
   # DELETE /v1/attachments/1.xml
   def destroy
-
+    @attachment.destroy
+    
     respond_to do |format|
-      if @attachment
-        @attachment.destroy
-        format.json { render :json=> success }
-        format.xml { render :xml=> success.to_xml(:root=>"result") }
-      else
-        format.json { render :json=> failure.merge(INVALID_PARAMETER_ID) }
-        format.xml { render :xml=> failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'error') }
-      end
+      format.json { render :json=> success }
+      format.xml { render :xml=> success.to_xml(ROOT) }
     end
   end
 

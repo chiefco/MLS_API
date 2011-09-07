@@ -30,7 +30,7 @@ class V1::PasswordsController < Devise::PasswordsController
           format.json{render :json=>success.to_json}
         else
           format.xml { render :xml=> self.resource.all_errors.to_xml(:root=>'errors') }
-          format.json { render :json=>failure.merge(:errors=>self.resource.all_errors).to_json }
+          format.json { render :json=>self.resource.all_errors.to_json }
         end
       else
           format.xml { render :xml=> self.resource.all_errors.to_xml(:root=>'errors') }

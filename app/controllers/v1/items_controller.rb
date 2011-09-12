@@ -60,7 +60,7 @@ class V1::ItemsController < ApplicationController
           @location=Location.create(:name=>params[:item][:location])
           @item.update_attributes(:location_id=>@location.id)
         end
-        @item={:item=>@item.serializable_hash(:only=>[:item_date,:description,:current_category_id]),:location=>@location.name}.to_success 
+        @item={:item=>@item.serializable_hash(:only=>[:description,:current_category_id],:methods=>:date),:location=>@location.name}.to_success 
         format.xml  {render :xml=>@item.to_xml(ROOT)}
         format.json {render :json =>@item}
       else

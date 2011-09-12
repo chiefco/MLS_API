@@ -71,6 +71,11 @@ class String
   def parse
     JSON.parse(self)
   end
+  
+  def as_hash
+    Hash.from_xml(self)
+  end 
+  
 end
 
 #Error code for routing errors

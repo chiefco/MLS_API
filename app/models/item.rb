@@ -57,8 +57,8 @@ class Item
     location=self.location.nil? ? "nil" : self.location.name
   end
   
-  def date
-    self.item_date.strftime("%d/%m/%Y %I:%M %p")
+  def item_date 
+    super().strftime("%d/%m/%Y %I:%M %p")
   end
   
   def self.list(params,paginate_options,user)

@@ -110,7 +110,12 @@ Invalid Parameter:
   3070: password reset token - Invalid Parameter
   3071: name-already exist
   3072: invalid-status
-  3073: invalid length
+  3073: name-invalid length
+  3074: first_name-invalid length
+  3075: last_name-invalid length
+  3076: business_unit-invalid length
+  3077: company-invalid length
+  3078: job_title-invalid length
 Format Error:
   4001: email - Invalid email format
   4002: due_date - Invalid date format

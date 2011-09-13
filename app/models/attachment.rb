@@ -17,10 +17,9 @@ class Attachment
   field :size, type: Integer
   field :width, type: Integer
   field :height, type: Integer
-
   protected
   def generate_link
-    self.file_link  =  self.file.url
+     self.update_attribute(:file_link,self.file.url) if self.file_link != self.file.url
   end
 
   def self.list(attachments,params,paginate_options)

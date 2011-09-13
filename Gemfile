@@ -17,7 +17,6 @@ gem 'rspec-rails','2.6.1'
 gem 'acts_as_api','0.3.8'
 gem 'carrierwave','0.5.7'
 gem 'exception_notifier','1.0.0'
-gem "aws-s3", "~> 0.6.2", :require => 'aws/s3'
 gem 'builder','~> 2.1.2'
 gem 'will_paginate', '2.3.16'
 gem 'newrelic_rpm'
@@ -27,7 +26,8 @@ gem 'sunspot_mongoid'
 gem 'sunspot'
 gem 'sunspot_rails'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
-
+gem 'rails_best_practices'
+gem 'fog'
 
 
 # Deploy with Capistrano

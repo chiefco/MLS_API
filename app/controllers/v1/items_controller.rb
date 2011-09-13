@@ -2,7 +2,7 @@ class V1::ItemsController < ApplicationController
   before_filter :authenticate_request!
   before_filter :get_item,:only=>([:update,:show,:item_categories,:destroy,:item_topics,:get_all_tasks,:list_item_attendees])
   before_filter :add_pagination,:only=>[:index]
-
+  before_filter :detect_missing_params, :only=>[:create]
   # GET /items
   # GET /items.xml
   def index
@@ -32,6 +32,7 @@ class V1::ItemsController < ApplicationController
   # POST /items.xml
 
   def create
+    
     @item = @current_user.items.new(params[:item])
     @template=Template.find(params[:item][:template_id]) if params[:item][:template_id]
     respond_to do |format|
@@ -197,4 +198,15 @@ class V1::ItemsController < ApplicationController
   def get_item
     @item=Item.find(params[:id])
   end
+  
+  def detect_missing_params
+    param_must = [:name, :template_id] 
+    if params.has_key?(:item) && params[:item].is_a?(Hash)
+      missing_params = param_must.select { |param| !params[:item].has_key?(param.to_s) }
+    else
+      missing_params = param_must
+    end 
+    render_missing_params(missing_params) unless missing_params.blank?
+  end
+  
 end

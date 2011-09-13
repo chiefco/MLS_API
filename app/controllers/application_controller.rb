@@ -111,6 +111,6 @@ class ApplicationController < ActionController::Base
   
   #gived error code of missing parameter
   def missing_error_code(parameter)
-    API_ERRORS["Missing Parameter"].select { |code,message| message.include?(parameter.to_s) }.keys.first
+    API_ERRORS["Missing Parameter"].select { |code,message| message.match(/\A#{parameter.to_s}/) }.keys.first
   end 
 end

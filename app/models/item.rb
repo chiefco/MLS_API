@@ -57,6 +57,10 @@ class Item
     location=self.location.nil? ? "nil" : self.location.name
   end
   
+  def item_date 
+    super().strftime("%d/%m/%Y %I:%M %p")
+  end
+  
   def self.list(params,paginate_options,user)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)

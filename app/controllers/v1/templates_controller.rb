@@ -14,9 +14,9 @@ class V1::TemplatesController < ApplicationController
   def show
     respond_to do |format|
       if @template
-        value={:template=>@template.to_json(:include=>:template_categories),:template_definitions=>@template.template_definitions.attributes}.to_success
-        format.xml  { render :xml => value.to_xml(FOR_XML) }
-        format.json  { render :json =>value.to_json}
+        value={:template=>@template.serializable_hash(:only=>[:_id,:name],:include=>{:template_definitions=>{:only=>[:_id,:created_at,:has_topics_section,:has_task_section,:has_attachment_section,:has_text_section,:sequence],:include=>{:custom_page=>{:include=>:custom_page_fields,:only=>[:name,:type]}}}})}.to_success
+        format.xml  { render :xml => value.to_xml(ROOT) }
+        format.json  { render :json =>value}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(:root=>'xml') }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
@@ -28,8 +28,8 @@ class V1::TemplatesController < ApplicationController
     @template = Template.new(params[:template])
     respond_to do |format|
       if @template.save
-        value={:template=>@template.to_json(:only=>[:name,:_id,:description],:include=>:template_categories)}.to_success
-        format.xml { render :xml => value.to_xml(FOR_XML) }
+        value={:template=>@template.serializable_hash(:only=>[:name,:_id,:description],:include=>{:template_categories=>{:only=>[:_id,:name]}})}.to_success
+        format.xml { render :xml => value.to_xml(ROOT) }
         format.json { render :json =>value}
       else
         format.xml { render :xml => @template.all_errors.to_xml(:root=>"errors") }

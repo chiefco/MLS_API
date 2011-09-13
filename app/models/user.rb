@@ -30,11 +30,11 @@ class User
   validates_confirmation_of :password, :message=>"password and password_confimation does not match", :code=>2040, :if=>:pass_create_or_update?
   validates_length_of       :password, :message=>"password- Too short(Minimum is 6 characters)", :minimum => 6, :code=>2038, :allow_blank => true, :if=>:pass_create_or_update?
   validates_length_of       :password, :message=>"password- Too long(Maximum is 128 characters)", :maximum =>128, :code=>2039, :allow_blank => true, :if=>:pass_create_or_update?
-  #~ validates :first_name ,:length => { :minimum => 1 ,:maximum =>40,:message=>"first_name-invalid length",:code=>3074}
-  #~ validates :last_name ,:length => { :minimum => 1 ,:maximum =>40,:message=>" last_name-invalid length",:code=>3075}
-  #~ validates :company ,:length => { :minimum => 1 ,:maximum =>80,:message=>"company-invalid length",:code=>3077}
-  #~ validates :job_title ,:length => {:maximum =>80,:message=>"job_title-invalid length",:code=>3078}
-  #~ validates :business_unit ,:length => {:maximum =>80,:message=>"business_unit-invalid length",:code=>3076}
+  validates :first_name ,:length => { :minimum => 1 ,:maximum =>40,:message=>"first_name-invalid length",:code=>3074,:allow_blank=>true}
+  validates :last_name ,:length => { :minimum => 1 ,:maximum =>40,:message=>" last_name-invalid length",:code=>3075,:allow_blank=>true}
+  validates :company ,:length => { :minimum => 1 ,:maximum =>80,:message=>"company-invalid length",:code=>3077}
+  validates :job_title ,:length => {:maximum =>80,:message=>"job title-invalid length",:code=>3078}
+  validates :business_unit ,:length => {:maximum =>80,:message=>"business_unit-invalid length",:code=>3076}
   validates_format_of       :password, :with =>  /^\S*$/,:message=>"password- Invalid should not contain space", :code=>2040, :if=>:pass_create_or_update?
 
   field :first_name, :type=> String

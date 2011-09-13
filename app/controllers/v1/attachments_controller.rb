@@ -51,7 +51,7 @@ class V1::AttachmentsController < ApplicationController
   # DELETE /v1/attachments/1.xml
   def destroy
     @attachment.destroy
-    
+
     respond_to do |format|
       format.json { render :json=> success }
       format.xml { render :xml=> success.to_xml(ROOT) }
@@ -63,7 +63,7 @@ class V1::AttachmentsController < ApplicationController
   def find_resource
     @attachment = Attachment.find(params[:id])
   end
-  
+
   def detect_missing_file
     file_missing = true
     file_missing = false if params.has_key?(:attachment) && params[:attachment].is_a?(Hash) && params[:attachment].has_key?("file")
@@ -71,8 +71,8 @@ class V1::AttachmentsController < ApplicationController
       respond_to do |format|
         format.json { render :json=> {:error=>{:code=>6001, :message=>"The file was not correctly uploaded"}}.to_failure }
         format.xml { render :xml=> {:error=>{:code=>6001, :message=>"The file was not correctly uploaded"}}.to_failure.to_xml(ROOT) }
-      end 
-    end 
+      end
+    end
   end
-  
+
 end

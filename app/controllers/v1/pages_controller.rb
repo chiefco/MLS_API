@@ -12,7 +12,7 @@ class V1::PagesController < ApplicationController
     paginate_options.store(:page,set_page)
     paginate_options.store(:per_page,set_page_size)
     @pages = Page.list(@item.pages,params,paginate_options)
-    
+
     respond_to do |format|
       format.json { render :json=> success.merge(:pages=>@pages.to_json(:only=>[:_id, :page_order], :include=>{:page_texts=>{:only=>[:_id, :content, :position]}, :attachment=>{:only=>[:file]}}).parse) }
       format.xml { render :xml => @pages.to_xml(:only=>[:_id, :page_order])}
@@ -22,7 +22,7 @@ class V1::PagesController < ApplicationController
   # GET /v1/pages/1
   # GET /v1/pages/1.xml
   def show
-  
+
     respond_to do |format|
       format.json { render :json=> @page.to_json(:only=>[:_id, :page_order], :include=>{:page_texts=>{:only=>[:_id, :content, :position]}, :attachment=>{:only=>[:file]}}).parse.to_success }
       format.xml { render :xml => @page.to_xml(:only=>[:_id, :page_order])}
@@ -32,7 +32,7 @@ class V1::PagesController < ApplicationController
   # POST /v1/pages
   # POST /v1/pages.xml
   def create
-    if valid_file? 
+    if valid_file?
       set_position; set_page_order; set_attachment
       @page = @item.pages.new(:page_order=>params[:page][:page_order])
 
@@ -40,10 +40,10 @@ class V1::PagesController < ApplicationController
         if @page.save
           @page.create_attachment(params[:attachment])
           params[:page][:page_text].each { |page_txt| @page.page_texts.create(page_txt) } unless params[:page][:page_text].blank?
-          
+
           success_json =  success.merge(:item_id=>@item.id, :page=>@page.to_json(:only=>[:_id, :page_order], :include=>{:attachment=>{:only=>[:file]}}).parse)
           success_json[:page].store(:page_texts,@page.page_texts.to_a.to_json(:only=>[:_id, :position, :content]).parse) unless @page.page_texts.empty?
-          
+
           format.json  { render :json => success_json }
           format.xml  { render :xml => @page.to_xml(:root=>:page, :except=>[:created_at, :updated_at]) }
         else
@@ -53,13 +53,13 @@ class V1::PagesController < ApplicationController
       end
     else
       render_invalid_file
-    end 
+    end
   end
 
   # PUT /v1/pages/1
   # PUT /v1/pages/1.xml
   def update
-    if valid_file? 
+    if valid_file?
       set_position; set_attachment
       params[:page][:page_order] = @page.page_order if params[:page][:page_order].blank?
 
@@ -67,10 +67,10 @@ class V1::PagesController < ApplicationController
         if @page.update_attributes(:page_order=>params[:page][:page_order], :item_id=>params[:item_id])
           @page.attachment.update_attributes(params[:attachment])
           update_page_texts  unless params[:page][:page_text].blank?
-          
+
           success_json =  success.merge(:item_id=>@item.id, :page=>@page.to_json(:only=>[:_id, :page_order], :include=>{:attachment=>{:only=>[:file]}}).parse)
           success_json[:page].store(:page_texts,@page.page_texts.to_a.to_json(:only=>[:_id, :position, :content]).parse) unless @page.page_texts.empty?
-          
+
           format.json  { render :json => success_json }
           format.xml  { render :xml => @page.to_xml(:root=>:page, :except=>[:created_at, :updated_at]) }
         else
@@ -80,7 +80,7 @@ class V1::PagesController < ApplicationController
       end
     else
        render_invalid_file
-    end 
+    end
   end
 
   # DELETE /v1/pages/1
@@ -104,7 +104,7 @@ class V1::PagesController < ApplicationController
   def find_item
     return render_missing("item_id","2012") unless params.has_key?("item_id")
     @item = Item.find(params[:item_id])
-  end 
+  end
 
   def set_position
     unless params[:page][:page_text].blank?
@@ -114,8 +114,8 @@ class V1::PagesController < ApplicationController
           page_txt["position"] = eval(page_txt["position"])
         else
           page_txt["position"] = [0,0]
-        end 
-      end 
+        end
+      end
     end
   end
 
@@ -129,19 +129,19 @@ class V1::PagesController < ApplicationController
 
   def set_attachment
     params.store(:attachment,{})
-    params[:attachment][:file] =params[:page].delete(:file) 
+    params[:attachment][:file] =params[:page].delete(:file)
     set_attachment_options
   end
-  
+
   def valid_file?
-    return true if params[:page] && params[:page].has_key?(:file) && !params[:page][:file].blank? 
-    false 
-  end 
-   
-  def  update_page_texts     
+    return true if params[:page] && params[:page].has_key?(:file) && !params[:page][:file].blank?
+    false
+  end
+
+  def  update_page_texts
     params[:page][:page_text].each do |page_txt|
       page_txt_to_update = @page.page_texts.find(page_txt["id"]) if page_txt["id"]
       page_txt_to_update.update_attributes(:content=>page_txt["content"], :position=>page_txt["position"]) if page_txt_to_update
-    end 
-  end 
+    end
+  end
 end

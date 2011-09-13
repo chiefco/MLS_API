@@ -74,7 +74,7 @@ class V1::BookmarksController < ApplicationController
       end
     end
   end
-  
+
   #Add items in the bookmark
   def add_bookmark
     if @v1_bookmark
@@ -83,7 +83,7 @@ class V1::BookmarksController < ApplicationController
       failure_save
     end
   end
-  
+
   def save_bookmark_content
     @v1_bookmark.save
     respond_to do |format|
@@ -91,12 +91,12 @@ class V1::BookmarksController < ApplicationController
       format.xml {render :xml => success.to_xml(ROOT)}
     end
   end
-  
+
   #Find the Bookmark by param[:id]
   def find_bookmark
     @v1_bookmark = Bookmark.find(params[:id])
   end
-  
+
   def process_in_bookmark_content
     @v1_bookmark=@v1_bookmark.bookmarked_contents.build(params[:add_bookmark])
     @v1_bookmark.bookmarkable.nil? ? failure_save : validate_in_bookmark_content

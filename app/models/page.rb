@@ -15,10 +15,10 @@ class Page
 
   #validations
   validates_presence_of :item_id, :message=>"item_id - Blank Parameter", :code=>3026
-  
+
   SORT_BY_ALLOWED = [:page_order, :created_at]
   ORDER_BY_ALLOWED = [:asc, :desc]
-  
+
   def self.list(pages,params,paginate_options)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)

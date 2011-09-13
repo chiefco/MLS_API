@@ -17,7 +17,7 @@ class V1::ItemsController < ApplicationController
   # GET /items/1.xml
   def show
     respond_to do |format|
-      if @item 
+      if @item
         @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date],:include=>{:location=>{:only=>[:_id,:name]}}),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id)}.to_success
         format.xml  { render :xml => @item.to_xml(ROOT) }
         format.json  { render :json => @item}
@@ -32,7 +32,7 @@ class V1::ItemsController < ApplicationController
   # POST /items.xml
 
   def create
-    
+
     @item = @current_user.items.new(params[:item])
     @template=Template.find(params[:item][:template_id]) if params[:item][:template_id]
     respond_to do |format|
@@ -61,7 +61,7 @@ class V1::ItemsController < ApplicationController
           @location=Location.create(:name=>params[:item][:location])
           @item.update_attributes(:location_id=>@location.id)
         end
-        @item={:item=>@item.serializable_hash(:only=>[:description,:current_category_id],:methods=>:item_date),:location=>@location.name}.to_success 
+        @item={:item=>@item.serializable_hash(:only=>[:description,:current_category_id],:methods=>:item_date),:location=>@location.name}.to_success
         format.xml  {render :xml=>@item.to_xml(ROOT)}
         format.json {render :json =>@item}
       else
@@ -198,15 +198,15 @@ class V1::ItemsController < ApplicationController
   def get_item
     @item=Item.find(params[:id])
   end
-  
+
   def detect_missing_params
-    param_must = [:name, :template_id] 
+    param_must = [:name, :template_id]
     if params.has_key?(:item) && params[:item].is_a?(Hash)
       missing_params = param_must.select { |param| !params[:item].has_key?(param.to_s) }
     else
       missing_params = param_must
-    end 
+    end
     render_missing_params(missing_params) unless missing_params.blank?
   end
-  
+
 end

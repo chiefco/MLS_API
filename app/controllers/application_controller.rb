@@ -22,7 +22,7 @@ class ApplicationController < ActionController::Base
       format.xml{render :xml=>{:errors=>[INVALID_PARAMETER_ID]}.to_failure,:root=>:xml}
     end
   end
-  
+
   #~ rescue_from Exception do |exception|
     #~ logger.info exception.inspect
   #~ end
@@ -83,34 +83,34 @@ class ApplicationController < ActionController::Base
     params[:attachment][:file_name] =  params[:attachment][:file].original_filename if params[:attachment][:file_name].blank?
     params[:attachment][:file_type] =  params[:attachment][:file].content_type.split('/').last if params[:attachment][:file_type].blank?
   end
-  
-  #renders missing parameter response 
+
+  #renders missing parameter response
   def render_missing(parameter,code)
     respond_to do |format|
       format.json { render :json=> {:message=>"#{parameter} - Required parameter missing", :code=>code}.to_failure }
       format.xml { render :xml=> {:message=>"#{parameter} - Required parameter missing", :code=>code}.to_failure.to_xml(:root=>"error") }
-    end 
-  end 
+    end
+  end
 
   def add_pagination
     @paginate_options = {}
     @paginate_options.store(:page,set_page)
-    @paginate_options.store(:per_page,set_page_size)  
+    @paginate_options.store(:per_page,set_page_size)
   end
-  
-  #renders missing parameter response 
+
+  #renders missing parameter response
   def render_missing_params(missing_params,errors = [])
     missing_params.each do |param|
       errors << { :code=>missing_error_code(param), :message=>"#{param} - Required parameter missing"}
-    end 
+    end
     respond_to do |format|
       format.json { render :json=> {:errors=>errors}.to_failure.to_json }
       format.xml { render :xml=> {:errors=>errors}.to_failure.to_xml(:root=>:result) }
-    end 
+    end
   end
-  
+
   #gived error code of missing parameter
   def missing_error_code(parameter)
     API_ERRORS["Missing Parameter"].select { |code,message| message.match(/\A#{parameter.to_s}/) }.keys.first
-  end 
+  end
 end

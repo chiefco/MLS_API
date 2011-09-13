@@ -15,12 +15,12 @@ class Location
   default_scope :only=>ALLOWED_FIELDS
   SORT_BY_ALLOWED = [:name,:created_at,:updated_at]
   ORDER_BY_ALLOWED =  [:asc,:desc]
-  
+
   searchable do
     string :name
     string :user_id
   end
-  
+
   def find_co_ordinates
     latitude,longitude=Geocoder.coordinates(self.name) if self.latitude.nil? || self.longitude.nil?
     self.latitude="#{latitude} #{compass_point(latitude)}" unless latitude.nil?

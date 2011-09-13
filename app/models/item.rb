@@ -28,19 +28,19 @@ class Item
   referenced_in :user
   references_and_referenced_in_many :categories
   referenced_in :template
-  
+
   after_save :sunspot_index
-  
+
   searchable do
     text :name
     text :description
     string :user_id
   end
-  
+
   def template_fields
     true
   end
-  
+
   api_accessible :item_with_user do |t|
     t.add :name
     t.add :description
@@ -56,11 +56,11 @@ class Item
   def location_name
     location=self.location.nil? ? "nil" : self.location.name
   end
-  
-  def item_date 
+
+  def item_date
     super().strftime("%d/%m/%Y %I:%M %p")
   end
-  
+
   def self.list(params,paginate_options,user)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)

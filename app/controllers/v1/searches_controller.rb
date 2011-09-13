@@ -72,12 +72,12 @@ class V1::SearchesController < ApplicationController
   def find_search
     @search = @current_user.searches.find(params[:id])
   end
-  
+
   def multi_success
     {:response=>:success,:searches=>@searches}
   end
-  
+
   def render_success
     {:response=>:success,:search=>@search}
-  end    
+  end
 end

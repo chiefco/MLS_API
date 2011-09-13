@@ -3,7 +3,7 @@ class V1::TasksController < ApplicationController
   before_filter :find_task,:only=>([:update,:show,:destroy])
   before_filter :find_reminder,:only=>([:get_reminder,:delete_reminder,:update_reminder])
   before_filter :add_pagination,:only=>[:index]
-  
+
   #Retrieves the tasks of the current_user
 	def index
     @tasks = Task.list(params,@paginate_options,@current_user)

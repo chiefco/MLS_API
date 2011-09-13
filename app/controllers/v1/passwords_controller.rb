@@ -3,7 +3,6 @@ class V1::PasswordsController < Devise::PasswordsController
 
 
   def create
-    pa
     self.resource = resource_class.send_reset_password_instructions(params[:user])
     if successful_and_sane?(resource)
       success_message=success.merge(RESET_TOKEN_SENT)
@@ -21,7 +20,7 @@ class V1::PasswordsController < Devise::PasswordsController
   end
 
   def update
-    self.resource = User.where(reset_password_token: params[:user][:reset_password_token]).first
+    self.resource = User.where(reset_password_token: params[:user][:reset_password_token]).first if params[:user]
 
     respond_to do |format|
       if self.resource

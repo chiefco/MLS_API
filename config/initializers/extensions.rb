@@ -71,6 +71,29 @@ class String
   def parse
     JSON.parse(self)
   end
+  
+  def as_hash
+    Hash.from_xml(self)
+  end 
+  
+end
+
+#Error code for routing errors
+
+module ActionDispatch
+  class ShowExceptions
+    def render_exception(env, exception)
+      error=[{:message=>'bad request',:code=>9001}]
+      error2=[{:message=>'Something went wrong',:code=>500}]
+      method='.to_json'
+      method='.to_xml(:root=>"errors")' if env['HTTP_ACCEPT']=='application/xml'
+      if exception.kind_of? ActionController::RoutingError
+        render(404, eval("#{error}#{method}"))
+      else
+        render(500, eval("#{error2}#{method}"))
+      end
+    end
+  end
 end
 
 #generate the token value
@@ -85,7 +108,7 @@ Devise.instance_eval do
 	def friendly_token(len=15)
 		SecureRandom.base64(len).tr('+/=', 'xyz')
 	end
-end if defined? Devise
+end 
 
 #added to customize authentication_token length 
 Devise::Models::Authenticatable::ClassMethods.module_exec do
@@ -95,4 +118,4 @@ Devise::Models::Authenticatable::ClassMethods.module_exec do
       break token unless to_adapter.find_first({ column => token })
     end
 	end
-end if defined? Devise
+end

@@ -39,7 +39,10 @@ class V1::RegistrationsController < Devise::RegistrationsController
       else
 				updated = resource.update_without_password(params[resource_name])
       end 
-      render_results(updated,resource)
+       respond_to do |format|
+        format.json{render :json=>success  }
+        format.xml{render :xml=>success.to_xml(ROOT) }
+      end
     else
       render_results(true,resource)
     end 

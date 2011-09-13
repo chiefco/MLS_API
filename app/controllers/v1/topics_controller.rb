@@ -38,7 +38,7 @@ class  V1::TopicsController < ApplicationController
     respond_to do |format|
       if @topic
         if @topic.update_attributes(params[:topic])
-        @topic={:topic=>@topic.serializable_hash(:only=>[:name,:status,:item_id,:_id]) }.to_success
+        @topic={:topic=>@topic.serializable_hash(:only=>[:name,:status,:item_id]) }.to_success
         format.xml  { render :xml => @topic.to_xml(:root=>:xml)}
         format.json  { render :json => @topic}
         else

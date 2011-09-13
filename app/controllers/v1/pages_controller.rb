@@ -14,7 +14,7 @@ class V1::PagesController < ApplicationController
     @pages = Page.list(@item.pages,params,paginate_options)
     
     respond_to do |format|
-      format.json { render :json=> success.merge(:pages=>@pages.to_json(:only=>[:_id, :page_order], :include=>{:page_texts=>{:only=>[:_id, :content, :position]}, :attachment=>{:only=>[:file_link]}}).parse) }
+      format.json { render :json=> success.merge(:pages=>@pages.to_json(:only=>[:_id, :page_order], :include=>{:page_texts=>{:only=>[:_id, :content, :position]}, :attachment=>{:only=>[:file]}}).parse) }
       format.xml { render :xml => @pages.to_xml(:only=>[:_id, :page_order])}
     end
   end
@@ -24,7 +24,7 @@ class V1::PagesController < ApplicationController
   def show
   
     respond_to do |format|
-      format.json { render :json=> @page.to_json(:only=>[:_id, :page_order], :include=>{:page_texts=>{:only=>[:_id, :content, :position]}, :attachment=>{:only=>[:file_link]}}).parse.to_success }
+      format.json { render :json=> @page.to_json(:only=>[:_id, :page_order], :include=>{:page_texts=>{:only=>[:_id, :content, :position]}, :attachment=>{:only=>[:file]}}).parse.to_success }
       format.xml { render :xml => @page.to_xml(:only=>[:_id, :page_order])}
     end
   end
@@ -41,7 +41,7 @@ class V1::PagesController < ApplicationController
           @page.create_attachment(params[:attachment])
           params[:page][:page_text].each { |page_txt| @page.page_texts.create(page_txt) } unless params[:page][:page_text].blank?
           
-          success_json =  success.merge(:item_id=>@item.id, :page=>@page.to_json(:only=>[:_id, :page_order], :include=>{:attachment=>{:only=>:file_link}}).parse)
+          success_json =  success.merge(:item_id=>@item.id, :page=>@page.to_json(:only=>[:_id, :page_order], :include=>{:attachment=>{:only=>[:file]}}).parse)
           success_json[:page].store(:page_texts,@page.page_texts.to_a.to_json(:only=>[:_id, :position, :content]).parse) unless @page.page_texts.empty?
           
           format.json  { render :json => success_json }
@@ -68,7 +68,7 @@ class V1::PagesController < ApplicationController
           @page.attachment.update_attributes(params[:attachment])
           update_page_texts  unless params[:page][:page_text].blank?
           
-          success_json =  success.merge(:item_id=>@item.id, :page=>@page.to_json(:only=>[:_id, :page_order], :include=>{:attachment=>{:only=>:file_link}}).parse)
+          success_json =  success.merge(:item_id=>@item.id, :page=>@page.to_json(:only=>[:_id, :page_order], :include=>{:attachment=>{:only=>[:file]}}).parse)
           success_json[:page].store(:page_texts,@page.page_texts.to_a.to_json(:only=>[:_id, :position, :content]).parse) unless @page.page_texts.empty?
           
           format.json  { render :json => success_json }

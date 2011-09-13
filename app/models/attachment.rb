@@ -9,10 +9,10 @@ class Attachment
   validates_inclusion_of :attachable_type, :in=>["User","Item","Category","Page"], :message=>"attachable_type - Invalid Parameter", :code=>3050
   SORT_BY_ALLOWED = [:file_name, :size, :content_type]
   ORDER_BY_ALLOWED =  [:asc,:desc]
-  before_save :generate_link
+  after_save :generate_link
   field :file_name, type: String
-  field :file_type, type: String
   field :file_link, type: String
+  field :file_type, type: String
   field :content_type, type: String
   field :size, type: Integer
   field :width, type: Integer
@@ -20,7 +20,7 @@ class Attachment
 
   protected
   def generate_link
-    self.file_link = self.file.url
+    self.file_link  =  self.file.url
   end
 
   def self.list(attachments,params,paginate_options)

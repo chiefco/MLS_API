@@ -8,7 +8,8 @@ class TemplateDefinition
   field :has_topic_section,:type=>Boolean
   field :custom_page_id,:type=>String
   referenced_in :template
-  belongs_to :custom_page
+  has_one :custom_page
+
   #~ references_one :custom_page
   #~ embedded_in :template
   default_scope :without=>[:created_at,:updated_at]

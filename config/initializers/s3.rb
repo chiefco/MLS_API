@@ -3,5 +3,4 @@ CarrierWave.configure do |config|
 	config.s3_secret_access_key = "KYX9hoWk2F1bYOzqlCz09PJPUq/bEBhBsGtWPHFo"
 	config.s3_bucket = "mls-staging"
 	config.s3_access_policy = :public_read
-	config.s3_cnamed = true
 end

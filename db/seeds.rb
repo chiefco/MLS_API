@@ -6,9 +6,9 @@
 #   cities = City.create([{ :name => 'Chicago' }, { :name => 'Copenhagen' }])
 #   Mayor.create(:name => 'Daley', :city => cities.first)
 admin=User.new(:first_name=>"Admin",:last_name=>"MLS",:email=>"admin@mls.com",:password=>"mls123",:password_confirmation=>"mls123")
-admin.is_admin=true
 admin.skip_confirmation!
 admin.save
+admin.update_attribute(:is_admin,true)
 admin.ensure_authentication_token!
 
 #Addition of Template,TemplateDefinition,CustomPage,CustomPageFields

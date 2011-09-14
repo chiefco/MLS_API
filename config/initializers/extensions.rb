@@ -41,10 +41,8 @@ module Mongoid #:nodoc:
   module Serialization
     def serializable_hash(options = nil)
       hash = super(options)
-      if hash.has_key?("_id")
-        hash["id"] = hash.delete("_id")
-        hash
-      end 
+      hash["id"] = hash.delete("_id") if hash && hash.has_key?("_id")
+      hash
     end 
   end 
 end

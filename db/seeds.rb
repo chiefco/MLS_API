@@ -12,7 +12,9 @@ admin.update_attribute(:is_admin,true)
 admin.ensure_authentication_token!
 
 #Addition of Template,TemplateDefinition,CustomPage,CustomPageFields
-
+sales_call_arrays=["Prospect's current situation","Business Development Goals","Desired next outcome","My relative strengths","My relative vulnerabilities","Related Categories","Customer Buying Process Step","Customer Next Step","Assistance to Navigate"]
+board_paper_arrays=["Draft Resolution","Executive Summary","Background","Recommendation","Strategy Implications","Financial Implications","Risk Analysis","Corporate Governance and Compliance","Management Responsibility","CEO Signature","Sponsor Signature","Board Paper Prepared By"]
+type='String'
 #Template ----------------Note------------------------------------------------
 note=Template.create(:name=>"Note")
 note.template_definitions.create(:sequence=>1,:has_text_section=>true)
@@ -30,15 +32,9 @@ sales_call_plan.template_definitions.create(:sequence=>1,:has_topics_section=>tr
 sales_template_definitions=sales_call_plan.template_definitions.create(:sequence=>2)
 sales_custom_page_fields=sales_template_definitions.create_custom_page
 sales_template_definitions.update_attributes(:custom_page_id=>sales_custom_page_fields._id)
-sales_custom_page_fields.custom_page_fields.create(:field_name=>"Prospect's current situation",:field_type=>"String")
-sales_custom_page_fields.custom_page_fields.create(:field_name=>"Business Development Goals",:field_type=>"String")
-sales_custom_page_fields.custom_page_fields.create(:field_name=>"Desired next outcome",:field_type=>"String")
-sales_custom_page_fields.custom_page_fields.create(:field_name=>"My relative strengths",:field_type=>"String")
-sales_custom_page_fields.custom_page_fields.create(:field_name=>"My relative vulnerabilities",:field_type=>"String")
-sales_custom_page_fields.custom_page_fields.create(:field_name=>"Related Categories",:field_type=>"String")
-sales_custom_page_fields.custom_page_fields.create(:field_name=>"Customer Buying Process Step",:field_type=>"String")
-sales_custom_page_fields.custom_page_fields.create(:field_name=>"Customer Next Step",:field_type=>"String")
-sales_custom_page_fields.custom_page_fields.create(:field_name=>"Assistance to Navigate",:field_type=>"String")
+sales_call_arrays.each do |sales_call|
+	sales_custom_page_fields.custom_page_fields.create(:field_name=>sales_call,:field_type=>type)
+end
 sales_call_plan.template_definitions.create(:sequence=>3,:has_text_section=>true)
 sales_call_plan.template_definitions.create(:sequence=>4,:has_attachment_section=>true)
 sales_call_plan.template_definitions.create(:sequence=>5,:has_task_section=>true)
@@ -49,18 +45,9 @@ board_papers.template_definitions.create(:sequence=>1,:has_topics_section=>true)
 board_papers_template_definitions=board_papers.template_definitions.create(:sequence=>2)
 board_papers_custom_page_fields=board_papers_template_definitions.create_custom_page
 board_papers_template_definitions.update_attributes(:custom_page_id=>board_papers_custom_page_fields._id)
-board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Draft Resolution",:field_type=>"String")
-board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Executive Summary",:field_type=>"String")
-board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Background",:field_type=>"String")
-board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Recommendation",:field_type=>"String")
-board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Strategy Implications",:field_type=>"String")
-board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Financial Implications",:field_type=>"String")
-board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Risk Analysis",:field_type=>"String")
-board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Corporate Governance and Compliance",:field_type=>"String")
-board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Management Responsibility",:field_type=>"String")
-board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"CEO Signature",:field_type=>"String")
-board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Sponsor Signature",:field_type=>"String")
-board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Board Paper Prepared By",:field_type=>"String")
+board_paper_arrays.each do |board_paper|
+	board_papers_custom_page_fields.custom_page_fields.create(:field_name=>board_paper,:field_type=>type)
+end
 board_papers.template_definitions.create(:sequence=>3,:has_text_section=>true)
 board_papers.template_definitions.create(:sequence=>4,:has_attachment_section=>true)
 board_papers.template_definitions.create(:sequence=>5,:has_task_section=>true)

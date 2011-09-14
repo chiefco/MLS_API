@@ -85,7 +85,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
   #detects missing parameters in users create
   def detect_missing_params
     param_must = [:email, :password, :password_confirmation, :first_name, :last_name]
-    if params.has_key?(:user) && !params[:user].blank? && !['nil', 'NULL', 'null'].include?(params[:user])
+    if params.has_key?(:user) && params[:user].is_a?(Hash)
       missing_params = param_must.select { |param| !params[:user].has_key?(param.to_s) }
     else
       missing_params = param_must

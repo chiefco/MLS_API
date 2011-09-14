@@ -5,13 +5,13 @@ class V1::TasksController < ApplicationController
   before_filter :add_pagination,:only=>[:index]
 
   #Retrieves the tasks of the current_user
-	def index
-    @tasks = Task.list(params,@paginate_options,@current_user)
-			respond_to do |format|
-				format.json {render :json=>{:tasks=>@tasks.to_a.to_json(:only=>[:_id,:due_date,:is_completed,:description],:include=>{:item=>{:only=>[:_id,:name]}}).parse}.to_success}
-        format.xml
-      end
-	end
+def index
+  @tasks = Task.list(params,@paginate_options,@current_user)
+    respond_to do |format|
+      format.json {render :json=>{:tasks=>@tasks.to_a.to_json(:only=>[:_id,:due_date,:is_completed,:description],:include=>{:item=>{:only=>[:_id,:name]}}).parse}.to_success}
+      format.xml
+    end
+end
   # GET /v1/tasks/1
   # GET /v1/tasks/1.xml
   def show

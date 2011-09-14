@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   RESET_TOKEN_ERROR={:code=>5003,:message=>"Email not found"}
   UNAUTHORIZED={:code=>1004,:message=>"Authentication/Authorization Failed"}
   INVALID_PARAMETER_ID={:code=>3065,:message=>"id -Invalid Parameter"}
-  RECORD_NOT_FOUND={:code=>2096,:message=>'Record does not exist'}
+  RECORD_NOT_FOUND={:code=>2096,:message=>'Record does not exist in database'}
   USER_COLUMN=[:status,:remember_token,:remember_created_at,:created_at,:updated_at]
   PAGE_SIZE=10
   PAGE=1

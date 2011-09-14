@@ -13,5 +13,5 @@ class TemplateDefinition
   #~ references_one :custom_page
   #~ embedded_in :template
   default_scope :without=>[:created_at,:updated_at]
-
+  scope :unchanged, excludes(:custom_page_id => nil)
 end

@@ -27,7 +27,7 @@ class User
   validates_format_of     :email, :message=>"email - Invalid email format", :code=>2033, :with  => /\A([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})\z/i, :allow_blank => true
   validates_presence_of     :password, :message=>"password - Blank Parameter",:code=>2003, :if=>:pass_create_or_update?
   validates_presence_of     :password_confirmation, :message=>"password_confirmation - Blank Parameter",:code=>2004, :if=>:pass_create_or_update?
-  validates_confirmation_of :password, :message=>"password and password_confimation does not match", :code=>2040, :if=>:pass_create_or_update?
+  validates_confirmation_of :password, :message=>"password and password_confirmation does not match", :code=>2040, :if=>:pass_create_or_update?
   validates_length_of       :password, :message=>"password- Too short(Minimum is 6 characters)", :minimum => 6, :code=>2038, :allow_blank => true, :if=>:pass_create_or_update?
   validates_length_of       :password, :message=>"password- Too long(Maximum is 128 characters)", :maximum =>128, :code=>2039, :allow_blank => true, :if=>:pass_create_or_update?
   validates :first_name ,:length => { :minimum => 1 ,:maximum =>40,:message=>"first_name-invalid length",:code=>3074,:allow_blank=>true}

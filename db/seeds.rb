@@ -27,7 +27,9 @@ meeting_note.template_definitions.create(:sequence=>3,:has_task_section=>true)
 #Template ----------------SalesCallPlan-------------------------------------
 sales_call_plan=Template.create(:name=>"Sales Call Plan")
 sales_call_plan.template_definitions.create(:sequence=>1,:has_topics_section=>true)
-sales_custom_page_fields=sales_call_plan.template_definitions.create(:sequence=>2).create_custom_page
+sales_template_definitions=sales_call_plan.template_definitions.create(:sequence=>2)
+sales_custom_page_fields=sales_template_definitions.create_custom_page
+sales_template_definitions.update_attributes(:custom_page_id=>sales_custom_page_fields._id)
 sales_custom_page_fields.custom_page_fields.create(:field_name=>"Prospect's current situation",:field_type=>"String")
 sales_custom_page_fields.custom_page_fields.create(:field_name=>"Business Development Goals",:field_type=>"String")
 sales_custom_page_fields.custom_page_fields.create(:field_name=>"Desired next outcome",:field_type=>"String")
@@ -44,7 +46,9 @@ sales_call_plan.template_definitions.create(:sequence=>5,:has_task_section=>true
 #Template ----------------Board Papers------------------------------------
 board_papers=Template.create(:name=>"Board Papers")
 board_papers.template_definitions.create(:sequence=>1,:has_topics_section=>true)
-board_papers_custom_page_fields=board_papers.template_definitions.create(:sequence=>2).create_custom_page
+board_papers_template_definitions=board_papers.template_definitions.create(:sequence=>2)
+board_papers_custom_page_fields=board_papers_template_definitions.create_custom_page
+board_papers_template_definitions.update_attributes(:custom_page_id=>board_papers_custom_page_fields._id)
 board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Draft Resolution",:field_type=>"String")
 board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Executive Summary",:field_type=>"String")
 board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Background",:field_type=>"String")

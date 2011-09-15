@@ -13,7 +13,7 @@ class Task
   has_many :activities, as: :activity, :dependent=>:destroy
   referenced_in :user
   referenced_in :item
-  validates_presence_of :description,:code=>"3014",:message=>"description - Blank Parameter"
+  validates_presence_of :description,:code=>3014,:message=>"description - Blank Parameter"
   after_save :sunspot_index
   searchable do
     text :description

@@ -50,8 +50,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
 
   def show
     respond_to do |format|
-      format.xml{ render_for_api :user_with_token, :xml => current_user, :root => :user}
-      format.json{render_for_api :user_with_token, :json => current_user, :root => :user}
+      user = { :user => current_user.serializable_hash(:only=>[:_id, :email, :first_name, :last_name, :job_title, :company, :business_unit, :sign_in_count, :current_sign_in_at, :last_sign_in_at, :current_sign_in_ip, :last_sign_in_ip, :authentication_token], :root=>:user) } 
+      format.json { render :json=> user.to_success }
+      format.xml { render :xml=> user.to_success.to_xml(ROOT) }
     end
   end
 
@@ -85,7 +86,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
   #detects missing parameters in users create
   def detect_missing_params
     param_must = [:email, :password, :password_confirmation, :first_name, :last_name]
-    if params.has_key?(:user) && !params[:user].blank? && !['nil', 'NULL', 'null'].include?(params[:user])
+    if params.has_key?(:user) && params[:user].is_a?(Hash)
       missing_params = param_must.select { |param| !params[:user].has_key?(param.to_s) }
     else
       missing_params = param_must

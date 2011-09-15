@@ -32,7 +32,7 @@ sales_call_plan.template_definitions.create(:sequence=>1,:has_topics_section=>tr
 sales_template_definitions=sales_call_plan.template_definitions.create(:sequence=>2)
 sales_custom_page_fields=sales_template_definitions.create_custom_page
 sales_template_definitions.update_attributes(:custom_page_id=>sales_custom_page_fields._id)
-<<<<<<< HEAD:db/seeds.rb
+
 sales_custom_page_fields.custom_page_fields.create(:field_name=>"Prospect's current situation",:field_type=>"String",:default=>"")
 sales_custom_page_fields.custom_page_fields.create(:field_name=>"Business Development Goals",:field_type=>"String",:default=>"")
 sales_custom_page_fields.custom_page_fields.create(:field_name=>"Desired next outcome",:field_type=>"String",:default=>"")
@@ -42,11 +42,7 @@ sales_custom_page_fields.custom_page_fields.create(:field_name=>"Related Categor
 sales_custom_page_fields.custom_page_fields.create(:field_name=>"Customer Buying Process Step",:field_type=>"String",:default=>"")
 sales_custom_page_fields.custom_page_fields.create(:field_name=>"Customer Next Step",:field_type=>"String",:default=>"")
 sales_custom_page_fields.custom_page_fields.create(:field_name=>"Assistance to Navigate",:field_type=>"String",:default=>"")
-=======
-sales_call_arrays.each do |sales_call|
-	sales_custom_page_fields.custom_page_fields.create(:field_name=>sales_call,:field_type=>type)
-end
->>>>>>> 913a322ba36e2b81d76964aaed6437b626324b17:db/seeds.rb
+
 sales_call_plan.template_definitions.create(:sequence=>3,:has_text_section=>true)
 sales_call_plan.template_definitions.create(:sequence=>4,:has_attachment_section=>true)
 sales_call_plan.template_definitions.create(:sequence=>5,:has_task_section=>true)
@@ -57,7 +53,7 @@ board_papers.template_definitions.create(:sequence=>1,:has_topics_section=>true)
 board_papers_template_definitions=board_papers.template_definitions.create(:sequence=>2)
 board_papers_custom_page_fields=board_papers_template_definitions.create_custom_page
 board_papers_template_definitions.update_attributes(:custom_page_id=>board_papers_custom_page_fields._id)
-<<<<<<< HEAD:db/seeds.rb
+
 board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Draft Resolution",:field_type=>"String",:default=>"")
 board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Executive Summary",:field_type=>"String",:default=>"")
 board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Background",:field_type=>"String",:default=>"")
@@ -70,11 +66,7 @@ board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Manageme
 board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"CEO Signature",:field_type=>"String",:default=>"")
 board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Sponsor Signature",:field_type=>"String",:default=>"")
 board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Board Paper Prepared By",:field_type=>"String",:default=>"")
-=======
-board_paper_arrays.each do |board_paper|
-	board_papers_custom_page_fields.custom_page_fields.create(:field_name=>board_paper,:field_type=>type)
-end
->>>>>>> 913a322ba36e2b81d76964aaed6437b626324b17:db/seeds.rb
+
 board_papers.template_definitions.create(:sequence=>3,:has_text_section=>true)
 board_papers.template_definitions.create(:sequence=>4,:has_attachment_section=>true)
 board_papers.template_definitions.create(:sequence=>5,:has_task_section=>true)

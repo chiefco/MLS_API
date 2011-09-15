@@ -192,7 +192,9 @@ end
   end
 
   def reminder_parameters
-    @reminder={:reminder=>@reminder.serializable_hash(:only=>[:_id,:time],:include=>{:task=>{:only=>[:_id,:description]}})}.to_success
+    reminder={:reminder=>@reminder.serializable_hash(:only=>[:_id],:include=>{:task=>{:only=>[:_id,:description]}})}.to_success
+    reminder[:reminder][:time] = @reminder.time.strftime("%d-%m-%Y")
+    @reminder = reminder 
   end
 
 	  # finds the task

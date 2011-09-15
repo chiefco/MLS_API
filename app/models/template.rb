@@ -29,14 +29,6 @@ class Template
   def custom_page_definition
     template_definitions.excludes(:custom_page_id => nil).first
   end
-
-  def custom_page_definition
-    template_definitions.excludes(:custom_page_id => nil).first
-  end
-  
-  def custom_page_definition
-    template_definitions.excludes(:custom_page_id => nil).first
-  end
   
   def task_page_definition
     template_definitions.where(:has_task_section=>true).first

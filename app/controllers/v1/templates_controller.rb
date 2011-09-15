@@ -14,7 +14,7 @@ class V1::TemplatesController < ApplicationController
   def show
     respond_to do |format|
       if @template
-        value={:template=>@template.serializable_hash(:only=>[:_id,:name],:include=>{:template_definitions=>{:only=>[:_id,:created_at,:has_topics_section,:has_task_section,:has_attachment_section,:has_text_section,:sequence],:include=>{:custom_page=>{:include=>:custom_page_fields,:only=>[:name,:type]}}}})}.to_success
+        value={:template=>@template.serializable_hash(:only=>[:_id,:name],:include=>{:template_definitions=>{:only=>[:_id,:created_at,:has_topics_section,:has_task_section,:has_attachment_section,:has_text_section,:sequence],:include=>{:custom_page=>{:include=>:custom_page_fields,:only=>[:field_name,:field_type]}}}})}.to_success
         format.xml  { render :xml => value.to_xml(ROOT) }
         format.json  { render :json =>value}
       else

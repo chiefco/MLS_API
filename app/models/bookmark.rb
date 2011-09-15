@@ -3,7 +3,7 @@ class Bookmark
   include Mongoid::Timestamps
   include Sunspot::Mongoid
   field :name, :type => String
-  validates_presence_of :name, :message=>"name - Required parameter missing", :code=>"3013"
+  validates_presence_of :name, :message=>"name - Blank Parameter", :code=>3013
   validates_length_of     :name, :message=>"name-invalid length", :maximum =>40,:minimum=>2, :code=>3073, :allow_blank => true
   references_many :bookmarked_contents,:dependent=>:destroy
   referenced_in :user

@@ -18,7 +18,7 @@ class V1::ItemsController < ApplicationController
   def show
     respond_to do |format|
       if @item
-        @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date],:include=>{:location=>{:only=>[:_id,:name]}}),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id)}.to_success
+        @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:include=>{:location=>{:only=>[:_id,:name]}}),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id)}.to_success
         format.xml  { render :xml => @item.to_xml(ROOT) }
         format.json  { render :json => @item}
       else
@@ -32,9 +32,10 @@ class V1::ItemsController < ApplicationController
   # POST /items.xml
 
   def create
-
-    @item = @current_user.items.new(params[:item])
     @template=Template.find(params[:item][:template_id]) if params[:item][:template_id]
+    params[:item].merge!({:custom_page=>@template.custom_page}) if @template.has_custom_page?
+    @item = @current_user.items.new(params[:item]) 
+    #~ @item.custome
     respond_to do |format|
       if @template
           if @item.save

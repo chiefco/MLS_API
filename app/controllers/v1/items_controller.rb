@@ -195,10 +195,6 @@ class V1::ItemsController < ApplicationController
     [ {name: query} , { description: query } ]
   end
 
-  def get_item
-    @item=Item.find(params[:id])
-  end
-
   def detect_missing_params
     param_must = [:name, :template_id]
     if params.has_key?(:item) && params[:item].is_a?(Hash)
@@ -208,5 +204,27 @@ class V1::ItemsController < ApplicationController
     end
     render_missing_params(missing_params) unless missing_params.blank?
   end
-
+  
+  #Retrieves the Statistics of the Item
+  def get_statistics
+    @item=Item.find(params[:item_id])
+    respond_to do |format|
+      if @item
+        @items = Item.stats(params,@current_user,@item)  
+        format.json{ render :json=>success.merge(@items).merge(item_count)}
+        format.xml{ render :xml=>success.merge(@items).merge(item_count).to_xml(ROOT)}
+      else
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
+    end
+  end
+    
+  def get_item
+    @item=Item.find(params[:id])
+  end
+  
+  def item_count
+  {:count=>@items.count}
+  end
 end

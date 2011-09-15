@@ -64,7 +64,15 @@ class V1::RegistrationsController < Devise::RegistrationsController
       format.json{ render :json=>{:activities=>@activities.to_json(:only=>[:_id,:description,:activity_type],:include=>{:activity=>{:only=>[:_id,:name,:description,:item_date,:is_completed,:due_date,:show_in_quick_links,:status]}})}.to_success}
     end
   end
-
+  
+  def close_account 
+    respond_to do |format|
+      @current_user.update_attributes(:authentication_token=>nil,:status=>false)
+      format.json {render :json=>success}
+      format.xml {render :xml=>success}
+    end
+  end
+  
   private
 
   def render_results(valid,resource)
@@ -93,6 +101,5 @@ class V1::RegistrationsController < Devise::RegistrationsController
     end
     render_missing_params(missing_params) unless missing_params.blank?
   end
-
 end
 

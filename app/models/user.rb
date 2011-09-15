@@ -20,21 +20,22 @@ class User
   attr_protected :authentication_token,:is_admin,:reset_password_token,:confirmation_token
   attr_accessible :email,:password,:password_confirmation,:first_name,:last_name,:company,:business_unit,:job_title
 
-  validates_presence_of :first_name, :message=>"first_name - Blank Parameter", :code=>2041
-  validates_presence_of :last_name, :message=>"last_name - Blank Parameter", :code=>2043
-  validates_presence_of   :email, :message=>"email - Blank Parameter", :code=>2032
-  validates_uniqueness_of :email, :message=>"email - Already exist", :code=>2035, :case_sensitive => (case_insensitive_keys != false), :allow_blank => true
-  validates_format_of     :email, :message=>"email - Invalid email format", :code=>2033, :with  => /\A([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})\z/i, :allow_blank => true
-  validates_presence_of     :password, :message=>"password - Blank Parameter",:code=>2003, :if=>:pass_create_or_update?
-  validates_presence_of     :password_confirmation, :message=>"password_confirmation - Blank Parameter",:code=>2004, :if=>:pass_create_or_update?
-  validates_confirmation_of :password, :message=>"password and password_confirmation does not match", :code=>2040, :if=>:pass_create_or_update?
-  validates_length_of       :password, :message=>"password- Too short(Minimum is 6 characters)", :minimum => 6, :code=>2038, :allow_blank => true, :if=>:pass_create_or_update?
-  validates_length_of       :password, :message=>"password- Too long(Maximum is 128 characters)", :maximum =>128, :code=>2039, :allow_blank => true, :if=>:pass_create_or_update?
-  validates :first_name ,:length => { :minimum => 1 ,:maximum =>40,:message=>"first_name-invalid length",:code=>3074,:allow_blank=>true}
-  validates :last_name ,:length => { :minimum => 1 ,:maximum =>40,:message=>" last_name-invalid length",:code=>3075,:allow_blank=>true}
-  validates :company ,:length => { :minimum => 1 ,:maximum =>80,:message=>"company-invalid length",:code=>3077},:allow_blank=>true
-  validates :job_title ,:length => {:maximum =>80,:message=>"job title-invalid length",:code=>3078}
-  validates :business_unit ,:length => {:maximum =>80,:message=>"business_unit-invalid length",:code=>3076}
+  validates_presence_of :first_name, :message=>"first_name - Blank Parameter", :code=>3010
+  validates_presence_of :last_name, :message=>"last_name - Blank Parameter", :code=>3011
+  validates_presence_of   :email, :message=>"email - Blank Parameter", :code=>3002
+  validates_uniqueness_of :email, :message=>"email - Already exist", :code=>3004, :case_sensitive => (case_insensitive_keys != false), :allow_blank => true
+  validates_format_of     :email, :message=>"email - Invalid email format", :code=>4001, :with  => /\A([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})\z/i, :allow_blank => true
+  validates_presence_of     :password, :message=>"password - Blank Parameter",:code=>3066, :if=>:pass_create_or_update?
+  validates_presence_of     :password_confirmation, :message=>"password_confirmation - Blank Parameter",:code=>3079, :if=>:pass_create_or_update?
+  validates_confirmation_of :password, :message=>"password and password_confirmation does not match", :code=>3009, :if=>:pass_create_or_update?
+  validates_length_of       :password, :message=>"password - Parameter length less than 6", :minimum => 6, :code=>3005, :allow_blank => true, :if=>:pass_create_or_update?
+  validates_length_of       :password_confirmation, :message=>"password_confirmation - Parameter length less than 6", :minimum => 6, :code=>3007, :allow_blank => true, :if=>:pass_create_or_update?
+  validates_length_of       :password_confirmation, :message=>"password_confirmation - Parameter length greater than 32", :maximum =>32, :code=>3008, :allow_blank => true, :if=>:pass_create_or_update?
+  validates :first_name ,:length => { :minimum => 1 ,:maximum =>40,:message=>"first_name - Invalid length",:code=>3074,:allow_blank=>true}
+  validates :last_name ,:length => { :minimum => 1 ,:maximum =>40,:message=>" last_name - Invalid length",:code=>3075,:allow_blank=>true}
+  validates :company ,:length => { :minimum => 1 ,:maximum =>80,:message=>"company - Invalid length",:code=>3077},:allow_blank=>true
+  validates :job_title ,:length => {:maximum =>80,:message=>"job_title - Invalid length",:code=>3078}
+  validates :business_unit ,:length => {:maximum =>80,:message=>"business_unit - Invalid length",:code=>3076}
   validates_format_of       :password, :with =>  /^\S*$/,:message=>"password- Invalid should not contain space", :code=>2040, :if=>:pass_create_or_update?
 
   field :first_name, :type=> String
@@ -48,7 +49,7 @@ class User
     template.add :email
     template.add :first_name
     template.add :last_name
-    template.add :_id
+    template.add :_id, :as=>:id
     template.add :job_title
     template.add :company
     template.add :business_unit

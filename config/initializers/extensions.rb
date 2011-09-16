@@ -34,7 +34,8 @@ module Mongoid #:nodoc:
     end
     
     def sunspot_index
-      Sunspot.index!(self)
+      #~ Sunspot.index!(self)
+      true
     end
   end
 

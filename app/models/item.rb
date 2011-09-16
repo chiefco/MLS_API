@@ -2,7 +2,7 @@ class Item
   include Mongoid::Document
   include Mongoid::Timestamps
   acts_as_api
-  #~ include Sunspot::Mongoid
+  include Sunspot::Mongoid
   field :name, :type => String
   field :description, :type => String
   field :item_date, :type => Time
@@ -29,13 +29,13 @@ class Item
   references_and_referenced_in_many :categories
   referenced_in :template
 
-  #~ after_save :sunspot_index
+  after_save :sunspot_index
 
-  #~ searchable do
-    #~ text :name
-    #~ text :description
-    #~ string :user_id
-  #~ end
+  searchable do
+    text :name
+    text :description
+    string :user_id
+  end
 
   def template_fields
     true

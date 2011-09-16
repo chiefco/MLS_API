@@ -29,7 +29,7 @@ class Item
   references_and_referenced_in_many :categories
   referenced_in :template
 
-  after_save :sunspot_index
+  #~ after_save :sunspot_index
 
   searchable do
     text :name

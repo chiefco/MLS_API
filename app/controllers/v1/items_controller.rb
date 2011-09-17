@@ -17,6 +17,9 @@ class V1::ItemsController < ApplicationController
   # GET /items/1.xml
   def show
     respond_to do |format|
+      logger.info "ssssssssssssssssssssssssss"
+      logger.info @current_user
+      logger.info @item
       if @item
         @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:include=>{:location=>{:only=>[:_id,:name]}}),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id)}.to_success
         format.xml  { render :xml => @item.to_xml(ROOT) }

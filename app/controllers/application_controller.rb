@@ -15,9 +15,6 @@ class ApplicationController < ActionController::Base
       respond_to do |format|
         format.json{render :json=>{:response=>:failure,:errors=>[RECORD_NOT_FOUND]}}
         format.xml{render :xml=>{:errors=>[RECORD_NOT_FOUND]}.to_failure,:root=>:xml}
-    else
-        format.json{render :json=>{:response=>:failure,:errors=>[BLANK_PARAMETER_ID]}}
-        format.xml{render :xml=>{:errors=>[BLANK_PARAMETER_ID]}.to_failure,:root=>:xml}
       end
     end
   end

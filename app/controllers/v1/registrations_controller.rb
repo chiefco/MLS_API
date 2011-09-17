@@ -67,7 +67,8 @@ class V1::RegistrationsController < Devise::RegistrationsController
   
   def close_account 
     respond_to do |format|
-      @current_user.update_attributes(:authentication_token=>nil,:status=>false)
+      @current_user.update_attribute(:authentication_token,nil)
+      @current_user.update_attribute(:status,false)
       format.json {render :json=>success}
       format.xml {render :xml=>success}
     end

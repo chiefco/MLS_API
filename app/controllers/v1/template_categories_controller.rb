@@ -26,11 +26,11 @@ class V1::TemplateCategoriesController < ApplicationController
     @template_category = TemplateCategory.new(params[:template_category])
     respond_to do |format|
       if @template_category.save
-        format.html { redirect_to(@template_category, :notice => 'Template category was successfully created.') }
-        format.xml  { render :xml => @template_category, :status => :created, :location => @template_category }
+        format.xml  { render :xml => @template_category.to_xml(ROOT)}
+        format.json  { render :json => @template_category }
       else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @template_category.errors, :status => :unprocessable_entity }
+        format.xml  { render :xml => @template_category.all_errors.to_xml(ROOT)}
+        format.json  { render :json => @template_category.all_errors}
       end
     end
   end
@@ -40,11 +40,11 @@ class V1::TemplateCategoriesController < ApplicationController
   def update
     respond_to do |format|
       if @template_category.update_attributes(params[:template_category])
-        format.html { redirect_to(@template_category, :notice => 'Template category was successfully updated.') }
-        format.xml  { head :ok }
+        format.xml  { render :xml => @template_category.to_xml(ROOT)}
+        format.json  { render :json => @template_category }
       else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @template_category.errors, :status => :unprocessable_entity }
+        format.xml  { render :xml => @template_category.all_errors.to_xml(ROOT)}
+        format.json  { render :json => @template_category.all_errors}
       end
     end
   end

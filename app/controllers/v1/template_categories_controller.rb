@@ -26,6 +26,7 @@ class V1::TemplateCategoriesController < ApplicationController
     @template_category = TemplateCategory.new(params[:template_category])
     respond_to do |format|
       if @template_category.save
+        @template_category=@template_category.serializable_hash(:only=>[:_id,:name])
         format.xml  { render :xml => @template_category.to_xml(ROOT)}
         format.json  { render :json => @template_category }
       else
@@ -40,6 +41,7 @@ class V1::TemplateCategoriesController < ApplicationController
   def update
     respond_to do |format|
       if @template_category.update_attributes(params[:template_category])
+        @template_category=@template_category.serializable_hash(:only=>[:_id,:name])
         format.xml  { render :xml => @template_category.to_xml(ROOT)}
         format.json  { render :json => @template_category }
       else

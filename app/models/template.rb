@@ -15,15 +15,15 @@ class Template
   default_scope :without=>[:created_at,:updated_at,:template_category_id]
   
   def has_custom_page?
-    has_value?(custom_page_definition)
+    !custom_page_definition.nil?
   end
   
   def has_task_page?
-    has_value?(task_page_definition)
+    !task_page_definition.nil?
   end
 
   def has_topic_page?
-    has_value?(topic_page_definition)
+    !topic_page_definition.nil?
   end
   
   def custom_page_definition

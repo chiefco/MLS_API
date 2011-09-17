@@ -4,15 +4,18 @@ class ApplicationController < ActionController::Base
   RESET_TOKEN_ERROR={:code=>5003,:message=>"Email not found"}
   UNAUTHORIZED={:code=>1004,:message=>"Authentication/Authorization Failed"}
   INVALID_PARAMETER_ID={:code=>3065,:message=>"id -Invalid Parameter"}
+  BLANK_PARAMETER_ID={:code=>3036,:message=>"id - Blank Parameter"}
   RECORD_NOT_FOUND={:code=>2096,:message=>'Record does not exist in database'}
   USER_COLUMN=[:status,:remember_token,:remember_created_at,:created_at,:updated_at]
   PAGE_SIZE=10
   PAGE=1
   ROOT={:root=>:xml}
   rescue_from Mongoid::Errors::DocumentNotFound do |exception|
-    respond_to do |format|
-      format.json{render :json=>{:response=>:failure,:errors=>[RECORD_NOT_FOUND]}}
-      format.xml{render :xml=>{:errors=>[RECORD_NOT_FOUND]}.to_failure,:root=>:xml}
+    if !exception.identifiers.empty?
+      respond_to do |format|
+        format.json{render :json=>{:response=>:failure,:errors=>[RECORD_NOT_FOUND]}}
+        format.xml{render :xml=>{:errors=>[RECORD_NOT_FOUND]}.to_failure,:root=>:xml}
+      end
     end
   end
 

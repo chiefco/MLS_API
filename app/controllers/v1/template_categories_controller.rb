@@ -54,6 +54,9 @@ class V1::TemplateCategoriesController < ApplicationController
           format.xml  { render :xml => @template_category.all_errors.to_xml(ROOT)}
           format.json  { render :json => @template_category.all_errors}
         end
+      else
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}        
       end
     end
   end
@@ -61,12 +64,18 @@ class V1::TemplateCategoriesController < ApplicationController
   # DELETE /template_categories/1
   # DELETE /template_categories/1.xml
   def destroy
-    @template_category.destroy
     respond_to do |format|
-      format.html { redirect_to(template_categories_url) }
-      format.xml  { head :ok }
+      if @template_category
+        @template_category.destroy
+        format.xml  { render :xml => success.to_xml(ROOT) }
+        format.json  { render :json=> success}
+      else
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
     end
   end
+  
   def find_template_category
     @template_category = TemplateCategory.find(params[:id])
   end

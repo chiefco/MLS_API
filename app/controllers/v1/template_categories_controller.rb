@@ -14,9 +14,14 @@ class V1::TemplateCategoriesController < ApplicationController
   # GET /template_categories/1.xml
   def show
     respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml => @template_category }
-       format.json{ render :json => @template_category }
+      if @template_category
+        @template_category=@template_category.serializable_hash(:only=>[:_id,:name])
+        format.xml  { render :xml => @template_category }
+        format.json{ render :json => @template_category }
+      else
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
     end
   end
 
@@ -40,13 +45,15 @@ class V1::TemplateCategoriesController < ApplicationController
   # PUT /template_categories/1.xml
   def update
     respond_to do |format|
-      if @template_category.update_attributes(params[:template_category])
-        @template_category=@template_category.serializable_hash(:only=>[:_id,:name])
-        format.xml  { render :xml => @template_category.to_xml(ROOT)}
-        format.json  { render :json => @template_category }
-      else
-        format.xml  { render :xml => @template_category.all_errors.to_xml(ROOT)}
-        format.json  { render :json => @template_category.all_errors}
+      if @template_category
+        if @template_category.update_attributes(params[:template_category])
+          @template_category=@template_category.serializable_hash(:only=>[:_id,:name])
+          format.xml  { render :xml => @template_category.to_xml(ROOT)}
+          format.json  { render :json => @template_category }
+        else
+          format.xml  { render :xml => @template_category.all_errors.to_xml(ROOT)}
+          format.json  { render :json => @template_category.all_errors}
+        end
       end
     end
   end

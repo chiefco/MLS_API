@@ -57,6 +57,7 @@ class User
     template.add :last_sign_in_at
     template.add :current_sign_in_ip
     template.add :last_sign_in_ip
+    template.add :sign_in_count
   end
 
   api_accessible :user_with_token , :extend=> :user_with_out_token do |template|

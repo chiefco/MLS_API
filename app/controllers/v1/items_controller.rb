@@ -35,7 +35,6 @@ class V1::ItemsController < ApplicationController
     @template=Template.find(params[:item][:template_id]) if params[:item][:template_id]
     params[:item].merge!({:custom_page=>@template.custom_page}) if @template.has_custom_page?
     @item = @current_user.items.new(params[:item]) 
-    #~ @item.custome
     respond_to do |format|
       if @template
           if @item.save
@@ -117,8 +116,8 @@ class V1::ItemsController < ApplicationController
 
   #Adds the category to the given item
   def item_add_category
-    @item=Item.find(params[:item_category][:item_id])
-    @category=Category.find(params[:item_category][:category_id])
+    @item=@current_user.items.find(params[:item_category][:item_id])
+    @category=@current_user.categories.find(params[:item_category][:category_id])
     respond_to do  |format|
       if @item && @category
         @item.categories<<@category
@@ -134,7 +133,7 @@ class V1::ItemsController < ApplicationController
 
   #Adds the attendee to the given item
   def item_add_attendees
-    @item=Item.find(params[:item_attendee][:item_id])
+    @item=@current_user.items.find(params[:item_attendee][:item_id])
     respond_to do |format|
       @attendee=@item.attendees.build(params[:item_attendee])
       if @attendee.save
@@ -208,7 +207,7 @@ class V1::ItemsController < ApplicationController
   
   #Retrieves the Statistics of the Item
   def get_statistics
-    @item=Item.find(params[:item_id])
+    @item=@current_user.items.find(params[:item_id])
     respond_to do |format|
       if @item
         @items = Item.stats(params,@current_user,@item)  
@@ -222,7 +221,7 @@ class V1::ItemsController < ApplicationController
   end
     
   def get_item
-    @item=Item.find(params[:id])
+    @item=@current_user.items.find(params[:id])
   end
   
   def item_count

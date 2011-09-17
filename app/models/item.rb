@@ -12,7 +12,7 @@ class Item
   field :location_id, :type => String
   field :current_category_id, :type => String
 
-  validates_presence_of :name,:message=>'name - Required parameter missing',:code=>2009
+  validates_presence_of :name,:message=>'name - Blank Parameter',:code=>3013
   validates_presence_of :template_id,:message=>'template_id - Blank Parameter',:code=>3025
 
   belongs_to  :template

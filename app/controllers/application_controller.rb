@@ -11,10 +11,13 @@ class ApplicationController < ActionController::Base
   PAGE=1
   ROOT={:root=>:xml}
   rescue_from Mongoid::Errors::DocumentNotFound do |exception|
-    if !exception.identifiers.empty?
       respond_to do |format|
-        format.json{render :json=>{:response=>:failure,:errors=>[RECORD_NOT_FOUND]}}
-        format.xml{render :xml=>{:errors=>[RECORD_NOT_FOUND]}.to_failure,:root=>:xml}
+        if !exception.identifiers.empty?
+          format.json{render :json=>{:response=>:failure,:errors=>[RECORD_NOT_FOUND]}}
+          format.xml{render :xml=>{:errors=>[RECORD_NOT_FOUND]}.to_failure,:root=>:xml}
+        else
+          format.json{render :json=>{:response=>:failure,:errors=>[BLANK_PARAMETER_ID]}}
+          format.xml{render :xml=>{:errors=>[BLANK_PARAMETER_ID]}.to_failure,:root=>:xml}
       end
     end
   end

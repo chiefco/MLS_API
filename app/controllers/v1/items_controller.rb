@@ -18,7 +18,7 @@ class V1::ItemsController < ApplicationController
   def show
     respond_to do |format|
       if @item
-        @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:methods=>:location_name),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id)}.to_success
+        @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page,:created_at,:updated_at],:methods=>:location_name),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id)}.to_success
         format.xml  { render :xml => @item.to_xml(ROOT) }
         format.json  { render :json => @item}
       else

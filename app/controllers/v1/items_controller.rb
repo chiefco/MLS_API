@@ -61,7 +61,7 @@ class V1::ItemsController < ApplicationController
       get_item
         if @item.update_attributes(params[:item])
         if params[:item][:location]
-          @location=Location.create(:name=>params[:item][:location])
+          @location=@current_user.locations.find_or_create_by(:name=>params[:item][:location])
           @item.update_attributes(:location_id=>@location.id)
         end
         @item={:item=>@item.serializable_hash(:only=>[:description,:current_category_id],:methods=>:item_date),:location=>@location.name}.to_success

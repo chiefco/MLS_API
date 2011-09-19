@@ -27,10 +27,11 @@ class User
   validates_format_of     :email, :message=>"email - Invalid email format", :code=>4001, :with  => /\A([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})\z/i, :allow_blank => true
   validates_presence_of     :password, :message=>"password - Blank Parameter",:code=>3066, :if=>:pass_create_or_update?
   validates_presence_of     :password_confirmation, :message=>"password_confirmation - Blank Parameter",:code=>3079, :if=>:pass_create_or_update?
-  validates_confirmation_of :password, :message=>"password and password_confirmation does not match", :code=>3009, :if=>:pass_create_or_update?
   validates_length_of       :password, :message=>"password - Parameter length less than 6", :minimum => 6, :code=>3005, :allow_blank => true, :if=>:pass_create_or_update?
+  validates_length_of       :password, :message=>"password - Parameter length greater than 32", :maximum =>32, :code=>3006, :allow_blank => true, :if=>:pass_create_or_update?
   validates_length_of       :password_confirmation, :message=>"password_confirmation - Parameter length less than 6", :minimum => 6, :code=>3007, :allow_blank => true, :if=>:pass_create_or_update?
   validates_length_of       :password_confirmation, :message=>"password_confirmation - Parameter length greater than 32", :maximum =>32, :code=>3008, :allow_blank => true, :if=>:pass_create_or_update?
+  validates_confirmation_of :password, :message=>"password and password_confirmation does not match", :code=>3009, :if=>:pass_create_or_update?
   validates :first_name ,:length => { :minimum => 1 ,:maximum =>40,:message=>"first_name - Invalid length",:code=>3074,:allow_blank=>true}
   validates :last_name ,:length => { :minimum => 1 ,:maximum =>40,:message=>" last_name - Invalid length",:code=>3075,:allow_blank=>true}
   validates :company ,:length => { :minimum => 1 ,:maximum =>80,:message=>"company - Invalid length",:code=>3077},:allow_blank=>true

@@ -2,6 +2,8 @@ class Item
   include Mongoid::Document
   include Mongoid::Timestamps
   acts_as_api
+  SORT_BY_ALLOWED = [ :name, :description]
+  ORDER_BY_ALLOWED =  [:asc,:desc]
   include Sunspot::Mongoid
   field :name, :type => String
   field :description, :type => String

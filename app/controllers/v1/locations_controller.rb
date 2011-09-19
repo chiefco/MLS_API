@@ -56,7 +56,7 @@ class V1::LocationsController < ApplicationController
   end
 
   def single_response
-    {:response=>:success,:location=>@location}
+    {:response=>:success,:location=>@location.serializable_hash(:except=>[:created_at,:updated_at])}
   end
 
   def multi_result

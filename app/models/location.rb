@@ -12,6 +12,7 @@ class Location
   #~ after_validation :geocode
   before_save :find_co_ordinates
   ALLOWED_FIELDS=[:_id,:name,:latitude,:longitude]
+    validates_presence_of :name,:message=>'name - Blank Parameter',:code=>3013
   default_scope :only=>ALLOWED_FIELDS
   SORT_BY_ALLOWED = [:name,:created_at,:updated_at]
   ORDER_BY_ALLOWED =  [:asc,:desc]

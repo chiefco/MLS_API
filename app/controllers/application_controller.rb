@@ -4,7 +4,9 @@ class ApplicationController < ActionController::Base
   RESET_TOKEN_ERROR={:code=>5003,:message=>"Email not found"}
   UNAUTHORIZED={:code=>1004,:message=>"Authentication/Authorization Failed"}
   INVALID_PARAMETER_ID={:code=>3065,:message=>"id -Invalid Parameter"}
+  INVALID_CATEGORY_ID={:code=>  3079,:message=>"current_category_id-invalid"}
   BLANK_PARAMETER_ID={:code=>3036,:message=>"id - Blank Parameter"}
+  INVALID_DATE={:code=>  3080,:message=>"invalid-date"}
   RECORD_NOT_FOUND={:code=>2096,:message=>'Record does not exist in database'}
   USER_COLUMN=[:status,:remember_token,:remember_created_at,:created_at,:updated_at]
   PAGE_SIZE=10
@@ -114,7 +116,8 @@ class ApplicationController < ActionController::Base
       format.xml { render :xml=> {:errors=>errors}.to_failure.to_xml(:root=>:result) }
     end
   end
-
+  
+ 
   #gived error code of missing parameter
   def missing_error_code(parameter)
     API_ERRORS["Missing Parameter"].select { |code,message| message.match(/\A#{parameter.to_s}/) }.keys.first

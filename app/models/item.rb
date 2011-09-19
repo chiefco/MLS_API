@@ -17,10 +17,9 @@ class Item
   validates_presence_of :name,:message=>'name - Blank Parameter',:code=>3013
   validates :name ,:length => { :minimum => 3 ,:maximum =>20,:message=>"name - Invalid length",:code=>3077},:allow_blank=>true
   validates_presence_of :template_id,:message=>'template_id - Blank Parameter',:code=>3025
-
   belongs_to  :template
   belongs_to  :location
-  has_one :item
+
   references_many :topics,:dependent => :destroy
   references_many :attendees,:dependent => :destroy
   references_many :tasks,:dependent => :destroy

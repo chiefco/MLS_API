@@ -56,7 +56,10 @@ class V1::ItemsController < ApplicationController
   # PUT /items/1.xml
   def update
     respond_to do |format|
-      if @item.update_attributes(params[:item])
+      begin
+      @item.categories.find(params[:item][:current_category_id]) if params[:item][:current_category_id]
+      get_item
+        if @item.update_attributes(params[:item])
         if params[:item][:location]
           @location=Location.create(:name=>params[:item][:location])
           @item.update_attributes(:location_id=>@location.id)
@@ -67,6 +70,15 @@ class V1::ItemsController < ApplicationController
       else
         format.xml  { render :xml => @item.all_errors.to_xml(ROOT)}
         format.json {render :json =>@item.all_errors}
+      end
+      rescue Exception => e 
+       if e.message.to_s=="argument out of range" 
+          format.xml  { render :xml => failure.merge(INVALID_DATE).to_xml(ROOT) }
+          format.json  { render :json=> failure.merge(INVALID_DATE)} 
+        else
+         format.xml  { render :xml => failure.merge(INVALID_CATEGORY_ID).to_xml(ROOT) }
+         format.json  { render :json=> failure.merge(INVALID_CATEGORY_ID)}
+       end
       end
     end
   end
@@ -225,6 +237,7 @@ class V1::ItemsController < ApplicationController
   end
   
   def item_count
-  {:count=>@items.count}
+    {:count=>@items.count}
   end
+ 
 end

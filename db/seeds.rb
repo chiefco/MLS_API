@@ -49,7 +49,7 @@ sales_call_plan.template_definitions.create(:sequence=>5,:has_task_section=>true
 
 #Template ----------------Board Papers------------------------------------
 board_papers=Template.create(:name=>"Board Papers")
-board_papers.template_definitions.create(:sequence=>1,:has_topics_section=>true)
+board_papers.template_definitions.create(:sequence=>1,:has_topic_section=>true)
 board_papers_template_definitions=board_papers.template_definitions.create(:sequence=>2)
 board_papers_custom_page_fields=board_papers_template_definitions.create_custom_page
 board_papers_template_definitions.update_attributes(:custom_page_id=>board_papers_custom_page_fields._id)

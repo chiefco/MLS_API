@@ -72,8 +72,8 @@ class V1::TasksController < ApplicationController
         format.xml  { render :xml => @task.to_xml(ROOT) }
         format.json { render :json => @task}
       else
-        format.xml  { render :xml => failure.merge(@topic.all_errors).to_xml(ROOT)}
-        format.json  { render :json => @topic.all_errors }
+        format.xml  { render :xml => failure.merge(@task.all_errors).to_xml(ROOT)}
+        format.json  { render :json => @task.all_errors }
       end
     end
   end
@@ -86,8 +86,8 @@ class V1::TasksController < ApplicationController
           format.xml  { render :xml => @task.to_xml(ROOT) }
           format.json { render :json => @task}
         else
-          format.xml  { render :xml => failure.merge(@topic.all_errors).to_xml(ROOT)}
-          format.json  { render :json => @topic.all_errors }
+          format.xml  { render :xml => failure.merge(@task.all_errors).to_xml(ROOT)}
+          format.json  { render :json => @task.all_errors }
         end
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }

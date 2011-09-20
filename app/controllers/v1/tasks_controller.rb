@@ -39,7 +39,7 @@ class V1::TasksController < ApplicationController
   # PUT /v1/tasks/1.xml
   def update
     validate_item(params[:task][:item_id]) if params[:task][:item_id]
-    @count.nil? ? update_task : evaluate_item
+    @count.to_i>0 ? update_task : evaluate_item
   end
 
   # DELETE /v1/tasks/1

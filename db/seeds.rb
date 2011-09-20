@@ -22,13 +22,13 @@ note.template_definitions.create(:sequence=>2,:has_attachment_section=>true)
 
 #Template ----------------MeetingNote-----------------------------------
 meeting_note=Template.create(:name=>"Meeting Note")
-meeting_note.template_definitions.create(:sequence=>1,:has_topics_section=>true)
+meeting_note.template_definitions.create(:sequence=>1,:has_topic_section=>true)
 meeting_note.template_definitions.create(:sequence=>2,:has_text_section=>true)
 meeting_note.template_definitions.create(:sequence=>3,:has_task_section=>true)
 
 #Template ----------------SalesCallPlan-------------------------------------
 sales_call_plan=Template.create(:name=>"Sales Call Plan")
-sales_call_plan.template_definitions.create(:sequence=>1,:has_topics_section=>true)
+sales_call_plan.template_definitions.create(:sequence=>1,:has_topic_section=>true)
 sales_template_definitions=sales_call_plan.template_definitions.create(:sequence=>2)
 sales_custom_page_fields=sales_template_definitions.create_custom_page
 sales_template_definitions.update_attributes(:custom_page_id=>sales_custom_page_fields._id)

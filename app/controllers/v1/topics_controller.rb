@@ -92,7 +92,7 @@ class  V1::TopicsController < ApplicationController
       end
     end
   end
-  
+
   def evaluate_item
     if @count.to_i<1
       respond_to do |format|

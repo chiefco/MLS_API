@@ -56,7 +56,7 @@ class V1::TemplateCategoriesController < ApplicationController
         end
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}        
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
   end
@@ -75,7 +75,7 @@ class V1::TemplateCategoriesController < ApplicationController
       end
     end
   end
-  
+
   def find_template_category
     @template_category = TemplateCategory.find(params[:id])
   end

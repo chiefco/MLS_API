@@ -7,7 +7,7 @@ class V1::SearchesController < ApplicationController
     @searches = @current_user.searches.all
     respond_to do |format|
       format.xml  { render :xml => multi_success.to_xml(:root=>:result) }
-      format.json  { render :json => multi_success.to_json }
+      format.json  { render :json => multi_success.to_json(:except=>[:created_at,:updated_at,:user_id]) }
     end
   end
 

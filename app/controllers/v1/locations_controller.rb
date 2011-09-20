@@ -7,7 +7,7 @@ class V1::LocationsController < ApplicationController
     @locations = @current_user.locations.paginate(:page=>params[:page],:per_page=>params[:page_size])
     respond_to do |format|
       format.xml  { render :xml => multi_result.to_xml(:root=>:result) }
-      format.json  { render :json =>multi_result.to_json }
+      format.json  { render :json =>multi_result }
     end
   end
 
@@ -56,7 +56,7 @@ class V1::LocationsController < ApplicationController
   end
 
   def single_response
-    {:response=>:success,:location=>@location.serializable_hash(:except=>[:created_at,:updated_at])}
+    {:response=>:success,:location=>@location.serializable_hash(:except=>[:created_at,:updated_at,:user_id])}
   end
 
   def multi_result

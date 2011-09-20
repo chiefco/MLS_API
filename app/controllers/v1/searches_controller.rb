@@ -78,6 +78,6 @@ class V1::SearchesController < ApplicationController
   end
 
   def render_success
-    {:response=>:success,:search=>@search}
+    {:response=>:success,:search=>@search.serializable_hash(:except=>[:created_at,:updated_at,:user_id])}
   end
 end

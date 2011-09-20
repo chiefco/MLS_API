@@ -5,13 +5,13 @@ class V1::TasksController < ApplicationController
   before_filter :add_pagination,:only=>[:index]
 
   #Retrieves the tasks of the current_user
-def index
-  @tasks = Task.list(params,@paginate_options,@current_user)
-    respond_to do |format|
-      format.json {render :json=>{:tasks=>@tasks.to_a.to_json(:only=>[:_id,:due_date,:is_completed,:description],:include=>{:item=>{:only=>[:_id,:name]}}).parse}.to_success}
-      format.xml
-    end
-end
+  def index
+    @tasks = Task.list(params,@paginate_options,@current_user)
+      respond_to do |format|
+        format.json {render :json=>{:tasks=>@tasks.to_a.to_json(:only=>[:_id,:due_date,:is_completed,:description],:include=>{:item=>{:only=>[:_id,:name]}}).parse}.to_success}
+        format.xml
+      end
+  end
   # GET /v1/tasks/1
   # GET /v1/tasks/1.xml
   def show
@@ -32,7 +32,7 @@ end
   def create
     @task = @current_user.tasks.new(params[:task])
     validate_item(params[:task][:item_id]) if params[:task][:item_id]
-    @count.nil? ? save_task : evaluate_item
+    @count.to_i>0 ? save_task : evaluate_item
   end
 
   # PUT /v1/tasks/1
@@ -68,7 +68,7 @@ end
   def save_task
     respond_to do |format|
       if @task.save
-        @task={:task=>@task.serializable_hash(:only=>[:_id,:description,:due_date,:is_completed],:include=>{:item=>{:only =>[ :_id,:name]}})}.to_success
+        @task={:task=>@task.serializable_hash(:only=>[:_id,:description,:is_completed],:methods=>:due_date,:include=>{:item=>{:only =>[ :_id,:name]}})}.to_success
         format.xml  { render :xml => @task.to_xml(ROOT) }
         format.json { render :json => @task}
       else
@@ -82,7 +82,7 @@ end
    respond_to do |format|
       if @task
         if @task.update_attributes(params[:task])
-          @task={:task=>@task.serializable_hash(:only=>[:_id,:description,:due_date,:is_completed],:include=>{:item=>{:only =>[ :_id,:name]}})}.to_success
+          @task={:task=>@task.serializable_hash(:only=>[:_id,:description,:is_completed],:methods=>:due_date,:include=>{:item=>{:only =>[ :_id,:name]}})}.to_success
           format.xml  { render :xml => @task.to_xml(ROOT) }
           format.json { render :json => @task}
         else
@@ -97,7 +97,7 @@ end
   end
 
   def evaluate_item
-    if @count<0
+    if @count.to_i<1
       respond_to do |format|
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}

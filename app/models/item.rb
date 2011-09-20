@@ -2,6 +2,8 @@ class Item
   include Mongoid::Document
   include Mongoid::Timestamps
   acts_as_api
+  SORT_BY_ALLOWED = [ :name, :description]
+  ORDER_BY_ALLOWED =  [:asc,:desc]
   include Sunspot::Mongoid
   field :name, :type => String
   field :description, :type => String
@@ -12,12 +14,12 @@ class Item
   field :location_id, :type => String
   field :current_category_id, :type => String
 
-  validates_presence_of :name,:message=>'name - Required parameter missing',:code=>2009
+  validates_presence_of :name,:message=>'name - Blank Parameter',:code=>3013
+  validates :name ,:length => { :minimum => 3 ,:maximum =>20,:message=>"name - Invalid length",:code=>3077},:allow_blank=>true
   validates_presence_of :template_id,:message=>'template_id - Blank Parameter',:code=>3025
-
   belongs_to  :template
   belongs_to  :location
-  has_one :item
+
   references_many :topics,:dependent => :destroy
   references_many :attendees,:dependent => :destroy
   references_many :tasks,:dependent => :destroy

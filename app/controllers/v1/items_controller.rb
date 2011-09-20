@@ -18,7 +18,7 @@ class V1::ItemsController < ApplicationController
   def show
     respond_to do |format|
       if @item
-        @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:include=>{:location=>{:only=>[:_id,:name]}}),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id)}.to_success
+        @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:methods=>:location_name),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id)}.to_success
         format.xml  { render :xml => @item.to_xml(ROOT) }
         format.json  { render :json => @item}
       else
@@ -35,7 +35,6 @@ class V1::ItemsController < ApplicationController
     @template=Template.find(params[:item][:template_id]) if params[:item][:template_id]
     params[:item].merge!({:custom_page=>@template.custom_page}) if @template.has_custom_page?
     @item = @current_user.items.new(params[:item]) 
-    #~ @item.custome
     respond_to do |format|
       if @template
           if @item.save
@@ -57,9 +56,12 @@ class V1::ItemsController < ApplicationController
   # PUT /items/1.xml
   def update
     respond_to do |format|
-      if @item.update_attributes(params[:item])
+      begin
+      @item.categories.find(params[:item][:current_category_id]) if params[:item][:current_category_id]
+      get_item
+        if @item.update_attributes(params[:item])
         if params[:item][:location]
-          @location=Location.create(:name=>params[:item][:location])
+          @location=@current_user.locations.find_or_create_by(:name=>params[:item][:location])
           @item.update_attributes(:location_id=>@location.id)
         end
         @item={:item=>@item.serializable_hash(:only=>[:description,:current_category_id],:methods=>:item_date),:location=>@location.name}.to_success
@@ -68,6 +70,15 @@ class V1::ItemsController < ApplicationController
       else
         format.xml  { render :xml => @item.all_errors.to_xml(ROOT)}
         format.json {render :json =>@item.all_errors}
+      end
+      rescue Exception => e 
+       if e.message.to_s=="argument out of range" 
+          format.xml  { render :xml => failure.merge(INVALID_DATE).to_xml(ROOT) }
+          format.json  { render :json=> failure.merge(INVALID_DATE)} 
+        else
+         format.xml  { render :xml => failure.merge(INVALID_CATEGORY_ID).to_xml(ROOT) }
+         format.json  { render :json=> failure.merge(INVALID_CATEGORY_ID)}
+       end
       end
     end
   end
@@ -117,8 +128,8 @@ class V1::ItemsController < ApplicationController
 
   #Adds the category to the given item
   def item_add_category
-    @item=Item.find(params[:item_category][:item_id])
-    @category=Category.find(params[:item_category][:category_id])
+    @item=@current_user.items.find(params[:item_category][:item_id])
+    @category=@current_user.categories.find(params[:item_category][:category_id])
     respond_to do  |format|
       if @item && @category
         @item.categories<<@category
@@ -134,7 +145,7 @@ class V1::ItemsController < ApplicationController
 
   #Adds the attendee to the given item
   def item_add_attendees
-    @item=Item.find(params[:item_attendee][:item_id])
+    @item=@current_user.items.find(params[:item_attendee][:item_id])
     respond_to do |format|
       @attendee=@item.attendees.build(params[:item_attendee])
       if @attendee.save
@@ -208,7 +219,7 @@ class V1::ItemsController < ApplicationController
   
   #Retrieves the Statistics of the Item
   def get_statistics
-    @item=Item.find(params[:item_id])
+    @item=@current_user.items.find(params[:item_id])
     respond_to do |format|
       if @item
         @items = Item.stats(params,@current_user,@item)  
@@ -222,10 +233,11 @@ class V1::ItemsController < ApplicationController
   end
     
   def get_item
-    @item=Item.find(params[:id])
+    @item=@current_user.items.find(params[:id])
   end
   
   def item_count
-  {:count=>@items.count}
+    {:count=>@items.count}
   end
+ 
 end

@@ -116,6 +116,8 @@ Invalid Parameter:
   3076: business_unit-invalid length
   3077: company-invalid length
   3078: job_title-invalid length
+  3079: current_category_id-invalid id
+  3080: invalid-date
 Format Error:
   4001: email - Invalid email format
   4002: due_date - Invalid date format

@@ -52,13 +52,11 @@ MeetlinkshareApi::Application.configure do
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.default :charset => "utf-8"
 
-    ActionMailer::Base.smtp_settings = {
-    :address => "mail.railsfactory.com",
-    :port => 25,
-    :domain => "railsfactory.com",
+  ActionMailer::Base.smtp_settings = {
+    :address => "smtp.sendgrid.net",
     :authentication => :plain,
-    :user_name => "mailer1@railsfactory.com",
-    :password => "mail3r",
+    :user_name => "app1059926@heroku.com",
+    :password => "jeatkwb3",
     :enable_starttls_auto => false
     }
 end

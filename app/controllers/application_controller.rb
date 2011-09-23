@@ -116,8 +116,8 @@ class ApplicationController < ActionController::Base
       format.xml { render :xml=> {:errors=>errors}.to_failure.to_xml(:root=>:result) }
     end
   end
-  
- 
+
+
   #gived error code of missing parameter
   def missing_error_code(parameter)
     API_ERRORS["Missing Parameter"].select { |code,message| message.match(/\A#{parameter.to_s}/) }.keys.first

@@ -50,7 +50,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
 
   def show
     respond_to do |format|
-      user = { :user => current_user.serializable_hash(:only=>[:_id, :email, :first_name, :last_name, :job_title, :company, :business_unit, :sign_in_count], :root=>:user) } 
+      user = { :user => current_user.serializable_hash(:only=>[:_id, :email, :first_name, :last_name, :job_title, :company, :business_unit, :sign_in_count], :root=>:user) }
       format.json { render :json=> user.to_success }
       format.xml { render :xml=> user.to_success.to_xml(ROOT) }
     end
@@ -64,8 +64,8 @@ class V1::RegistrationsController < Devise::RegistrationsController
       format.json{ render :json=>{:activities=>@activities.to_json(:only=>[:_id,:description,:activity_type],:include=>{:activity=>{:only=>[:_id,:name,:description,:item_date,:is_completed,:due_date,:show_in_quick_links,:status]}})}.to_success}
     end
   end
-  
-  def close_account 
+
+  def close_account
     respond_to do |format|
       @current_user.update_attribute(:authentication_token,nil)
       @current_user.update_attribute(:status,false)
@@ -73,7 +73,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
       format.xml {render :xml=>success}
     end
   end
-  
+
   private
 
   def render_results(valid,resource)

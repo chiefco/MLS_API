@@ -34,7 +34,7 @@ class V1::ItemsController < ApplicationController
   def create
     @template=Template.find(params[:item][:template_id]) if params[:item][:template_id]
     params[:item].merge!({:custom_page=>@template.custom_page}) if @template.has_custom_page?
-    @item = @current_user.items.new(params[:item]) 
+    @item = @current_user.items.new(params[:item])
     respond_to do |format|
       if @template
           if @item.save
@@ -71,10 +71,10 @@ class V1::ItemsController < ApplicationController
         format.xml  { render :xml => @item.all_errors.to_xml(ROOT)}
         format.json {render :json =>@item.all_errors}
       end
-      rescue Exception => e 
-       if e.message.to_s=="argument out of range" 
+      rescue Exception => e
+       if e.message.to_s=="argument out of range"
           format.xml  { render :xml => failure.merge(INVALID_DATE).to_xml(ROOT) }
-          format.json  { render :json=> failure.merge(INVALID_DATE)} 
+          format.json  { render :json=> failure.merge(INVALID_DATE)}
         else
          format.xml  { render :xml => failure.merge(INVALID_CATEGORY_ID).to_xml(ROOT) }
          format.json  { render :json=> failure.merge(INVALID_CATEGORY_ID)}
@@ -216,13 +216,13 @@ class V1::ItemsController < ApplicationController
     end
     render_missing_params(missing_params) unless missing_params.blank?
   end
-  
+
   #Retrieves the Statistics of the Item
   def get_statistics
     @item=@current_user.items.find(params[:item_id])
     respond_to do |format|
       if @item
-        @items = Item.stats(params,@current_user,@item)  
+        @items = Item.stats(params,@current_user,@item)
         format.json{ render :json=>success.merge(@items).merge(item_count)}
         format.xml{ render :xml=>success.merge(@items).merge(item_count).to_xml(ROOT)}
       else
@@ -231,13 +231,13 @@ class V1::ItemsController < ApplicationController
       end
     end
   end
-    
+
   def get_item
     @item=@current_user.items.find(params[:id])
   end
-  
+
   def item_count
     {:count=>@items.count}
   end
- 
+
 end

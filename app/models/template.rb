@@ -13,11 +13,11 @@ class Template
   references_many :template_categories, :dependent => :destroy
   has_one :item
   default_scope :without=>[:created_at,:updated_at,:template_category_id]
-  
+
   def has_custom_page?
     !custom_page_definition.nil?
   end
-  
+
   def has_task_page?
     !task_page_definition.nil?
   end
@@ -25,11 +25,11 @@ class Template
   def has_topic_page?
     !topic_page_definition.nil?
   end
-  
+
   def custom_page_definition
     template_definitions.excludes(:custom_page_id => nil).first
   end
-  
+
   def task_page_definition
     template_definitions.where(:has_task_section=>true).first
   end
@@ -37,7 +37,7 @@ class Template
   def topic_page_definition
     template_definitions.where(:has_task_section=>true).first
   end
-  
+
   def custom_page
     cus=custom_page_definition
     page={}

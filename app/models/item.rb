@@ -62,16 +62,16 @@ class Item
   def item_date
     super().strftime("%d/%m/%Y %I:%M %p")
   end
-	
+
   def self.stats(params,user,item)
     query=""
     query = '{:tasks=>item.tasks.serializable_hash(:only=>[:_id,:description,:due_date,:is_completed])}' if (params[:tasks] == "true")
-    query =query.empty? ? {} : eval(query) 
+    query =query.empty? ? {} : eval(query)
     query=query.merge({:topics=>item.topics.serializable_hash(:only=>[:_id,:name,:status])}) if (params[:topics] == "true")
 		query=query.merge({:categories=>item.categories.serializable_hash(:only=>[:_id,:name,:status])}) if (params[:categories] == "true")
 		return query
   end
-	
+
   def self.list(params,paginate_options,user)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)

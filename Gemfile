@@ -5,11 +5,11 @@ gem 'rails', '3.0.9'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
-
+gem 'validates_timeliness', '~> 3.0.2'
 
 # Use unicorn as the web server
 # gem 'unicorn'
-
+gem 'ssl_requirement'
 gem 'mongoid', '2.1.2'
 gem 'bson_ext','1.3.1'
 gem 'devise','1.4.2'
@@ -23,8 +23,8 @@ gem 'newrelic_rpm'
 gem 'mongoid_acts_as_tree'
 #gem 'acts_as_full_text_searchable', :path => "vendor/gems/acts_as_full_text_searchable"
 gem 'sunspot_mongoid'
-gem 'sunspot'
-gem 'sunspot_rails'
+#gem 'sunspot'
+#gem 'sunspot_rails'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 gem 'rails_best_practices'
 gem 'fog'

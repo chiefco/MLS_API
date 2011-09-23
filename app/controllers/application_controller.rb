@@ -1,4 +1,7 @@
 class ApplicationController < ActionController::Base
+  include SslRequirement
+#~ before_filter :ensure_proper_protocol
+  before_filter :need_ssl
   after_filter :clear_session
   RESET_TOKEN_SENT={:reset_token_sent=>true}
   RESET_TOKEN_ERROR={:code=>5003,:message=>"Email not found"}
@@ -12,6 +15,12 @@ class ApplicationController < ActionController::Base
   PAGE_SIZE=10
   PAGE=1
   ROOT={:root=>:xml}
+  
+
+  def need_ssl
+    redirect_to "https://#{request.host}#{request.request_uri}" unless request.ssl?
+  end
+  
   rescue_from Mongoid::Errors::DocumentNotFound do |exception|
       respond_to do |format|
         if !exception.identifiers.empty?

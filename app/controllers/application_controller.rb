@@ -18,6 +18,11 @@ class ApplicationController < ActionController::Base
   
 
   def need_ssl
+    logger.info "https://#{request.host}#{request.request_uri}" 
+    logger.info "HHHHHHHHHHHHHHHHHHHHHHHHHH"
+    logger.info request.ssl?
+    logger.info "HHHHHHHHHHHHHHHHHHHHHHHHHH"
+    
     redirect_to "https://#{request.host}#{request.request_uri}" unless request.ssl?
   end
   

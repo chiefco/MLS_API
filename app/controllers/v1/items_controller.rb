@@ -9,7 +9,7 @@ class V1::ItemsController < ApplicationController
     @items = Item.list(params,@paginate_options,@current_user)
     respond_to do |format|
       format.xml  { render :xml => @items}
-      format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>:location_name).parse,:count=>@items.size}.merge(success)}
+      format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>[:location_name,:item_date,:created_at,:updated_at]).parse,:count=>@items.size}.merge(success)}
   end
   end
 

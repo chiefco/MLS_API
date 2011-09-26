@@ -18,7 +18,7 @@ class V1::ItemsController < ApplicationController
   def show
     respond_to do |format|
       if @item
-        @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:methods=>:location_name),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id)}.to_success
+        @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:methods=>[:created_at,:updated_at,:location_name,:item_date]),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id)}.to_success
         format.xml  { render :xml => @item.to_xml(ROOT) }
         format.json  { render :json => @item}
       else
@@ -38,7 +38,7 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       if @template
           if @item.save
-            @item={:item=>@item.serializable_hash(:only=>[:_id,:name])}.to_success
+            @item={:item=>@item.serializable_hash(:only=>[:_id,:name],:methods=>[:created_at,:updated_at])}.to_success
             format.xml  {render :xml => @item.to_xml(ROOT)}
             format.json  {render :json =>@item}
           else
@@ -64,7 +64,7 @@ class V1::ItemsController < ApplicationController
           @location=@current_user.locations.find_or_create_by(:name=>params[:item][:location])
           @item.update_attributes(:location_id=>@location.id)
         end
-        @item={:item=>@item.serializable_hash(:only=>[:description,:current_category_id],:methods=>:item_date),:location=>@location.name}.to_success
+        @item={:item=>@item.serializable_hash(:only=>[:description,:current_category_id],:methods=>[:created_at,:updated_at,:item_date]),:location=>@location.name}.to_success
         format.xml  {render :xml=>@item.to_xml(ROOT)}
         format.json {render :json =>@item}
       else

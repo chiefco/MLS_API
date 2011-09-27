@@ -25,18 +25,19 @@ MeetlinkshareApi::Application.routes.draw do
     match "/add_bookmark/:id" => 'bookmarks#add_bookmark'
     match "/item/statistics" => 'items#get_statistics'
   end
-
-  devise_for 'users', :constraints => { :protocol => "https" },:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
-    post "v1/forgot_password", :to => "v1/passwords#create"
-    post "v1/users/sign_in", :to => "v1/sessions#create"
-    post "v1/users", :to => "v1/registrations#create"
-    put "v1/user", :to => "v1/registrations#update"
-    post "v1/reset_password", :to => "v1/passwords#update"
-    get "v1/user", :to=>"v1/registrations#show"
-    get "v1/users", :to=> "v1/registrations#index"
-    get "users/confirmation",:to=>"v1/confirmations#show"
-    get "v1/activities",:to=> 'v1/registrations#get_activities'
-   delete "v1/close_account",:to=>'v1/registrations#close_account'
+  constraints :protocol => "https" do
+    devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
+      post "v1/forgot_password", :to => "v1/passwords#create"
+      post "v1/users/sign_in", :to => "v1/sessions#create"
+      post "v1/users", :to => "v1/registrations#create"
+      put "v1/user", :to => "v1/registrations#update"
+      post "v1/reset_password", :to => "v1/passwords#update"
+      get "v1/user", :to=>"v1/registrations#show"
+      get "v1/users", :to=> "v1/registrations#index"
+      get "users/confirmation",:to=>"v1/confirmations#show"
+      get "v1/activities",:to=> 'v1/registrations#get_activities'
+     delete "v1/close_account",:to=>'v1/registrations#close_account'
+    end
   end
 
   # The priority is based upon order of creation:

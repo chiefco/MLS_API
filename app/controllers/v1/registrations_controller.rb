@@ -1,7 +1,6 @@
 class V1::RegistrationsController < Devise::RegistrationsController
   skip_before_filter :authenticate_scope!
   before_filter :authenticate_request!,:except=>[:create]
-  before_filter :test,:only=>[:create]
   before_filter :add_pagination,:only=>[:index,:get_activities]
   before_filter :detect_missing_params, :only=>[:create]
 
@@ -13,12 +12,8 @@ class V1::RegistrationsController < Devise::RegistrationsController
       format.json{render_for_api :user_with_out_token, :json => @users, :root => :users}
     end
   end
-   def test 
-     puts "sssssssssssssssssssssssssss"
-     puts "sssssssssssssssssss"
-    end
+
   def create
-    puts "DDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
     resource=User.new(params[:user])
 
     if resource.save

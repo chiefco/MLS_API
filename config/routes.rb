@@ -26,7 +26,7 @@ MeetlinkshareApi::Application.routes.draw do
     match "/item/statistics" => 'items#get_statistics'
   end
 
-  devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
+  devise_for 'users', :constraints => { :protocol => "https" },:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
     post "v1/forgot_password", :to => "v1/passwords#create"
     post "v1/users/sign_in", :to => "v1/sessions#create"
     post "v1/users", :to => "v1/registrations#create"

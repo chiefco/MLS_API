@@ -16,11 +16,10 @@ class ApplicationController < ActionController::Base
   
 
   def ssl_required?
-    puts "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ"
     Rails.env.production?
   end
-
-rescue_from Mongoid::Errors::DocumentNotFound do |exception|
+  
+  rescue_from Mongoid::Errors::DocumentNotFound do |exception|
       respond_to do |format|
         if !exception.identifiers.empty?
           format.json{render :json=>{:response=>:failure,:errors=>[RECORD_NOT_FOUND]}}

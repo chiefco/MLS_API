@@ -16,6 +16,9 @@ class ApplicationController < ActionController::Base
   
 
   def ssl_required?
+    puts "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ"
+    puts Rails.env.production?
+    puts "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ"
     logger.info "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"
     logger.info Rails.env.production?
     logger.info "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"

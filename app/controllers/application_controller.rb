@@ -20,18 +20,12 @@ class ApplicationController < ActionController::Base
     puts "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ"
     puts Rails.env.production?
     puts "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ"
-    logger.info "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"
-    logger.info Rails.env.production?
-    logger.info "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"
     Rails.env.production?
   end
   def test
     puts "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ"
     puts Rails.env.production?
     puts "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ"
-    logger.info "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"
-    logger.info Rails.env.production?
-    logger.info "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"
     Rails.env.production?
   end
   rescue_from Mongoid::Errors::DocumentNotFound do |exception|

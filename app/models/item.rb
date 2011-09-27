@@ -56,7 +56,7 @@ class Item
   end
 
   def location_name
-    location=self.location.nil? ? "nil" : self.location.name
+    self.location.nil? ? "nil" : self.location.name
   end
 
   def item_date

@@ -64,7 +64,8 @@ class V1::ItemsController < ApplicationController
           @location=@current_user.locations.find_or_create_by(:name=>params[:item][:location])
           @item.update_attributes(:location_id=>@location.id)
         end
-        @item={:item=>@item.serializable_hash(:only=>[:description,:current_category_id],:methods=>[:created_at,:updated_at,:item_date]),:location=>@location.name}.to_success
+        get_item
+        @item={:item=>@item.to_json(:only=>[:description,:current_category_id],:methods=>[:created_at,:updated_at,:item_date,:location_name]).parse}.to_success
         format.xml  {render :xml=>@item.to_xml(ROOT)}
         format.json {render :json =>@item}
       else

@@ -1,7 +1,6 @@
 class ApplicationController < ActionController::Base
   include SslRequirement
   after_filter :clear_session
-  before_filter :test
   RESET_TOKEN_SENT={:reset_token_sent=>true}
   RESET_TOKEN_ERROR={:code=>5003,:message=>"Email not found"}
   UNAUTHORIZED={:code=>1004,:message=>"Authentication/Authorization Failed"}
@@ -20,7 +19,8 @@ class ApplicationController < ActionController::Base
     puts "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ"
     Rails.env.production?
   end
-  rescue_from Mongoid::Errors::DocumentNotFound do |exception|
+
+rescue_from Mongoid::Errors::DocumentNotFound do |exception|
       respond_to do |format|
         if !exception.identifiers.empty?
           format.json{render :json=>{:response=>:failure,:errors=>[RECORD_NOT_FOUND]}}

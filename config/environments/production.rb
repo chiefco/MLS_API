@@ -59,4 +59,6 @@ MeetlinkshareApi::Application.configure do
     :password => "jeatkwb3",
     :enable_starttls_auto => false
     }
+  
+  Sunspot.config.solr.url = ENV['WEBSOLR_URL']
 end

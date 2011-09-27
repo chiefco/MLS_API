@@ -18,14 +18,6 @@ class ApplicationController < ActionController::Base
 
   def ssl_required?
     puts "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ"
-    puts Rails.env.production?
-    puts "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ"
-    Rails.env.production?
-  end
-  def test
-    puts "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ"
-    puts Rails.env.production?
-    puts "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ"
     Rails.env.production?
   end
   rescue_from Mongoid::Errors::DocumentNotFound do |exception|

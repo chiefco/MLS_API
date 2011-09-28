@@ -16,7 +16,7 @@ class ApplicationController < ActionController::Base
   
 
   def ssl_required?
-    false
+    Rails.env.production?
   end
   
   rescue_from Mongoid::Errors::DocumentNotFound do |exception|

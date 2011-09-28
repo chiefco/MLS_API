@@ -13,12 +13,12 @@ class ApplicationController < ActionController::Base
   PAGE_SIZE=10
   PAGE=1
   ROOT={:root=>:xml}
-  
+
 
   def ssl_required?
     Rails.env.production?
   end
-  
+
   rescue_from Mongoid::Errors::DocumentNotFound do |exception|
       respond_to do |format|
         if !exception.identifiers.empty?

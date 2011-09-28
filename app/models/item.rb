@@ -62,11 +62,11 @@ class Item
   def item_date
     super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %I:%M %p")
   end
-  
+
   def created_at
     super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %I:%M %p ")
   end
-  
+
  def updated_at
   super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %I:%M %p")
  end

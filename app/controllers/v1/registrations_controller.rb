@@ -50,7 +50,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
 
   def show
     respond_to do |format|
-      user = { :user => current_user.serializable_hash(:only=>[:_id, :email, :first_name, :last_name, :job_title, :company, :business_unit, :sign_in_count], :root=>:user) }
+      user = { :user => current_user.serializable_hash(:only=>[:_id, :email, :first_name, :last_name, :job_title, :company, :business_unit, :sign_in_count,:date_of_birth], :root=>:user) }
       format.json { render :json=> user.to_success }
       format.xml { render :xml=> user.to_success.to_xml(ROOT) }
     end
@@ -73,6 +73,13 @@ class V1::RegistrationsController < Devise::RegistrationsController
       format.xml {render :xml=>success}
     end
   end
+  
+   def options_for_the_field
+    @industry=Industry.all
+      respond_to do |format|
+      format.json { render :json=> {:industry=>@industry.to_json(:only=>[:_id,:name]).parse}}
+    end
+  end
 
   private
 
@@ -85,7 +92,6 @@ class V1::RegistrationsController < Devise::RegistrationsController
       end
     else
       respond_to do |format|
-        format.html
         format.xml { render :xml=> resource.all_errors.to_xml(:root=>:result) }
         format.json { render :json=> resource.all_errors }
       end
@@ -102,5 +108,6 @@ class V1::RegistrationsController < Devise::RegistrationsController
     end
     render_missing_params(missing_params) unless missing_params.blank?
   end
+ 
 end
 

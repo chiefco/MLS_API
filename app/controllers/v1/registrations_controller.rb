@@ -34,10 +34,10 @@ class V1::RegistrationsController < Devise::RegistrationsController
 
     if params.has_key?(:user) && params[:user]
       if params[:user][:password] || params[:user][:password_confirmation] || params[:user][:current_password]
-				resource.set_password = true
-				updated = resource.update_with_password(params[resource_name])
+        resource.set_password = true
+        updated = resource.update_with_password(params[resource_name])
       else
-				updated = resource.update_without_password(params[resource_name])
+        updated = resource.update_without_password(params[resource_name])
       end
        respond_to do |format|
         format.json{render :json=>success  }

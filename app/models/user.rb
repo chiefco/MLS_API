@@ -14,11 +14,12 @@ class User
   references_many :activities,:dependent => :destroy
   references_many :locations
   references_many :searches
+  referenced_in :industry
   attr_accessor :set_password
 
   devise :confirmable, :database_authenticatable, :registerable, :recoverable, :rememberable, :token_authenticatable, :trackable
   attr_protected :authentication_token,:is_admin,:reset_password_token,:confirmation_token
-  attr_accessible :email,:password,:password_confirmation,:first_name,:last_name,:company,:business_unit,:job_title
+  attr_accessible :email,:password,:password_confirmation,:first_name,:last_name,:company,:business_unit,:job_title,:date_of_birth,:industry_id
 
   validates_presence_of :first_name, :message=>"first_name - Blank Parameter", :code=>3010
   validates_presence_of :last_name, :message=>"last_name - Blank Parameter", :code=>3011
@@ -43,8 +44,8 @@ class User
   field :last_name, :type=>String
   field :job_title, :type=>String
   field :company, :type=> String
-  field :business_unit, :type=> String
   field :status, :type=> Boolean,:default=>true
+  field :date_of_birth, :type=> Date
 
   api_accessible :user_with_out_token do |template|
     template.add :email
@@ -59,6 +60,7 @@ class User
     template.add :current_sign_in_ip
     template.add :last_sign_in_ip
     template.add :sign_in_count
+    template.add :date_of_birth
   end
 
   api_accessible :user_with_token , :extend=> :user_with_out_token do |template|

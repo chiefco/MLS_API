@@ -70,3 +70,9 @@ board_papers_custom_page_fields.custom_page_fields.create(:field_name=>"Board Pa
 board_papers.template_definitions.create(:sequence=>3,:has_text_section=>true)
 board_papers.template_definitions.create(:sequence=>4,:has_attachment_section=>true)
 board_papers.template_definitions.create(:sequence=>5,:has_task_section=>true)
+
+#Creating default Industry values
+industry=['Automotive','Banking','Consumer','Education','Energy','Fast-Moving Consumer Goods','Financial''Food and Beverage','Government','Healthcare','Insurance','Manufacturing','Media','Online','Real estate','Religion','Retail','Technology','Telecommunications','Transportation','Other']
+		industry.each do |ind|
+			Industry.create(:name=>ind)
+		end

@@ -5,6 +5,7 @@ class Task
   SORT_BY_ALLOWED = [ :due_date, :is_completed, :description]
   ORDER_BY_ALLOWED =  [:asc,:desc]
   #~ STATUS_TASK=[:current_task,:late_task,:pending_task]
+  field :title, :type => String
   field :due_date, :type => Time
   field :is_completed,:type=> Boolean,:default=>false
   field :assignee_id,:type=> String
@@ -13,7 +14,7 @@ class Task
   has_many :activities, as: :activity, :dependent=>:destroy
   referenced_in :user
   referenced_in :item
-  validates_presence_of :description,:code=>3014,:message=>"description - Blank Parameter"
+  validates_presence_of :title,:code=>3083,:message=>"title-blank_parameter - Blank Parameter"
   after_save :sunspot_index
   searchable do
     text :description

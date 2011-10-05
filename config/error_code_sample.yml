@@ -118,6 +118,9 @@ Invalid Parameter:
   3078: job_title-invalid length
   3079: current_category_id-invalid id
   3080: invalid-date
+  3081: community_id-invalid_parameter
+  3082: permission_id-invalid_parameter
+  3083: title-blank_parameter
 Format Error:
   4001: email - Invalid email format
   4002: due_date - Invalid date format

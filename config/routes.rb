@@ -1,10 +1,10 @@
 MeetlinkshareApi::Application.routes.draw do
-  resources :contacts
+
 
   API_VERSION1="v1"
 
   namespace :v1 do
-    resources :topics, :template_categories, :templates, :items, :bookmarks, :categories, :searches, :attachments, :custom_pages,:tasks,:locations, :pages, :contacts
+    resources :topics, :template_categories, :templates, :items, :bookmarks, :categories, :searches, :attachments, :custom_pages,:tasks,:locations, :pages, :contacts,:comments
 
     match "item_add_attendees" => 'items#item_add_attendees',:via=>:post
     match "item_topics/:id"=> 'items#item_topics'

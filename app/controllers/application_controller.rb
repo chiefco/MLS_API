@@ -10,6 +10,7 @@ class ApplicationController < ActionController::Base
   INVALID_DATE={:code=>  3080,:message=>"invalid-date"}
   RECORD_NOT_FOUND={:code=>2096,:message=>'Record does not exist in database'}
   USER_COLUMN=[:status,:remember_token,:remember_created_at,:created_at,:updated_at]
+  AUTH_FAILED={:code=>1001,:message=>"Username/Password is incorrect"}
   PAGE_SIZE=10
   PAGE=1
   ROOT={:root=>:xml}

@@ -8,6 +8,7 @@ class Topic
   validates_presence_of :name, :message=>"name - Required parameter missing", :code=>"2009"
   validates :name ,:length => { :minimum => 3 ,:maximum =>20,:message=>"name-invalid length",:code=>3073,:allow_blank=>true}
   validates_inclusion_of :status, :in=>[1,2,3], :message=>"invalid-status", :code=>3072
+  has_many :comments, as: :commentable
   has_many :activities, as: :activity, :dependent=>:destroy
   def topic_item
     item=self.item.to_json(:only=>[:_id,:name,:description]).parse

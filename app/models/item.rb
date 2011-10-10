@@ -27,6 +27,7 @@ class Item
   has_many :attachments, as: :attachable, :dependent=>:destroy
   has_many :activities, as: :activity, :dependent=>:destroy
   has_many :bookmarked_contents, as: :bookmarkable
+  has_many :comments, as: :commentable
   referenced_in :user
   references_and_referenced_in_many :categories
   referenced_in :template

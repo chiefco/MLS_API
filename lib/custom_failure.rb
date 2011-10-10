@@ -10,6 +10,11 @@ class CustomFailure < Devise::FailureApp
       i18n_message
     end
   end
+  def redirect
+    store_location!
+    flash[:alert] = i18n_message
+    render :json=>:failure
+  end
   protected
   def i18n_message(default = nil)
     message = warden.message || warden_options[:message] || default || :unauthenticated

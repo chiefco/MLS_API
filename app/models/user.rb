@@ -2,7 +2,7 @@ class User
   include Mongoid::Document
   include Mongoid::Timestamps
   acts_as_api
-  SORT_BY_ALLOWED = [ :email, :first_name, :last_name, :job_title, :company, :business_unit]
+  SORT_BY_ALLOWED = [ :email, :first_name, :last_name, :job_title, :company]
   ORDER_BY_ALLOWED =  [:asc,:desc]
   # Include default devise modules. Others available are:i
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
@@ -14,12 +14,13 @@ class User
   references_many :activities,:dependent => :destroy
   references_many :locations
   references_many :searches
+  references_many :contacts
   referenced_in :industry
   attr_accessor :set_password
 
   devise :confirmable, :database_authenticatable, :registerable, :recoverable, :rememberable, :token_authenticatable, :trackable
   attr_protected :authentication_token,:is_admin,:reset_password_token,:confirmation_token
-  attr_accessible :email,:password,:password_confirmation,:first_name,:last_name,:company,:business_unit,:job_title,:date_of_birth,:industry_id
+  attr_accessible :email,:password,:password_confirmation,:first_name,:last_name,:company,:job_title,:date_of_birth,:industry_id
 
   validates_presence_of :first_name, :message=>"first_name - Blank Parameter", :code=>3010
   validates_presence_of :last_name, :message=>"last_name - Blank Parameter", :code=>3011
@@ -37,7 +38,6 @@ class User
   validates :last_name ,:length => { :minimum => 1 ,:maximum =>40,:message=>" last_name - Invalid length",:code=>3075,:allow_blank=>true}
   validates :company ,:length => { :minimum => 1 ,:maximum =>80,:message=>"company - Invalid length",:code=>3077},:allow_blank=>true
   validates :job_title ,:length => {:maximum =>80,:message=>"job_title - Invalid length",:code=>3078}
-  validates :business_unit ,:length => {:maximum =>80,:message=>"business_unit - Invalid length",:code=>3076}
   validates_format_of       :password, :with =>  /^\S*$/,:message=>"password- Invalid should not contain space", :code=>2040, :if=>:pass_create_or_update?
 
   field :first_name, :type=> String
@@ -54,7 +54,6 @@ class User
     template.add :_id, :as=>:id
     template.add :job_title
     template.add :company
-    template.add :business_unit
     template.add :current_sign_in_at
     template.add :last_sign_in_at
     template.add :current_sign_in_ip
@@ -102,7 +101,7 @@ class User
   end
 
   def self.get_criteria(query)
-    [ {first_name: query} , { last_name: query }, { email: query }, { job_title: query }, { company: query}, { business_unit: query } ]
+    [ {first_name: query} , { last_name: query }, { email: query }, { job_title: query }, { company: query} ]
   end
 
 end

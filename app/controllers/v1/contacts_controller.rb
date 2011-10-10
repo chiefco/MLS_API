@@ -1,12 +1,13 @@
-class ContactsController < ApplicationController
+class V1::ContactsController < ApplicationController
+  before_filter :authenticate_request!
+  before_filter :find_contact,:only=>[:update,:show,:destroy]
+  before_filter :add_pagination,:only=>[:index]
   # GET /contacts
   # GET /contacts.xml
   def index
-    @contacts = Contact.all
-
+    @contacts = Contact.list(params,@paginate_options,@current_user)
     respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render :xml => @contacts }
+      format.json  { render :json =>{:contacts=>@contacts.to_json(:except=>[:status]).parse}}
     end
   end
 
@@ -14,41 +15,25 @@ class ContactsController < ApplicationController
   # GET /contacts/1.xml
   def show
     @contact = Contact.find(params[:id])
-
+    find_parameters
     respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml => @contact }
+      format.json  {render :json =>@contact}
     end
   end
 
-  # GET /contacts/new
-  # GET /contacts/new.xml
-  def new
-    @contact = Contact.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.xml  { render :xml => @contact }
-    end
-  end
-
-  # GET /contacts/1/edit
-  def edit
-    @contact = Contact.find(params[:id])
-  end
 
   # POST /contacts
   # POST /contacts.xml
   def create
-    @contact = Contact.new(params[:contact])
-
+    @contact_id=User.where(:email=>params[:contact][:email]).first
+    params[:contact][:contact_id]=@contact_id._id if @contact_id
+    @contact = @current_user.contacts.new(params[:contact])
     respond_to do |format|
       if @contact.save
-        format.html { redirect_to(@contact, :notice => 'Contact was successfully created.') }
-        format.xml  { render :xml => @contact, :status => :created, :location => @contact }
+       find_parameters
+       format.json  {render :json =>@contact}
       else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @contact.errors, :status => :unprocessable_entity }
+        format.json  { render :json => @contact.all_errors}
       end
     end
   end
@@ -56,15 +41,12 @@ class ContactsController < ApplicationController
   # PUT /contacts/1
   # PUT /contacts/1.xml
   def update
-    @contact = Contact.find(params[:id])
-
     respond_to do |format|
       if @contact.update_attributes(params[:contact])
-        format.html { redirect_to(@contact, :notice => 'Contact was successfully updated.') }
-        format.xml  { head :ok }
+        find_parameters
+        format.json  {render :json =>@contact}
       else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @contact.errors, :status => :unprocessable_entity }
+        format.json  { render :json => @contact.all_errors}
       end
     end
   end
@@ -72,12 +54,18 @@ class ContactsController < ApplicationController
   # DELETE /contacts/1
   # DELETE /contacts/1.xml
   def destroy
-    @contact = Contact.find(params[:id])
-    @contact.destroy
-
+    @contact.update_attributes(:status=>true)
     respond_to do |format|
-      format.html { redirect_to(contacts_url) }
-      format.xml  { head :ok }
+      format.json  { render :json=> success}
     end
+  end
+  
+  #finds the contact
+  def find_contact 
+    @contact=Contact.find(params[:id])
+  end
+  #find parameters needed for the contacts
+  def find_parameters
+    @contact={:contact=>@contact.serializable_hash(:only=>[:_id,:first_name,:last_name,:job_title,:company,:email])}.to_success
   end
 end

@@ -62,7 +62,7 @@ class V1::ContactsController < ApplicationController
   
   #finds the contact
   def find_contact 
-    @contact=Contact.find(params[:id])
+    @contact=@current_user.contacts.find(params[:id])
   end
   #find parameters needed for the contacts
   def find_parameters

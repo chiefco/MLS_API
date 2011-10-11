@@ -5,11 +5,9 @@ class V1::CommentsController < ApplicationController
   # GET /comments
   # GET /comments.xml
   def index
-    @comments = Comment.all
-
+    @comments = Comment.undeleted
     respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render :xml => @comments }
+      format.json  { render :json =>{:comment=>@comments.to_json(:except=>[:_type]).parse,:count=>@comments.count}.to_success}
     end
   end
 
@@ -17,22 +15,29 @@ class V1::CommentsController < ApplicationController
   # GET /comments/1.xml
   def show
     respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml => @comment }
+      if @comment.status!=true
+        get_parameters
+        format.json  { render :json =>success.merge({:comment=>@comment})}
+      else 
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
     end
   end
 
   # POST /comments
   # POST /comments.xml
   def create
-    @comment = Comment.new(params[:comment])
+    @comment = @current_user.comments.new(params[:comment])
     respond_to do |format|
-      if @comment.save
-        format.html { redirect_to(@comment, :notice => 'Comment was successfully created.') }
-        format.xml  { render :xml => @comment, :status => :created, :location => @comment }
+      if !@comment.commentable.nil?
+        if @comment.save
+          get_parameters
+          format.json  { render :json =>success.merge({:comment=>@comment})}
+        else
+          format.json  { render :json => @comment.all_errors}
+        end
       else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @comment.errors, :status => :unprocessable_entity }
+        format.json {render :json=>failure.merge(INVALID_COMMENTABLE)}
       end
     end
   end
@@ -41,12 +46,19 @@ class V1::CommentsController < ApplicationController
   # PUT /comments/1.xml
   def update
     respond_to do |format|
-      if @comment.update_attributes(params[:comment])
-        format.html { redirect_to(@comment, :notice => 'Comment was successfully updated.') }
-        format.xml  { head :ok }
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @comment.errors, :status => :unprocessable_entity }
+      if  @comment.status!=true
+        if !@comment.commentable.nil?
+          if @comment.update_attributes(params[:comment])
+            get_parameters
+            format.json  { render :json =>success.merge({:comment=>@comment})}
+          else
+            format.json  { render :json => @comment.all_errors}
+          end
+        else
+        format.json {render :json=>failure.merge(INVALID_COMMENTABLE)}
+        end
+      else 
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
   end
@@ -54,15 +66,17 @@ class V1::CommentsController < ApplicationController
   # DELETE /comments/1
   # DELETE /comments/1.xml
   def destroy
-    @comment.destroy
+    @comment.update_attributes(:status=>true)
     respond_to do |format|
-      format.html { redirect_to(comments_url) }
-      format.xml  { head :ok }
+      format.json {render :json=>success}
     end
   end
   
+  def get_parameters
+    @comment=@comment.serializable_hash(:only=>[:_id,:status,:message,:is_public,:commentable_type,:commentable_id])
+  end
   #finds the comment
   def find_comment
-    @comment=Comment.find(params[:id])
+    @comment=@current_user.comments.find(params[:id])
   end
 end

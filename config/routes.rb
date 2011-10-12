@@ -30,7 +30,8 @@ MeetlinkshareApi::Application.routes.draw do
     match "/community_members/:id" => 'communities#members'
     match "/remove_member" => 'communities#remove_member'
     match "/item_comments/:id" => 'items#comments'
-    match "//topic_comments/:id" => 'topics#comments'
+    match "/topic_comments/:id" => 'topics#comments'
+    match "/invite_member" => 'contacts#invite_member'
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do

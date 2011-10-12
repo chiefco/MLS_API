@@ -67,6 +67,13 @@ class V1::ContactsController < ApplicationController
     end
   end
   
+  def invite_member
+    Invite.send_invitations(@current_user,params[:invite_member][:email]).deliver
+    respond_to do |format|
+      format.json  { render :json=> success}
+    end
+  end
+  
   #finds the contact
   def find_contact 
     @contact=@current_user.contacts.find(params[:id])

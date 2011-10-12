@@ -4,7 +4,7 @@ MeetlinkshareApi::Application.routes.draw do
   API_VERSION1="v1"
 
   namespace :v1 do
-    resources :topics, :template_categories, :templates, :items, :bookmarks, :categories, :searches, :attachments, :custom_pages,:tasks,:locations, :pages, :contacts,:comments
+    resources :topics, :template_categories, :templates, :items, :bookmarks, :categories, :searches, :attachments, :custom_pages,:tasks,:locations, :pages, :contacts,:comments,:communities
 
     match "item_add_attendees" => 'items#item_add_attendees',:via=>:post
     match "item_topics/:id"=> 'items#item_topics'
@@ -26,6 +26,11 @@ MeetlinkshareApi::Application.routes.draw do
     match "/generic_search" => 'searches#search'
     match "/add_bookmark/:id" => 'bookmarks#add_bookmark'
     match "/item/statistics" => 'items#get_statistics'
+    match "/community_invite/:id" => 'communities#invite_member'
+    match "/community_members/:id" => 'communities#members'
+    match "/remove_member" => 'communities#remove_member'
+    match "/item_comments/:id" => 'items#comments'
+    match "//topic_comments/:id" => 'topics#comments'
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do

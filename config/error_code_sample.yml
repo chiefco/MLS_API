@@ -123,7 +123,8 @@ Invalid Parameter:
   3083: title-blank_parameter
   3084: commentable_type-invalid_parameter
   3085: commentable_id-invalid_parameter
-Format Error:
+  3086: message-blank_parameter
+  Format Error:
   4001: email - Invalid email format
   4002: due_date - Invalid date format
 Record Not Found:

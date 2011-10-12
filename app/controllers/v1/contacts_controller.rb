@@ -14,10 +14,13 @@ class V1::ContactsController < ApplicationController
   # GET /contacts/1
   # GET /contacts/1.xml
   def show
-    @contact = Contact.find(params[:id])
-    find_parameters
     respond_to do |format|
-      format.json  {render :json =>@contact}
+      if @contact.status!=true
+        find_parameters
+        format.json  {render :json =>@contact}
+      else
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
     end
   end
 
@@ -42,11 +45,15 @@ class V1::ContactsController < ApplicationController
   # PUT /contacts/1.xml
   def update
     respond_to do |format|
-      if @contact.update_attributes(params[:contact])
-        find_parameters
-        format.json  {render :json =>@contact}
+      if @contact.status!=true
+        if @contact.update_attributes(params[:contact])
+          find_parameters
+          format.json  {render :json =>@contact}
+        else
+          format.json  { render :json => @contact.all_errors}
+        end
       else
-        format.json  { render :json => @contact.all_errors}
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
   end

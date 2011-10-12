@@ -1,6 +1,6 @@
 class V1::ItemsController < ApplicationController
   before_filter :authenticate_request!
-  before_filter :get_item,:only=>([:update,:show,:item_categories,:destroy,:item_topics,:get_all_tasks,:list_item_attendees])
+  before_filter :get_item,:only=>([:update,:show,:item_categories,:destroy,:item_topics,:get_all_tasks,:list_item_attendees,:comments])
   before_filter :add_pagination,:only=>[:index]
   before_filter :detect_missing_params, :only=>[:create]
   # GET /items
@@ -232,7 +232,14 @@ class V1::ItemsController < ApplicationController
       end
     end
   end
-
+  
+  #Retrieves the Item comments
+  def comments
+    respond_to do |format|
+      format.json {render :json=>{:comments=>@item.comments.to_a.to_json(:only=>[:_id,:message,:commentable_type,:commentable_id]).parse}.to_success}
+    end
+  end
+  
   def get_item
     @item=@current_user.items.find(params[:id])
   end

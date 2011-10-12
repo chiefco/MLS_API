@@ -1,6 +1,6 @@
 class  V1::TopicsController < ApplicationController
   before_filter :authenticate_request!
-  before_filter :find_topic,:only=>([:update,:show,:destroy])
+  before_filter :find_topic,:only=>([:update,:show,:destroy,:comments])
   # GET /topics/1
   # GET /topics/1.xml
   def show
@@ -103,6 +103,13 @@ class  V1::TopicsController < ApplicationController
       request.post? ? save_task : update_task
    end
  end
+ 
+   #Retrieves the Topic comments
+  def comments
+    respond_to do |format|
+      format.json {render :json=>{:comments=>@topic.comments.to_a.to_json(:only=>[:_id,:message,:commentable_type,:commentable_id]).parse}.to_success}
+    end
+  end
 
    #Find the Topic by param[:id]
   def find_topic

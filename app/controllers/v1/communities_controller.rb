@@ -31,6 +31,7 @@ class V1::CommunitiesController < ApplicationController
     @community = @current_user.communities.new(params[:community])
     respond_to do |format|
       if @community.save
+        CommunityUser.create(:user_id=>@current_user._id,:community_id=>@cummunity_id,:role_id=>1)
         find_parameters
         format.json {render :json => @community}
       else
@@ -92,6 +93,10 @@ class V1::CommunitiesController < ApplicationController
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
+  end
+  
+  #Change the role of the CommunityUser
+  def change_role
   end
   
   def accept_invitation

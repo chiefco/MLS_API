@@ -66,7 +66,7 @@ class V1::CommentsController < ApplicationController
   # DELETE /comments/1
   # DELETE /comments/1.xml
   def destroy
-    @comment.update_attributes(:status=>true)
+    @comment.update_attributes(:status=>false)
     respond_to do |format|
       format.json {render :json=>success}
     end

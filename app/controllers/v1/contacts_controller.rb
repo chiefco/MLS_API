@@ -61,7 +61,7 @@ class V1::ContactsController < ApplicationController
   # DELETE /contacts/1
   # DELETE /contacts/1.xml
   def destroy
-    @contact.update_attributes(:status=>true)
+    @contact.update_attributes(:status=>false)
     respond_to do |format|
       format.json  { render :json=> success}
     end

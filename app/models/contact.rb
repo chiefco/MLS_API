@@ -8,7 +8,7 @@ class Contact
   field :job_title, :type => String
   field :company, :type => String
   field :email, :type => String
-  field :status, :type => Boolean,:default=>false
+  field :status, :type => Boolean,:default=>true
   field :contact_id, :type => String
   validates_presence_of :first_name,:code=>3011,:message=>"first_name - Blank Parameter"
   validates_presence_of :email,:code=>3002,:message=>"email - Blank Parameter"
@@ -17,7 +17,7 @@ class Contact
   default_scope :without=>[:created_at,:updated_at]
   referenced_in :user
   belongs_to :contact_user, :class_name => "User", :foreign_key => "contact_id"
-  scope :undeleted,self.excludes(:status=>true)
+  scope :undeleted,self.excludes(:status=>false)
   def self.list(params,paginate_options,user)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)

@@ -59,7 +59,7 @@ class V1::CommunitiesController < ApplicationController
   # DELETE /communities/1
   # DELETE /communities/1.xml
   def destroy
-    @community.update_attributes(:status=>true)
+    @community.update_attributes(:status=>false)
     respond_to do |format|
       format.json {render :json=>success }
     end
@@ -84,8 +84,9 @@ class V1::CommunitiesController < ApplicationController
   end
   def remove_member
     respond_to do |format|
-      unless @community_user=CommunityUser.where(:community_id=>params[:remove_member][:community_id],:user_id=>params[:remove_member][:user_id]).first.nil?
-        @community_user.update_attributes(:status=>true)
+      @community_user=CommunityUser.where(:community_id=>params[:remove_member][:community_id],:user_id=>params[:remove_member][:user_id]).first
+      unless @community_user.nil?
+        @community_user.update_attributes(:status=>false)
         format.json {render :json=>success}
       else
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}

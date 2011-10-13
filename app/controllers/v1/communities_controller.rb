@@ -31,7 +31,7 @@ class V1::CommunitiesController < ApplicationController
     @community = @current_user.communities.new(params[:community])
     respond_to do |format|
       if @community.save
-        CommunityUser.create(:user_id=>@current_user._id,:community_id=>@cummunity_id,:role_id=>1)
+        CommunityUser.create(:user_id=>@current_user._id,:community_id=>@community._id,:role_id=>1)
         find_parameters
         format.json {render :json => @community}
       else
@@ -97,6 +97,9 @@ class V1::CommunitiesController < ApplicationController
   
   #Change the role of the CommunityUser
   def change_role
+    respond_to do |format|
+      @community_user=CommunityUser.where(:community_id=>params[:change_role][:community_id],:user_id=>params[:change_role][:user_id]).first
+    end
   end
   
   def accept_invitation

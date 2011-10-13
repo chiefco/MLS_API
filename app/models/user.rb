@@ -19,6 +19,7 @@ class User
   references_many :invitations
   references_many :comments
   referenced_in :industry
+  references_many :shares
   has_many :community_users
   attr_accessor :set_password
 

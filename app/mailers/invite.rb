@@ -9,4 +9,8 @@ class Invite < ActionMailer::Base
     @name ="#{user.first_name} #{user.first_name}"
     mail(:to=>email,:subject =>"Invitation for MeetLinkShare", :reply_to=>"info@meetlinkshare.com")
   end 
+  def share_community(user,item)
+    @user,@item=user,item
+    mail(:to=>@user.email,:subject =>"Invitation for MeetLinkShare", :reply_to=>"info@meetlinkshare.com")
+  end
 end

@@ -7,6 +7,7 @@ class Invitation
   field :invited_at,:type=>Time
   field :invitation_accepted_at,:type=>Time
   referenced_in :community
+  belongs_to :item
   referenced_in :user
   validates_presence_of :email,:message=>"email - Blank Parameter", :code=>3002
   validates_uniqueness_of :email, :message=>"email - Already exist", :code=>3004, :allow_blank => true

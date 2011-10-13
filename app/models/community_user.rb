@@ -5,4 +5,5 @@ class CommunityUser
   field :status,:type=>Boolean,:default=>true
   field :user_id,:type=>String
   referenced_in :community
+  belongs_to :user
 end

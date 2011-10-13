@@ -19,6 +19,7 @@ class User
   references_many :invitations
   references_many :comments
   referenced_in :industry
+  has_many :community_users
   attr_accessor :set_password
 
   devise :confirmable, :database_authenticatable, :registerable, :recoverable, :rememberable, :token_authenticatable, :trackable
@@ -106,5 +107,12 @@ class User
   def self.get_criteria(query)
     [ {first_name: query} , { last_name: query }, { email: query }, { job_title: query }, { company: query} ]
   end
-
+  
+  def community_membership_ids
+    community_users.collect{|c| c.community_id.to_s}
+  end
+  
+  def community_memberships
+    Community.find(community_membership_ids)
+  end
 end

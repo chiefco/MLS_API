@@ -3,8 +3,6 @@ class V1::CommunitiesController < ApplicationController
   before_filter :find_community,:only=>[:update,:show,:destroy,:members,:invite_member]
   before_filter :add_pagination,:only=>[:index]
   
-  # GET /communities
-  # GET /communities.xml
   def index
     @communities = Community.undeleted
     respond_to do |format|
@@ -12,8 +10,6 @@ class V1::CommunitiesController < ApplicationController
     end
   end
 
-  # GET /communities/1
-  # GET /communities/1.xml
   def show
     respond_to do |format|
       if @community.status!=true
@@ -25,8 +21,6 @@ class V1::CommunitiesController < ApplicationController
     end
   end
 
-  # POST /communities
-  # POST /communities.xml
   def create
     @community = @current_user.communities.new(params[:community])
     respond_to do |format|
@@ -39,8 +33,6 @@ class V1::CommunitiesController < ApplicationController
     end
   end
 
-  # PUT /communities/1
-  # PUT /communities/1.xml
   def update
     respond_to do |format|
       if @community.status!=true
@@ -56,8 +48,6 @@ class V1::CommunitiesController < ApplicationController
     end
   end
 
-  # DELETE /communities/1
-  # DELETE /communities/1.xml
   def destroy
     @community.update_attributes(:status=>false)
     respond_to do |format|
@@ -80,8 +70,12 @@ class V1::CommunitiesController < ApplicationController
   
   #Retrieves members of the given community
   def members
-  
+    respond_to do |format|
+      format.json{render :json=>{:members=>@community.members}.to_success}
+      format.xml{render :xml=>{:members=>@community.members}.to_success.to_xml(:root=>:result)}
+    end
   end
+
   def remove_member
     respond_to do |format|
       @community_user=CommunityUser.where(:community_id=>params[:remove_member][:community_id],:user_id=>params[:remove_member][:user_id]).first
@@ -112,9 +106,11 @@ class V1::CommunitiesController < ApplicationController
   end
   
   private
+  
   def find_community 
-    @community=@current_user.communities.find(params[:id])
+    @community=Community.find(params[:id]) if @current_user.community_membership_ids.include?(params[:id])
   end
+  
   #find parameters needed for the contacts
   def find_parameters
     @community={:community=>@community.serializable_hash(:only=>[:_id,:name,:description])}.to_success

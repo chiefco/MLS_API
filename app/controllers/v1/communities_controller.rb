@@ -2,7 +2,8 @@ class V1::CommunitiesController < ApplicationController
   before_filter :authenticate_request!,:except=>[:accept_invitation]
   before_filter :find_community,:only=>[:update,:show,:destroy,:members,:invite_member]
   before_filter :add_pagination,:only=>[:index]
-  
+  before_filter :detect_missing_params, :only=>[:create]
+
   # GET /communities
   # GET /communities.xml
   def index
@@ -99,6 +100,16 @@ class V1::CommunitiesController < ApplicationController
   def change_role
     respond_to do |format|
       @community_user=CommunityUser.where(:community_id=>params[:change_role][:community_id],:user_id=>params[:change_role][:user_id]).first
+      if @community_user
+        if @community_user.community.user_id==@current_user._id 
+          @community_user.update_attributes(:role_id=>params[:change_role][:role_id].nil? ? '0' : params[:change_role][:role_id])
+          format.json  { render :json=> success}
+        else
+          format.json  { render :json=> failure.merge(ADMIN_PREVILEGE)}
+        end
+      else
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
     end
   end
   
@@ -119,12 +130,24 @@ class V1::CommunitiesController < ApplicationController
     end
   end
   
+  def detect_missing_params
+    param_must = [:name]
+    if params.has_key?(:community) && params[:community].is_a?(Hash)
+      missing_params = param_must.select { |param| !params[:community].has_key?(param.to_s) }
+    else
+      missing_params = param_must
+    end
+    render_missing_params(missing_params) unless missing_params.blank?
+  end
+  
   private
   def find_community 
     @community=@current_user.communities.find(params[:id])
   end
+  
   #find parameters needed for the contacts
   def find_parameters
     @community={:community=>@community.serializable_hash(:only=>[:_id,:name,:description])}.to_success
   end
+  
 end

@@ -12,6 +12,7 @@ class ApplicationController < ActionController::Base
   USER_COLUMN=[:status,:remember_token,:remember_created_at,:created_at,:updated_at]
   AUTH_FAILED={:code=>1001,:message=>"Username/Password is incorrect"}
   INVALID_COMMENTABLE={:code=>3085,:message=>"commentable_id-invalid_parameter"}
+  ADMIN_PREVILEGE={:code=>  3087,:message=>"not a Admin"}
   PAGE_SIZE=10
   PAGE=1
   ROOT={:root=>:xml}

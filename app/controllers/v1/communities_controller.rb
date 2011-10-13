@@ -94,15 +94,9 @@ class V1::CommunitiesController < ApplicationController
   end
   
   def accept_invitation
-          p "LLLLLLLLLLLLLLL"
-
     respond_to do |format|
       @invitation=Invitation.where(:invitation_token=>params[:accept_invitation]).first  
-      p @invitation
       unless @invitation.nil?
-      p "LLLLLLLLLLLLLLL"
-      p @invitation
-      p @invitation.user
         unless @invitation.user.nil?
           @invitation.community.community_users.create(:user_id=>@invitation.user_id)
           @invitation.update_attributes(:invitation_token=>nil)

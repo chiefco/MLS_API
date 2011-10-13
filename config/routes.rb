@@ -28,6 +28,7 @@ MeetlinkshareApi::Application.routes.draw do
     match "/item/statistics" => 'items#get_statistics'
     match "/community_invite/:id" => 'communities#invite_member'
     match "/community_members/:id" => 'communities#members'
+    match "/accept_invitation" => 'communities#accept_invitation'
     match "/remove_member" => 'communities#remove_member'
     match "/item_comments/:id" => 'items#comments'
     match "/topic_comments/:id" => 'topics#comments'

@@ -16,6 +16,7 @@ class User
   references_many :searches
   references_many :contacts
   references_many :communities
+  references_many :invitations
   references_many :comments
   referenced_in :industry
   attr_accessor :set_password

@@ -19,6 +19,7 @@ class Item
   validates_presence_of :template_id,:message=>'template_id - Blank Parameter',:code=>3025
   belongs_to  :template
   belongs_to  :location
+  belongs_to  :share
 
   references_many :topics,:dependent => :destroy
   references_many :attendees,:dependent => :destroy

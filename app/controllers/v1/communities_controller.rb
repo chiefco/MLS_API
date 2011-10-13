@@ -1,5 +1,5 @@
 class V1::CommunitiesController < ApplicationController
-  before_filter :authenticate_request!
+  before_filter :authenticate_request!,:except=>[:accept_invitation]
   before_filter :find_community,:only=>[:update,:show,:destroy,:members,:invite_member]
   before_filter :add_pagination,:only=>[:index]
   
@@ -89,6 +89,29 @@ class V1::CommunitiesController < ApplicationController
         format.json {render :json=>success}
       else
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
+    end
+  end
+  
+  def accept_invitation
+          p "LLLLLLLLLLLLLLL"
+
+    respond_to do |format|
+      @invitation=Invitation.where(:invitation_token=>params[:accept_invitation]).first  
+      p @invitation
+      unless @invitation.nil?
+      p "LLLLLLLLLLLLLLL"
+      p @invitation
+      p @invitation.user
+        unless @invitation.user.nil?
+          @invitation.community.community_users.create(:user_id=>@invitation.user_id)
+          @invitation.update_attributes(:invitation_token=>nil)
+          format.json {render :json=>success}
+        else
+          format.json {render :json=>failure}
+        end
+      else
+        format.json {render :json=>failure}
       end
     end
   end

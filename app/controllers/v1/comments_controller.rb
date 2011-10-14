@@ -73,7 +73,7 @@ class V1::CommentsController < ApplicationController
   end
   
   def get_parameters
-    @comment=@comment.serializable_hash(:only=>[:_id,:status,:message,:is_public,:commentable_type,:commentable_id])
+    @comment=@comment.serializable_hash(:only=>[:_id,:message,:is_public,:commentable_type,:commentable_id])
   end
   #finds the comment
   def find_comment

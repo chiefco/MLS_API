@@ -15,7 +15,7 @@ class V1::CommentsController < ApplicationController
   # GET /comments/1.xml
   def show
     respond_to do |format|
-      if @comment.status!=true
+      if @comment.status!=false
         get_parameters
         format.json  { render :json =>success.merge({:comment=>@comment})}
       else 
@@ -46,7 +46,7 @@ class V1::CommentsController < ApplicationController
   # PUT /comments/1.xml
   def update
     respond_to do |format|
-      if  @comment.status!=true
+      if  @comment.status!=false
         if !@comment.commentable.nil?
           if @comment.update_attributes(params[:comments])
             get_parameters

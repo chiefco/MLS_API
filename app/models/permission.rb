@@ -6,5 +6,5 @@ class Permission
   field :can_edit,:type=>Boolean
   field :can_comment,:type=>Boolean
   field :can_share,:type=>Boolean
-  belongs_to :share
+  has_one :share
 end

@@ -100,7 +100,7 @@ class V1::ContactsController < ApplicationController
   def share_to_members
     @community.members.each do |member|
       @share=@item.shares.create(:user_id=>member[:id])
-      @share.create_permission()
+      @share.create_permission(params[:share][:permission_id])
       Invite.share_community(@share.user,@item).deliver
     end
   end
@@ -114,7 +114,7 @@ class V1::ContactsController < ApplicationController
   
   def create_shares
     @share=@item.shares.create(:user_id=>@user._id)
-    @share.create_permission()
+    @share.create_permission(params[:share][:permission_id])
     Invite.share_community(@user,@item).deliver
   end
   

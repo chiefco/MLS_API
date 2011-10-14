@@ -1,6 +1,7 @@
 class V1::CommunitiesController < ApplicationController
   before_filter :authenticate_request!,:except=>[:accept_invitation]
   before_filter :find_community,:only=>[:update,:show,:destroy,:members,:invite_member]
+  before_filter :find_community_members,:only=>[:members]
   before_filter :add_pagination,:only=>[:index]
   before_filter :detect_missing_params, :only=>[:create]
 
@@ -137,6 +138,10 @@ class V1::CommunitiesController < ApplicationController
   private
   
   def find_community 
+    @community=Community.find(params[:id])
+  end
+  
+  def find_community_members
     @community=Community.find(params[:id]) if @current_user.community_membership_ids.include?(params[:id])
   end
   

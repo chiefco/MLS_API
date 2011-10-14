@@ -87,7 +87,7 @@ class V1::ContactsController < ApplicationController
   
   def remove_share
     respond_to do |format|
-      @share=Share.where(:user_id=>params[:share][:user_id],:item_id=>params[:share][:item_id]).first
+      @share=Share.where(:_id=>params[:id]]).first
       unless @share.nil?
         @share.update_attributes(:status=>false)
         format.json {render :json=>success}

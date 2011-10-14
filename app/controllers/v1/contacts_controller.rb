@@ -105,6 +105,15 @@ class V1::ContactsController < ApplicationController
     end
   end
   
+  #~ # Retrieves the shares of the item
+  def shares
+    @item=Item.find(params[:id])
+    respond_to do |format|
+      @share=@item.shares.serializable_hash(:only=>[:_id],:methods=>[:user_details,:role])
+      format.json{render :json=>{:shares=>@share}}
+    end
+  end
+  
   def send_shares_emails
     params[:share][:emails].split(',').each do |email|
       @user=User.where(:email=>email).first

@@ -36,6 +36,7 @@ MeetlinkshareApi::Application.routes.draw do
     match "/change_role" => 'communities#change_role'
     match "/share_item" => 'contacts#share'
     match "/remove_share" => 'contacts#remove_share'
+    match "/shares/:id" => 'contacts#shares'
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do

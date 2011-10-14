@@ -13,7 +13,7 @@ class V1::CommunitiesController < ApplicationController
 
   def show
     respond_to do |format|
-      if @community.status!=true
+      if @community.status!=false
         find_parameters
         format.json  {render :json =>@community}
       else
@@ -37,7 +37,7 @@ class V1::CommunitiesController < ApplicationController
 
   def update
     respond_to do |format|
-      if @community.status!=true
+      if @community.status!=false
         if @community.update_attributes(params[:community])
           find_parameters
           format.json {render :json => @community}

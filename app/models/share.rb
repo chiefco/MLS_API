@@ -1,7 +1,7 @@
 class Share
   include Mongoid::Document
   include Mongoid::Timestamps
-  field :status,:type=>Boolean
+  field :status,:type=>Boolean,:default=>true
   referenced_in :community
   referenced_in :user
   referenced_in :item

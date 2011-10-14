@@ -35,7 +35,7 @@ MeetlinkshareApi::Application.routes.draw do
     match "/invite_member" => 'contacts#invite_member'
     match "/change_role" => 'communities#change_role'
     match "/share_item" => 'contacts#share'
-    match "/remove_share" => 'contacts#remove_share'
+    match "/remove_share/:id" => 'contacts#remove_share'
     match "/shares/:id" => 'contacts#shares'
   end
 

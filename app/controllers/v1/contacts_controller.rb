@@ -15,7 +15,7 @@ class V1::ContactsController < ApplicationController
   # GET /contacts/1.xml
   def show
     respond_to do |format|
-      if @contact.status!=true
+      if @contact.status!=false
         find_parameters
         format.json  {render :json =>@contact}
       else
@@ -45,7 +45,7 @@ class V1::ContactsController < ApplicationController
   # PUT /contacts/1.xml
   def update
     respond_to do |format|
-      if @contact.status!=true
+      if @contact.status!=false
         if @contact.update_attributes(params[:contact])
           find_parameters
           format.json  {render :json =>@contact}

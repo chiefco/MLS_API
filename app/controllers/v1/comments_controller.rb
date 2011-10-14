@@ -27,7 +27,7 @@ class V1::CommentsController < ApplicationController
   # POST /comments
   # POST /comments.xml
   def create
-    @comment = @current_user.comments.new(params[:comment])
+    @comment = @current_user.comments.new(params[:comments])
     respond_to do |format|
       if !@comment.commentable.nil?
         if @comment.save
@@ -48,7 +48,7 @@ class V1::CommentsController < ApplicationController
     respond_to do |format|
       if  @comment.status!=true
         if !@comment.commentable.nil?
-          if @comment.update_attributes(params[:comment])
+          if @comment.update_attributes(params[:comments])
             get_parameters
             format.json  { render :json =>success.merge({:comment=>@comment})}
           else

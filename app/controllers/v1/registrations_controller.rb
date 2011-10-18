@@ -1,6 +1,6 @@
 class V1::RegistrationsController < Devise::RegistrationsController
   skip_before_filter :authenticate_scope!
-  before_filter :authenticate_request!,:except=>[:create]
+  before_filter :authenticate_request!,:except=>[:create,:options_for_the_field]
   before_filter :add_pagination,:only=>[:index,:get_activities]
   before_filter :detect_missing_params, :only=>[:create]
 

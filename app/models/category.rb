@@ -13,6 +13,7 @@ class Category
   references_and_referenced_in_many :items
   has_many :activities, as: :activity, :dependent=>:destroy
   has_many :attachments, as: :attachable, :dependent=>:destroy
+  has_many :activities, as: :entity
   referenced_in :user
   validates_presence_of :name,:message=>'name - Blank Parameter',:code=>3013
   after_save :sunspot_index

@@ -12,6 +12,7 @@ class User
   has_many :attachments, as: :attachable, :dependent=>:destroy
   references_many :tasks,:dependent => :destroy
   references_many :activities,:dependent => :destroy
+  has_many :activities, as: :subject
   references_many :locations
   references_many :searches
   references_many :contacts

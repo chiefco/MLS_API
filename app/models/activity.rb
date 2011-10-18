@@ -3,9 +3,10 @@ class Activity
   include Mongoid::Timestamps
   SORT_BY_ALLOWED = [ :activity_type,:created_at]
   ORDER_BY_ALLOWED =  [:asc,:desc]
-  field :description,:type=>String
+  field :action,:type=>String
 
-  belongs_to :activity, polymorphic: true
+  belongs_to :entity, polymorphic: true
+  belongs_to :subject, polymorphic: true
   referenced_in :user
 
   validates_presence_of :activity_id,:code=>3027,:message=>"activity_id - Required parameter missing"

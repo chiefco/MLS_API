@@ -7,7 +7,7 @@ class V1::SessionsController < Devise::SessionsController
     resource = warden.authenticate!(:scope => resource_name, :recall => "V1::Sessions#index")
     respond_to do |format|
       format.xml{ render_for_api :user_with_token, :xml => resource, :root => :user}
-      format.json{render :json=>{:user=>resource}.to_success}
+      format.json{render_for_api :user_with_token, :json => resource, :root => :user}
     end
   end
   def index

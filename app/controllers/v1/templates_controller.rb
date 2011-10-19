@@ -1,5 +1,5 @@
 class V1::TemplatesController < ApplicationController
-  before_filter :authenticate_request!
+  #~ before_filter :authenticate_request!
   before_filter :find_template,:only=>[:update,:destroy,:show,:add_template_definitions]
   FOR_XML={:methods=>:id,:except=>:_id,:root=>:result}
   def index

@@ -77,7 +77,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
    def options_for_the_field
     @industry=Industry.all
       respond_to do |format|
-      format.json { render :json=> {:industry=>@industry.to_json(:only=>[:_id,:name]).parse}}
+      format.json { render :json=>{:industry=>@industry.to_json(:only=>[:_id,:name]).parse}.merge(success)}
     end
   end
 

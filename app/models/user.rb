@@ -9,7 +9,7 @@ class User
   references_many :items
   references_many :categories
   references_many :bookmarks, :dependent=>:destroy
-  has_many :attachments, as: :attachable, :dependent=>:destroy
+  has_many :attachments
   references_many :tasks,:dependent => :destroy
   references_many :activities,:dependent => :destroy
   has_many :activities, as: :subject

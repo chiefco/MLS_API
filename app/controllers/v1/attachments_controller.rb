@@ -30,11 +30,11 @@ class V1::AttachmentsController < ApplicationController
   # POST /v1/attachments
   # POST /v1/attachments.xml
   def create
-    if params[:attachment][:attachable_id] || params[:attachment][:attachable_type]
-      @attachment = Attachment.new(params[:attachment])
-    else
+    #~ if params[:attachment][:attachable_id] || params[:attachment][:attachable_type]
+      #~ @attachment = Attachment.new(params[:attachment])
+    #~ else
       @attachment = @current_user.attachments.new(params[:attachment])
-    end
+    #~ end
 
     respond_to do |format|
       if @attachment.save

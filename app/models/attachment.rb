@@ -3,12 +3,15 @@ class Attachment
   include Mongoid::Timestamps
   mount_uploader :file, FileUploader
   belongs_to :attachable, polymorphic: true
+  belongs_to :user
   has_many :bookmarked_contents, as: :bookmarkable
   validates_presence_of :attachable_id, :message=>"attachable_id - Blank Parameter", :code=>3034
   validates_presence_of :attachable_type, :message=>"attachable_type - Blank Parameter", :code=>3022
   validates_inclusion_of :attachable_type, :in=>["User","Item","Category","Page"], :message=>"attachable_type - Invalid Parameter", :code=>3050
   SORT_BY_ALLOWED = [:file_name, :size, :content_type]
   ORDER_BY_ALLOWED =  [:asc,:desc]
+  after_create :create_activity
+  after_update :create_activity
   field :file_name, type: String
   field :file_type, type: String
   field :content_type, type: String
@@ -30,5 +33,14 @@ class Attachment
   def self.get_criteria(query)
     [ {file_name: query} , { size: query }, { content_type: query }]
   end
-
+  
+  def create_activity
+    save_activity("ITEM_UPDATED")
+  end
+  def save_activity(text)
+    evaluate_item(a=text) unless self.attachable.nil?
+  end
+  def  evaluate_item(text)
+    self.attachable.activities.create(:action=>text,:user_id=>self.attachable.user.nil?  ? 'nil' : self.attachable.user._id) unless self.attachable_type=="Page"
+  end
 end

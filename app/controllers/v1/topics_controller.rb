@@ -5,10 +5,15 @@ class  V1::TopicsController < ApplicationController
   # GET /topics/1.xml
   def show
     respond_to do |format|
-      if @topic
-        @topic={:topic=>@topic.serializable_hash(:only=>[:name,:_id,:status],:methods=>:topic_item)}.merge(success)
-        format.json  { render :json =>@topic}
-        format.xml  { render :xml =>@topic.to_xml(ROOT)}
+      unless @topic.delete_status==false 
+        if @topic
+          @topic={:topic=>@topic.serializable_hash(:only=>[:name,:_id,:status],:methods=>:topic_item)}.merge(success)
+          format.json  { render :json =>@topic}
+          format.xml  { render :xml =>@topic.to_xml(ROOT)}
+        else
+          format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
+          format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        end
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
@@ -20,7 +25,6 @@ class  V1::TopicsController < ApplicationController
   # POST /topics.xml
   def create
     validate_item(params[:topic][:item_id]) if params[:topic][:item_id]
-    p @count
     @count.to_i.zero? ? evaluate_item : save_task
     #~ @topic = Topic.new(params[:topic])
     #~ respond_to do |format|
@@ -39,18 +43,23 @@ class  V1::TopicsController < ApplicationController
   # PUT /topics/1.xml
   def update
     respond_to do |format|
-      if @topic
-        if @topic.update_attributes(params[:topic])
-        @topic={:topic=>@topic.serializable_hash(:only=>[:name,:status,:item_id]) }.to_success
-        format.xml  { render :xml => @topic.to_xml(ROOT)}
-        format.json  { render :json => @topic}
+      unless @topic.delete_status==false 
+        if @topic
+          if @topic.update_attributes(params[:topic])
+            @topic={:topic=>@topic.serializable_hash(:only=>[:name,:status,:item_id]) }.to_success
+            format.xml  { render :xml => @topic.to_xml(ROOT)}
+            format.json  { render :json => @topic}
+          else
+            format.xml  { render :xml => failure.merge(@topic.all_errors).to_xml(ROOT)}
+            format.json  { render :json => @topic.all_errors }
+          end
         else
-          format.xml  { render :xml => failure.merge(@topic.all_errors).to_xml(ROOT)}
-          format.json  { render :json => @topic.all_errors }
+          format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
+          format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
         end
       else
-      format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-      format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
   end
@@ -60,7 +69,7 @@ class  V1::TopicsController < ApplicationController
   def destroy
    respond_to do |format|
       if @topic
-         @topic.destroy
+         @topic.update_attributes(:delete_status=>false)
          format.xml  { render :xml => success.to_xml(ROOT) }
          format.json  { render :json=> success}
       else
@@ -73,8 +82,11 @@ class  V1::TopicsController < ApplicationController
   def validate_item(value)
     @count=0
     @item=Item.find(value)
+    puts @item.inspect
     @item.template.template_definitions.each do |item|
+      p "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS"
       p item.has_topic_section
+      p "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS"
       @count=@count+1 if item.has_topic_section == true
     end
   end

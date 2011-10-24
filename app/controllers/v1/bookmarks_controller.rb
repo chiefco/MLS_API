@@ -4,9 +4,9 @@ class V1::BookmarksController < ApplicationController
   # GET /v1/bookmarks
   # GET /v1/bookmarks.xml
   def index
-    @bookmark=@current_user.bookmarks
+    @bookmark=@current_user.bookmarks.undeleted
     respond_to do |format|
-      format.json{render :json=>{:bookmarks=>@bookmark.to_a.to_json(:only=>[:_id,:name],:include=>{:bookmarked_contents=>{:include=>{:bookmarkable=>{:only=>[:_id,:name,:description,:page_order,:attachable_type,:attachable_id,:file_name,:file_type]}},:only=>[:_id,:bookmarkable_type,:bookmarkable_id]}}).parse}}
+      format.json{render :json=>{:count=>@bookmark.count,:bookmarks=>@bookmark.to_a.to_json(:only=>[:_id,:name],:include=>{:bookmarked_contents=>{:include=>{:bookmarkable=>{:only=>[:_id,:name,:description,:page_order,:attachable_type,:attachable_id,:file_name,:file_type]}},:only=>[:_id,:bookmarkable_type,:bookmarkable_id]}}).parse}}
       format.xml
     end
   end
@@ -15,14 +15,18 @@ class V1::BookmarksController < ApplicationController
   # GET /v1/bookmarks/1.xml
   def show
     respond_to do |format|
-      if @v1_bookmark
-        @v1_bookmark={:bookmarks=>@v1_bookmark.serializable_hash(:only=>[:_id,:name],:include=>{:bookmarked_contents=>{:include=>{:bookmarkable=>{:only=>[:_id,:name,:description,:page_order,:attachable_type,:attachable_id,:file_name,:file_type]}},:only=>[:_id,:bookmarkable_type,:bookmarkable_id]}})}.to_success
-        format.json{render :json=>@v1_bookmark}
-        format.xml{render :xml=>@v1_bookmark.to_xml(ROOT)}
+      unless @v1_bookmark.status==false
+        if @v1_bookmark
+          @v1_bookmark={:bookmarks=>@v1_bookmark.serializable_hash(:only=>[:_id,:name],:include=>{:bookmarked_contents=>{:include=>{:bookmarkable=>{:only=>[:_id,:name,:description,:page_order,:attachable_type,:attachable_id,:file_name,:file_type]}},:only=>[:_id,:bookmarkable_type,:bookmarkable_id]}})}.to_success
+          format.json{render :json=>@v1_bookmark}
+          format.xml{render :xml=>@v1_bookmark.to_xml(ROOT)}
+        else
+          format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
+          format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        end
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
-      end
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}      end
     end
   end
 
@@ -45,13 +49,18 @@ class V1::BookmarksController < ApplicationController
   # PUT /v1/bookmarks/1.xml
   def update
     respond_to do |format|
-      if  @v1_bookmark
-        if @v1_bookmark.update_attributes(params[:bookmark])
-         format.xml  { render :xml => success.merge(:bookmark=>@v1_bookmark).to_xml(ROOT,:only=>[:name,:_id])}
-         format.json  { render :json =>{:bookmark=>@v1_bookmark.to_json(:only=>[:name,:_id]).parse}.to_success }
+      unless @v1_bookmark.status==false
+        if  @v1_bookmark
+          if @v1_bookmark.update_attributes(params[:bookmark])
+            format.xml  { render :xml => success.merge(:bookmark=>@v1_bookmark).to_xml(ROOT,:only=>[:name,:_id])}
+            format.json  { render :json =>{:bookmark=>@v1_bookmark.to_json(:only=>[:name,:_id]).parse}.to_success }
+          else
+            format.xml  { render :xml => failure.merge(@v1_bookmark.all_errors).to_xml(ROOT)}
+            format.json  { render :json => @v1_bookmark.all_errors }
+          end
         else
-        format.xml  { render :xml => failure.merge(@v1_bookmark.all_errors).to_xml(ROOT)}
-        format.json  { render :json => @v1_bookmark.all_errors }
+          format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
+          format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
         end
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
@@ -65,7 +74,7 @@ class V1::BookmarksController < ApplicationController
   def destroy
      respond_to do |format|
       if  @v1_bookmark
-        @v1_bookmark.destroy
+        @v1_bookmark.update_attributes(:status=>false)
         format.xml  { render :xml => success.to_xml(ROOT) }
         format.json  { render :json=> success}
       else

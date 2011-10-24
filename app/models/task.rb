@@ -2,6 +2,7 @@ class Task
   include Mongoid::Document
   include Mongoid::Timestamps
   include Sunspot::Mongoid
+  include_root_in_json
   SORT_BY_ALLOWED = [ :due_date, :is_completed, :description]
   ORDER_BY_ALLOWED =  [:asc,:desc]
   #~ STATUS_TASK=[:current_task,:late_task,:pending_task]

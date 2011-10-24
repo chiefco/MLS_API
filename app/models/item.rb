@@ -8,7 +8,7 @@ class Item
   field :name, :type => String
   field :description, :type => String
   field :item_date, :type => Time
-  field :status, :type => Boolean
+  field :status, :type => Boolean,:default=>true
   field :frequency_count, :type => Integer
   field :template_id, :type => String
   field :location_id, :type => String
@@ -26,7 +26,6 @@ class Item
   references_many :tasks,:dependent => :destroy
   has_many :pages,:dependent => :destroy
   has_many :attachments, as: :attachable, :dependent=>:destroy
-  has_many :activities, as: :activity, :dependent=>:destroy
   has_many :bookmarked_contents, as: :bookmarkable
   has_many :comments, as: :commentable
   has_many :activities, as: :entity
@@ -35,9 +34,24 @@ class Item
   referenced_in :user
   references_and_referenced_in_many :categories
   referenced_in :template
+  scope :undeleted,self.excludes(:status=>false)
 
   after_save :sunspot_index
-
+  after_create :create_activity
+  after_update :update_activity
+  
+  def create_activity
+    save_activity("ITEM_CREATED")
+  end
+  
+  def update_activity
+    if self.status_changed? 
+      save_activity("ITEM_DELETED") 
+    else 
+      save_activity("ITEM_UPDATED")
+    end
+  end
+  
   searchable do
     text :name
     text :description
@@ -68,12 +82,12 @@ class Item
     super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %I:%M %p")
   end
 
-  def created_at
-    super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %I:%M %p ")
+  def created_time
+    self.created_at.to_time.strftime("%d/%m/%Y %I:%M %p")
   end
 
- def updated_at
-  super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %I:%M %p")
+ def updated_time
+  self.updated_at.to_time.strftime("%d/%m/%Y %I:%M %p")
  end
 
   def self.stats(params,user,item)
@@ -89,9 +103,13 @@ class Item
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
     if params[:q]
-      user.items.any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
+      user.items.undeleted.any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
     else
-      user.items.order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
+      user.items.undeleted.order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
     end
+  end
+  
+  def save_activity(text)
+    self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end
 end

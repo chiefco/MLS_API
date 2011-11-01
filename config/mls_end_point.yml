@@ -1,0 +1,33 @@
+Item:
+  :list: items
+  :view: items
+  :delete: items
+Category:
+  :list: categories
+  :view: categories
+  :delete: categories
+Location:
+  :list: locations
+  :view: locations
+Industry:
+  :list: industries
+Template:
+  :list: templates
+  :view: templates
+Search:
+  :list: searches
+  :view: searches
+Contact:
+  :list: contacts
+  :view: contacts
+Comment:
+  :list: comments
+  :view: comments
+Community:
+  :list: communities
+  :view: communities
+User:
+  :list: users
+  :view: users
+Activity:
+  :list: activities

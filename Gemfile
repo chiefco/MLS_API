@@ -11,8 +11,9 @@ gem 'validates_timeliness', '~> 3.0.2'
 # gem 'unicorn'
 gem 'ssl_requirement'
 gem 'mongoid', '2.1.2'
-gem 'bson_ext','>=1.4.0'
-gem 'bson','>=1.4.0'
+gem 'bson_ext','>=1.4.0',:path => "vendor/gems/bson_ext-1.4.0"
+gem 'bson','1.4.0',:path => "vendor/gems/bson-1.4.0"
+gem 'mongo','1.4.0',:path => "vendor/gems/mongo-1.4.0"
 gem 'devise','1.4.2'
 gem 'rspec-rails','2.6.1'
 gem 'acts_as_api','0.3.8'

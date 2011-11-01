@@ -49,9 +49,10 @@ MeetlinkshareApi::Application.routes.draw do
     get "v1/user", :to=>"v1/registrations#show"
     get "v1/users", :to=> "v1/registrations#index"
     get "users/confirmation",:to=>"v1/confirmations#show"
-    get "v1/activities",:to=> 'v1/registrations#get_activities'
+    #~ get "v1/activities",:to=> 'v1/registrations#get_activities'
     delete "v1/close_account",:to=>'v1/registrations#close_account'
     get "v1/industries",:to=>'v1/registrations#options_for_the_field'
+    get "v1/activities",:to=>'v1/registrations#activities'
   end
 
   # The priority is based upon order of creation:

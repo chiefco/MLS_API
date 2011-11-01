@@ -11,7 +11,7 @@ class User
   references_many :bookmarks, :dependent=>:destroy
   has_many :attachments
   references_many :tasks,:dependent => :destroy
-  references_many :activities,:dependent => :destroy
+  references_many :activities_users,:dependent => :destroy,:class_name=>"Activity",:foreign_key=>"user_id"
   has_many :activities, as: :subject
   references_many :locations
   references_many :searches

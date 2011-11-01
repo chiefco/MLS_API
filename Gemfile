@@ -29,6 +29,9 @@ gem 'sunspot_mongoid'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 gem 'rails_best_practices'
 gem 'fog'
+gem 'yamler'
+gem 'httparty'
+gem 'json'
 
 
 # Deploy with Capistrano

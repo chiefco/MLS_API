@@ -1,0 +1,102 @@
+--- !ruby/object:Gem::Specification 
+name: bson_ext
+version: !ruby/object:Gem::Version 
+  hash: 7
+  prerelease: 
+  segments: 
+  - 1
+  - 4
+  - 0
+  version: 1.4.0
+platform: ruby
+authors: 
+- Mike Dirolf
+autorequire: 
+bindir: bin
+cert_chain: []
+
+date: 2011-09-20 00:00:00 -04:00
+default_executable: 
+dependencies: []
+
+description: C extensions to accelerate the Ruby BSON serialization. For more information about BSON, see http://bsonspec.org.  For information about MongoDB, see http://www.mongodb.org.
+email: mongodb-dev@googlegroups.com
+executables: []
+
+extensions: 
+- ext/cbson/extconf.rb
+extra_rdoc_files: []
+
+files: 
+- Rakefile
+- bson_ext.gemspec
+- ext/cbson/extconf.rb
+- ext/cbson/bson_buffer.c
+- ext/cbson/cbson.c
+- ext/cbson/encoding_helpers.c
+- ext/cmongo/c-driver/src/bson.c
+- ext/cmongo/c-driver/src/gridfs.c
+- ext/cmongo/c-driver/src/md5.c
+- ext/cmongo/c-driver/src/mongo.c
+- ext/cmongo/c-driver/src/numbers.c
+- ext/cmongo/c-driver/test/all_types.c
+- ext/cmongo/c-driver/test/auth.c
+- ext/cmongo/c-driver/test/benchmark.c
+- ext/cmongo/c-driver/test/count_delete.c
+- ext/cmongo/c-driver/test/endian_swap.c
+- ext/cmongo/c-driver/test/errors.c
+- ext/cmongo/c-driver/test/examples.c
+- ext/cmongo/c-driver/test/gridfs.c
+- ext/cmongo/c-driver/test/json.c
+- ext/cmongo/c-driver/test/pair.c
+- ext/cmongo/c-driver/test/replica_set.c
+- ext/cmongo/c-driver/test/resize.c
+- ext/cmongo/c-driver/test/simple.c
+- ext/cmongo/c-driver/test/sizes.c
+- ext/cmongo/c-driver/test/update.c
+- ext/cbson/bson_buffer.h
+- ext/cbson/encoding_helpers.h
+- ext/cbson/version.h
+- ext/cmongo/c-driver/src/bson.h
+- ext/cmongo/c-driver/src/gridfs.h
+- ext/cmongo/c-driver/src/md5.h
+- ext/cmongo/c-driver/src/mongo.h
+- ext/cmongo/c-driver/src/mongo_except.h
+- ext/cmongo/c-driver/src/platform_hacks.h
+- ext/cmongo/c-driver/test/test.h
+has_rdoc: true
+homepage: http://www.mongodb.org
+licenses: []
+
+post_install_message: 
+rdoc_options: []
+
+require_paths: 
+- ext
+required_ruby_version: !ruby/object:Gem::Requirement 
+  none: false
+  requirements: 
+  - - ">="
+    - !ruby/object:Gem::Version 
+      hash: 3
+      segments: 
+      - 0
+      version: "0"
+required_rubygems_version: !ruby/object:Gem::Requirement 
+  none: false
+  requirements: 
+  - - ">="
+    - !ruby/object:Gem::Version 
+      hash: 3
+      segments: 
+      - 0
+      version: "0"
+requirements: []
+
+rubyforge_project: 
+rubygems_version: 1.5.2
+signing_key: 
+specification_version: 3
+summary: C extensions for Ruby BSON.
+test_files: []
+

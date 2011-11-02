@@ -2,7 +2,7 @@ class Topic
   include Mongoid::Document
   include Mongoid::Timestamps
   field :name, :type => String
-  field :status, :type => Integer,:default=>1
+  field :status, :type => Integer,:default=>2
   field :delete_status,:type=>Boolean,:default=>true
   referenced_in :item
   validates_presence_of :item_id, :message=>"item_id - Blank Parameter", :code=>"3026",:on=>:create

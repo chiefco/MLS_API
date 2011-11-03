@@ -9,7 +9,7 @@ class V1::ItemsController < ApplicationController
     @items = Item.list(params,@paginate_options,@current_user)
     respond_to do |format|
       format.xml  { render :xml => @items}
-      format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>[:location_name,:item_date,:created_at,:updated_at]).parse,:count=>@items.size}.merge(success)}
+      format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>[:location_name,:item_date,:created_time,:updated_time]).parse,:count=>@items.size}.merge(success)}
   end
   end
 
@@ -19,7 +19,7 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       unless @item.status==false
         if @item
-          @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:methods=>[:created_at,:updated_at,:location_name,:item_date]),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id)}.to_success
+          @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:methods=>[:created_time,:updated_time,:location_name,:item_date]),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id)}.to_success
           format.xml  { render :xml => @item.to_xml(ROOT) }
           format.json  { render :json => @item}
         else

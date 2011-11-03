@@ -84,9 +84,6 @@ class  V1::TopicsController < ApplicationController
     @item=Item.find(value)
     puts @item.inspect
     @item.template.template_definitions.each do |item|
-      p "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS"
-      p item.has_topic_section
-      p "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS"
       @count=@count+1 if item.has_topic_section == true
     end
   end

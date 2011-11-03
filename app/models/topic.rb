@@ -11,7 +11,7 @@ class Topic
   validates_inclusion_of :status, :in=>[1,2,3], :message=>"invalid-status", :code=>3072
   has_many :comments, as: :commentable
   has_many :activities, as: :activity, :dependent=>:destroy
-  scope :undeleted,self.excludes(:status=>false)
+  scope :undeleted,self.excludes(:delete_status=>false)
 
   after_create :create_activity
   after_update :create_activity

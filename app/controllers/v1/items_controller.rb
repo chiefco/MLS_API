@@ -79,7 +79,6 @@ class V1::ItemsController < ApplicationController
           format.json {render :json =>@item.all_errors}
         end
         rescue Exception => e
-        p e
           if e.message.to_s=="argument out of range"
             format.xml  { render :xml => failure.merge(INVALID_DATE).to_xml(ROOT) }
             format.json  { render :json=> failure.merge(INVALID_DATE)}
@@ -113,8 +112,8 @@ class V1::ItemsController < ApplicationController
   def  item_topics
     respond_to do |format|
       if @item
-      @topics=@item.topics
-        @topic={:item_topics=>@topics.serializable_hash(:only=>[:name,:_id,:status]),:count=>@item.topics.count}.to_success
+      @topics=@item.topics.undeleted
+        @topic={:item_topics=>@topics.to_json(:only=>[:name,:_id,:status]).parse,:count=>@topics.count}.to_success
         format.json {render :json=>@topic}
         format.xml {render :xml=>@topic.to_xml(ROOT)}
       else

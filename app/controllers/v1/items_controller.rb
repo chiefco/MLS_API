@@ -113,7 +113,7 @@ class V1::ItemsController < ApplicationController
   def  item_topics
     respond_to do |format|
       if @item
-      @topics=@item.topics
+      @topics=@item.topics.undeleted
         @topic={:item_topics=>@topics.serializable_hash(:only=>[:name,:_id,:status]),:count=>@item.topics.count}.to_success
         format.json {render :json=>@topic}
         format.xml {render :xml=>@topic.to_xml(ROOT)}

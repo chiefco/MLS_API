@@ -74,7 +74,7 @@ class V1::CategoriesController < ApplicationController
     @items = @category.items
 
     respond_to do |format|
-      format.json  { render :json => { :items=>@items.to_a.to_json(:only=>[:_id, :name]).parse, :count=>@items.count, :id=>@category.id}.to_success }
+      format.json  { render :json => { :items=>@items.to_a.to_json(:only=>[:_id, :name],:methods=>[:location_name,:item_date,:created_time,:updated_time]).parse, :count=>@items.count, :id=>@category.id}.to_success }
       format.xml  { render :xml =>  @items.to_xml(:only=>[:_id, :name]).as_hash.merge( :count=> @items.count, :id=>@category.id).to_success.to_xml(ROOT) }
     end
   end

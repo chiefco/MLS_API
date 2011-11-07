@@ -82,7 +82,6 @@ class  V1::TopicsController < ApplicationController
   def validate_item(value)
     @count=0
     @item=Item.find(value)
-    puts @item.inspect
     @item.template.template_definitions.each do |item|
       @count=@count+1 if item.has_topic_section == true
     end
@@ -92,7 +91,7 @@ class  V1::TopicsController < ApplicationController
     @topic=@item.topics.new(params[:topic])
     respond_to do |format|
       if @topic.save
-        @topic={:task=>@topic.serializable_hash(:only=>[:_id,:name,:status,:item_id])}.to_success
+        @topic={:topic=>@topic.serializable_hash(:only=>[:_id,:name,:status,:item_id])}.to_success
         format.xml  { render :xml => @topic.to_xml(ROOT) }
         format.json { render :json => @topic}
       else

@@ -119,7 +119,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
   
   def find_activities
     @first_name=@current_user.first_name
-    @current_user.activities_users.each do |activity|
+    @current_user.activities_users.paginate(@paginate_options).each do |activity|
       if activity.entity_type=="Item" 
         @item_name=activity.entity.name
         #~ @template=activity.entity.template.name unless activity.entity.template.nil? 

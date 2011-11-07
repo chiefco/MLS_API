@@ -86,9 +86,9 @@ class Item
     self.created_at.to_time.strftime("%d/%m/%Y %I:%M %p")
   end
 
- def updated_time
-  self.updated_at.to_time.strftime("%d/%m/%Y %I:%M %p")
- end
+  def updated_time
+    self.updated_at.to_time.strftime("%d/%m/%Y %I:%M %p")
+  end
 
   def self.stats(params,user,item)
     query=""
@@ -103,13 +103,23 @@ class Item
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
     if params[:q]
-      user.items.undeleted.any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
+      values=user.items.undeleted.any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
     else
-      user.items.undeleted.order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
+      values=user.items.undeleted.order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
     end
+    if params[:group_by]
+      values=values.group_by{|i| i.send(params[:group_by]).to_s.split(' ').first}
+    end
+    values
   end
   
   def save_activity(text)
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
+  end
+  
+  def to_json(options={})
+    options[:only]=[:name,:_id]
+    options[:methods]=[:location_name,:item_date,:created_time,:updated_time]
+    super(options)
   end
 end

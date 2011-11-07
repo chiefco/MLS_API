@@ -9,8 +9,12 @@ class V1::ItemsController < ApplicationController
     @items = Item.list(params,@paginate_options,@current_user)
     respond_to do |format|
       format.xml  { render :xml => @items}
-      format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>[:location_name,:item_date,:created_time,:updated_time]).parse,:count=>@items.size}.merge(success)}
-  end
+      if params[:group_by]
+        format.json {render :json =>{:items=>@items,:response=>:success}.to_json}
+      else
+        format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>[:location_name,:item_date,:created_time,:updated_time]).parse,:count=>@items.size}.merge(success)}
+      end
+    end
   end
 
   # GET /items/1

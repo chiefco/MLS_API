@@ -108,7 +108,13 @@ class Item
       values=user.items.undeleted.order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
     end
     if params[:group_by]
-      values=values.group_by{|i| i.send(params[:group_by]).to_s.split(' ').first}
+      if params[:group_by]=='categories'
+        values=[]
+        user.categories.sort_by{|c| c.name}.each{|c|values<<{c.name=>c.items}}
+        values
+      else
+        values=values.group_by{|i| i.send(params[:group_by]).to_s.split(' ').first}
+      end
     end
     values
   end
@@ -117,9 +123,9 @@ class Item
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end
   
-  def to_json(options={})
-    options[:only]=[:name,:_id]
-    options[:methods]=[:location_name,:item_date,:created_time,:updated_time]
-    super(options)
-  end
+  #~ def as_json(options={})
+    #~ options[:only]=[:name,:_id]
+    #~ options[:methods]=[:location_name,:item_date,:created_time,:updated_time]
+    #~ super(options)
+  #~ end
 end

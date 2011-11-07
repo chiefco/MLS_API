@@ -118,7 +118,7 @@ class Item
       values,b=[],[]
       result.each do |k,v|
         v.each do |i|
-          x=i.attributes.merge({:id=>i.id,:created_time=>i.created_time,:updated_time=>i.updated_time,:item_date=>i.item_date})
+          x=i.attributes.merge({:id=>i.id,:created_time=>i.created_time,:updated_time=>i.updated_time,:item_date=>i.item_date,:location_name=>i.location_name})
           x.reject! {|k, v| %w"created_at updated_at location_id category_ids item_date _id".include? k }
           b<<x
         end

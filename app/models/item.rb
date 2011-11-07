@@ -109,11 +109,20 @@ class Item
     end
     if params[:group_by]
       if params[:group_by]=='categories'
-        values=[]
-        user.categories.sort_by{|c| c.name}.each{|c|values<<{c.name=>c.items}}
-        values
+        result={}
+        user.categories.sort_by{|c| c.name}.each{|c| result[c.name]=c.items}
+        #~ result=result.first
       else
-        values=values.group_by{|i| i.send(params[:group_by]).to_s.split(' ').first}
+        result=values.group_by{|i| i.send(params[:group_by]).to_s.split(' ').first}
+      end
+      values,b=[],[]
+      result.each do |k,v|
+        v.each do |i|
+          x=i.attributes.merge({:id=>i.id,:created_time=>i.created_time,:updated_time=>i.updated_time,:item_date=>i.item_date})
+          x.reject! {|k, v| %w"created_at updated_at location_id category_ids item_date _id".include? k }
+          b<<x
+        end
+        values<<{k=>b}
       end
     end
     values

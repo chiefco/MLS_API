@@ -35,7 +35,7 @@ class Item
   references_and_referenced_in_many :categories
   referenced_in :template
   scope :undeleted,self.excludes(:status=>false)
-  scope :upcoming,self.where(:item_date.gte=>Date.today)
+  scope :upcoming,self.where(:item_date.gte=>Date.tomorrow)
   scope :past,self.where(:item_date.lt=>Date.today)
 
   after_save :sunspot_index

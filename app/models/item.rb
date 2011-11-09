@@ -35,6 +35,8 @@ class Item
   references_and_referenced_in_many :categories
   referenced_in :template
   scope :undeleted,self.excludes(:status=>false)
+  scope :upcoming,self.where(:item_date.gte=>Date.today)
+  scope :past,self.where(:item_date.lt=>Date.today)
 
   after_save :sunspot_index
   after_create :create_activity
@@ -89,7 +91,27 @@ class Item
   def updated_time
     self.updated_at.to_time.strftime("%d/%m/%Y %I:%M %p")
   end
-
+  
+  def upcoming
+    date=item_date
+    date=Date.strptime(item_date,"%d/%m/%Y %I:%M %p") if item_date.is_a?(String)
+    if date==Date.today
+      "Today"
+    elsif date==Date.tomorrow
+      "Tommorrow"
+    elsif date<(Date.today+7.days) && date>Date.today
+      "Next Week"
+    elsif date==Date.yesterday
+      "Yesterday"
+    elsif date>(Date.today-7.days) && date<Date.today
+      "Last Week" 
+    elsif date<(Date.yesterday-7.days)
+      "Past Items"
+    else
+      "Later"
+    end
+  end
+  
   def self.stats(params,user,item)
     query=""
     query = '{:tasks=>item.tasks.serializable_hash(:only=>[:_id,:description,:due_date,:is_completed])}' if (params[:tasks] == "true")
@@ -111,27 +133,36 @@ class Item
       if params[:group_by]=='categories'
         result={}
         user.categories.sort_by{|c| c.name}.each{|c| result[c.name]=c.items}
-        #~ result=result.first
+      elsif params[:group_by]=='upcoming'
+        result=user.items.undeleted.upcoming.group_by(&:upcoming)
+      elsif params[:group_by]=='past'
+        result=user.items.undeleted.past.group_by(&:upcoming)
       else
-        result=values.group_by{|i| i.send(params[:group_by]).to_s.split(' ').first}
+        result=user.items.undeleted.group_by(&:location_name)
       end
-      values=[]
-      result.each do |k,v|
-        b=[]
-        v.each do |i|
-          
-          x=i.attributes.merge({:id=>i.id,:created_time=>i.created_time,:updated_time=>i.updated_time,:item_date=>i.item_date,:location_name=>i.location_name})
-          x.reject! {|k, v| %w"created_at updated_at location_id category_ids item_date _id".include? k }
-          b<<x
-        end
-        values<<{k=>b}
-      end
+      values=group_values(params[:group_by],result)
     end
     values
   end
   
   def save_activity(text)
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
+  end
+  
+  def self.group_values(group_by,result)
+    values=[]
+    keys=[]
+    result.each do |k,v|
+      keys<<k
+      b=[]
+      v.each do |i|
+        x=i.attributes.merge({:id=>i.id,:created_time=>i.created_time,:updated_time=>i.updated_time,:item_date=>i.item_date,:location_name=>i.location_name})
+        x.reject! {|k, v| %w"created_at updated_at location_id category_ids item_date _id".include? k }
+        b<<x
+      end
+      values<<{k=>b}
+    end
+     return {group_by=>keys,:items=>values}
   end
   
   #~ def as_json(options={})

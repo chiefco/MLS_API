@@ -93,6 +93,7 @@ class Item
   end
   
   def upcoming
+    puts item_date.inspect
     date=item_date
     date=Date.strptime(item_date,"%d/%m/%Y %I:%M %p") if item_date.is_a?(String)
     if date==Date.today

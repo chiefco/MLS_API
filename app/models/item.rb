@@ -151,6 +151,9 @@ class Item
   end
   
   def self.group_values(group_by,result)
+    puts "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
+    puts result
+    puts  "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
     values=[]
     keys=[]
     result.each do |k,v|
@@ -161,6 +164,9 @@ class Item
         x.reject! {|k, v| %w"created_at updated_at location_id category_ids item_date _id".include? k }
         b<<x
       end
+      puts "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMmm"
+      puts keys
+      puts "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMmm"
       values<<{k=>b}
     end
      return {group_by=>keys,:items=>values}

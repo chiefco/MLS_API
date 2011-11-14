@@ -12,7 +12,7 @@ class V1::ItemsController < ApplicationController
       if params[:group_by]
         format.json {render :json =>@items.merge({:response=>:success}).to_json}
       else
-        format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>[:location_name,:item_date,:created_time,:updated_time]).parse,:count=>@items.size}.merge(success)}
+        format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time]).parse,:count=>@items.size}.merge(success)}
       end
     end
   end
@@ -23,7 +23,7 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       unless @item.status==false
         if @item
-          @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:methods=>[:created_time,:updated_time,:location_name,:item_date]),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id)}.to_success
+          @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:methods=>[:created_time,:updated_time,:end_time,:location_name,:item_date]),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id)}.to_success
           format.xml  { render :xml => @item.to_xml(ROOT) }
           format.json  { render :json => @item}
         else
@@ -75,7 +75,7 @@ class V1::ItemsController < ApplicationController
           get_item
         if @item.update_attributes(params[:item])
           get_item
-          @item={:item=>@item.to_json(:only=>[:description,:current_category_id],:methods=>[:created_time,:updated_time,:item_date,:location_name]).parse}.to_success
+          @item={:item=>@item.to_json(:only=>[:description,:current_category_id,:end_time],:methods=>[:created_time,:updated_time,:item_date,:location_name]).parse}.to_success
           format.xml  {render :xml=>@item.to_xml(ROOT)}
           format.json {render :json =>@item}
         else
@@ -83,7 +83,7 @@ class V1::ItemsController < ApplicationController
           format.json {render :json =>@item.all_errors}
         end
         rescue Exception => e
-          if e.message.to_s=="argument out of range"
+          if e.message.to_s=="argument out of range" || e.message.start_with?("no")
             format.xml  { render :xml => failure.merge(INVALID_DATE).to_xml(ROOT) }
             format.json  { render :json=> failure.merge(INVALID_DATE)}
           else

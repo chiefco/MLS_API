@@ -157,22 +157,16 @@ class Item
   end
   
   def self.group_values(group_by,result)
-    puts "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
-    puts result
-    puts  "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
     values=[]
     keys=[]
     result.each do |k,v|
       keys<<k
       b=[]
       v.each do |i|
-        x=i.attributes.merge({:id=>i.id,:created_time=>i.created_time,:updated_time=>i.updated_time,:item_date=>i.item_date,:location_name=>i.location_name})
+        x=i.attributes.merge({:id=>i.id,:created_time=>i.created_time,:updated_time=>i.updated_time,:item_date=>i.item_date,:location_name=>i.location_name,:end_time=>i.end_time})
         x.reject! {|k, v| %w"created_at updated_at location_id category_ids item_date _id".include? k }
         b<<x
       end
-      puts "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMmm"
-      puts keys
-      puts "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMmm"
       values<<{k=>b}
     end
      return {group_by=>keys,:items=>values}

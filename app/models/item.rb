@@ -8,6 +8,7 @@ class Item
   field :name, :type => String
   field :description, :type => String
   field :item_date, :type => Time
+  field :end_time, :type => Time
   field :status, :type => Boolean,:default=>true
   field :frequency_count, :type => Integer
   field :template_id, :type => String
@@ -81,6 +82,11 @@ class Item
   end
 
   def item_date
+    super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %I:%M %p")
+  end
+  
+  
+  def end_time
     super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %I:%M %p")
   end
 

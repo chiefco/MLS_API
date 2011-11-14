@@ -9,7 +9,7 @@ class Category
   field :user_id, :type=>String
   field :status,:type=>Boolean,:default=>true
   acts_as_tree
-  SORT_BY_ALLOWED = [:name, :show_in_quick_links]
+  SORT_BY_ALLOWED = [:name, :show_in_quick_links,:updated_at]
   ORDER_BY_ALLOWED = [:asc, :desc]
   references_and_referenced_in_many :items
   has_many :activities, as: :activity, :dependent=>:destroy

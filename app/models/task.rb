@@ -42,11 +42,11 @@ class Task
     eval(query)
   end
   
-  def self.today_completed_percentage(user)
-    today_tasks=user.tasks.today_tasks.count.to_i
-    today_completed_tasks=user.tasks.completed_tasks.count.to_i
-    completed_percentage=today_tasks.zero? ? 0 : today_completed_tasks/today_tasks * 100 
-  end
+  #~ def self.today_completed_percentage(user)
+    #~ today_tasks=user.tasks.today_tasks.count.to_i
+    #~ today_completed_tasks=user.tasks.completed_tasks.count.to_i
+    #~ completed_percentage=today_tasks.zero? ? 0 : today_completed_tasks/today_tasks * 100 
+  #~ end
 
   def self.get_criteria(query)
     [ {due_date: query} , { description: query }, { is_completed: query }]

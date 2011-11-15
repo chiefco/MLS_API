@@ -7,7 +7,6 @@ class V1::TasksController < ApplicationController
   #Retrieves the tasks of the current_user
   def index
     @tasks = Task.list(params,@paginate_options,@current_user)
-    @percentage=Task.today_completed_percentage(@current_user)
     completed=@current_user.tasks.completed_tasks.count.to_i
     total_tasks=@current_user.tasks.today_tasks.count.to_i
       respond_to do |format|

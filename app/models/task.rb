@@ -17,6 +17,8 @@ class Task
   referenced_in :item
   validates_presence_of :title,:code=>3083,:message=>"title-blank_parameter - Blank Parameter"
   after_save :sunspot_index
+  scope :completed_tasks,self.where(:due_date.gt=>Date.today,:due_date.lt=>Date.tomorrow).excludes(:is_completed=>false)
+  scope :today_tasks,self.where(:due_date.gt=>Date.today,:due_date.lt=>Date.tomorrow)
   searchable do
     text :description
     date :due_date
@@ -38,6 +40,12 @@ class Task
     query +='.where(:activity_type=>params[:activity_type])' if params[:activity_type]
     query += '.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)'
     eval(query)
+  end
+  
+  def self.today_completed_percentage(user)
+    today_tasks=user.tasks.today_tasks.count.to_i
+    today_completed_tasks=user.tasks.completed_tasks.count.to_i
+    completed_percentage=today_tasks.zero? ? 0 : today_completed_tasks/today_tasks * 100 
   end
 
   def self.get_criteria(query)

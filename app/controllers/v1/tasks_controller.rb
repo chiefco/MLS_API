@@ -10,7 +10,7 @@ class V1::TasksController < ApplicationController
     completed=@current_user.tasks.completed_tasks.count.to_i
     total_tasks=@current_user.tasks.today_tasks.count.to_i
       respond_to do |format|
-        format.json {render :json=>{:tasks=>@tasks.as_json(:only=>[:_id,:due_date,:is_completed,:description],:include=>{:item=>{:only=>[:_id,:name]}}),:count=>@tasks.count,:completed=>completed,:total_tasks=>total_tasks,:uncompleted=>total_tasks-completed}.to_success}
+        format.json {render :json=>{:tasks=>@tasks.as_json(:only=>[:_id,:title,:due_date,:is_completed,:description, :item_id],:include=>{:reminders => {:only => [:time]}, :item=>{:only=>[:_id,:name]}}),:count=>@tasks.count,:completed=>completed,:total_tasks=>total_tasks,:uncompleted=>total_tasks-completed}.to_success}
         format.xml
       end
   end
@@ -19,7 +19,7 @@ class V1::TasksController < ApplicationController
   def show
     respond_to do |format|
       if @task
-        @task={:task=>@task.serializable_hash(:only=>[:_id,:description,:due_date,:is_completed,:title],:include=>{:item=>{:only =>[ :_id,:name]}})}.to_success
+        @task={:task=>@task.serializable_hash(:only=>[:_id,:description,:due_date,:is_completed,:title],:include=>{:reminders=>{:only =>[ :time]}, :item=>{:only =>[ :_id,:name]}})}.to_success
         format.json  { render :json =>@task }
         format.xml  { render :json =>@task.to_xml(ROOT) }
       else
@@ -70,6 +70,8 @@ class V1::TasksController < ApplicationController
   def save_task
     respond_to do |format|
       if @task.save
+        reminder = params[:reminder][:time]
+        @task.reminders.new(:task_id => @task.id, :time => reminder).save unless reminder.blank?
         @task={:task=>@task.serializable_hash(:only=>[:_id,:description,:title,:is_completed],:methods=>:due_date,:include=>{:item=>{:only =>[ :_id,:name]}})}.to_success
         format.xml  { render :xml => @task.to_xml(ROOT) }
         format.json { render :json => @task}
@@ -84,6 +86,8 @@ class V1::TasksController < ApplicationController
    respond_to do |format|
       if @task
         if @task.update_attributes(params[:task])
+          reminder = @task.reminders[0]
+          reminder.update_attributes(params[:reminder]) if params[:reminder] && reminder
           @task={:task=>@task.serializable_hash(:only=>[:_id,:description,:title,:is_completed],:methods=>:due_date,:include=>{:item=>{:only =>[ :_id,:name]}})}.to_success
           format.xml  { render :xml => @task.to_xml(ROOT) }
           format.json { render :json => @task}

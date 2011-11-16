@@ -82,20 +82,20 @@ class Item
   end
 
   def item_date
-    super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %H:%M:%S")
+    super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %I:%M %p")
   end
   
   
   def end_time
-    super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %H:%M:%S")
+    super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %I:%M %p")
   end
 
   def created_time
-    self.created_at.to_time.strftime("%d/%m/%Y %H:%M:%S")
+    self.created_at.to_time.strftime("%d/%m/%Y %I:%M %p")
   end
 
   def updated_time
-    self.updated_at.to_time.strftime("%d/%m/%Y %H:%M:%S")
+    self.updated_at.to_time.strftime("%d/%m/%Y %I:%M %p")
   end
   
   def upcoming

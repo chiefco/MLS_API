@@ -87,15 +87,15 @@ class Item
   
   
   def end_time
-    super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %I:%M %p")
+    super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %H:%M:%S")
   end
 
   def created_time
-    self.created_at.to_time.strftime("%d/%m/%Y %I:%M %p")
+    self.created_at.to_time.strftime("%d/%m/%Y %H:%M:%S")
   end
 
   def updated_time
-    self.updated_at.to_time.strftime("%d/%m/%Y %I:%M %p")
+    self.updated_at.to_time.strftime("%d/%m/%Y %H:%M:%S")
   end
   
   def upcoming

@@ -82,7 +82,7 @@ class Item
   end
 
   def item_date
-    super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %I:%M %p")
+    super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %H:%M:%S")
   end
   
   
@@ -101,7 +101,7 @@ class Item
   def upcoming
     puts item_date.inspect
     date=item_date
-    date=Date.strptime(item_date,"%d/%m/%Y %I:%M %p") if item_date.is_a?(String)
+    date=Date.strptime(item_date,"%d/%m/%Y %H:%M:%S") if item_date.is_a?(String)
     if date==Date.today
       "Today"
     elsif date==Date.tomorrow

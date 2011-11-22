@@ -109,7 +109,7 @@ class Item
       "Next Week"
     elsif date==Date.yesterday
       "Yesterday"
-    elsif date>(Date.today) 
+    elsif date<(Date.today) 
       "Past Items" 
     else
       "Later"

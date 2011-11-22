@@ -107,10 +107,8 @@ class Item
       "Tommorrow"
     elsif date<(Date.today+7.days) && date>Date.today
       "Next Week"
-    elsif date==Date.yesterday
-      "Yesterday"
-    elsif date>(Date.today-7.days) && date<Date.today
-      "Last Week" 
+    elsif date<Date.today
+       "Past Items"
     else
       "Later"
     end
@@ -166,7 +164,7 @@ class Item
       end
       values<<{k=>b}
     end
-     return {group_by=>keys,:items=>values}
+     return {group_by=>keys.reverse,:items=>values}
   end
   
   #~ def as_json(options={})

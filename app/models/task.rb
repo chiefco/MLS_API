@@ -37,7 +37,11 @@ class Task
     query +='.where(:due_date.gt=>Date.today,:due_date.lt=>Date.tomorrow)' if params.include? "current_task"
     query +='.where(:due_date.lt=>Date.today)' if params.include? "late_task"
     query +='.where(:due_date.gt=>Date.today)' if params.include? "pending_task"
-    query +='.where(:is_completed=>true)' if params.include? "completed"
+    if params.include? "completed"
+      query +='.where(:is_completed=>true)' 
+    else
+      query +='.where(:is_completed=>false)' 
+    end
     query +='.where(:activity_type=>params[:activity_type])' if params[:activity_type]
     query += '.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)'
     eval(query)

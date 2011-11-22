@@ -140,7 +140,8 @@ class Item
       elsif params[:group_by]=='upcoming'
         result=user.items.undeleted.upcoming.group_by(&:upcoming)
       elsif params[:group_by]=='past'
-        result=user.items.undeleted.past.group_by(&:upcoming)
+	p params[:sort_by]
+        result=user.items.undeleted.past.order_by([:item_date,params[:order_by].to_sym]).group_by(&:upcoming)
       else
         result=user.items.undeleted.group_by(&:location_name)
       end

@@ -99,7 +99,6 @@ class Item
   end
   
   def upcoming
-    puts item_date.inspect
     date=item_date
     date=Date.strptime(item_date,"%d/%m/%Y %H:%M:%S") if item_date.is_a?(String)
     if date==Date.today
@@ -112,8 +111,6 @@ class Item
       "Yesterday"
     elsif date>(Date.today-7.days) && date<Date.today
       "Last Week" 
-    elsif date<(Date.yesterday-7.days)
-      "Past Items"
     else
       "Later"
     end

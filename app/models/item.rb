@@ -147,7 +147,6 @@ class Item
       values=group_values(params[:group_by],result)
     end
     values
-    p values
   end
   
   def save_activity(text)
@@ -167,9 +166,9 @@ class Item
       end
       values<<{k=>b}
     end
-    p values.class
      return {group_by=>keys,:items=>values}
-  end
+   end
+   
   
   #~ def as_json(options={})
     #~ options[:only]=[:name,:_id]

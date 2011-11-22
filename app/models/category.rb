@@ -54,4 +54,8 @@ class Category
   def save_activity(text)
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end
+  
+  def category_items(text)
+    {text=>self.items.serializable_hash(:except=>:category_ids)}
+  end
 end

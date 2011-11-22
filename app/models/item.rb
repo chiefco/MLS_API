@@ -140,13 +140,14 @@ class Item
       elsif params[:group_by]=='upcoming'
         result=user.items.undeleted.upcoming.group_by(&:upcoming)
       elsif params[:group_by]=='past'
-        result=user.items.undeleted.past.group_by(&:upcoming)
+        result=user.items.undeleted.order_by(:desc,:item_date).past.group_by(&:upcoming)
       else
         result=user.items.undeleted.group_by(&:location_name)
       end
       values=group_values(params[:group_by],result)
     end
     values
+    p values
   end
   
   def save_activity(text)
@@ -166,6 +167,7 @@ class Item
       end
       values<<{k=>b}
     end
+    p values.class
      return {group_by=>keys,:items=>values}
   end
   

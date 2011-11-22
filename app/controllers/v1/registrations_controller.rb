@@ -39,18 +39,29 @@ class V1::RegistrationsController < Devise::RegistrationsController
 
   def update
     self.resource = resource_class.to_adapter.get!(send(:"current_#{resource_name}").to_key)
-
     if params.has_key?(:user) && params[:user]
       if params[:user][:password] || params[:user][:password_confirmation] || params[:user][:current_password]
         resource.set_password = true
         updated = resource.update_with_password(params[resource_name])
+        respond_to do |format|
+          if updated
+              format.json{render :json=>success  }
+              format.xml{render :xml=>success.to_xml(ROOT) }
+          else
+            format.xml  { render :xml => failure.to_xml(ROOT)}
+            format.json {render :json =>failure}               
+          end
+        end
       else
         updated = resource.update_without_password(params[resource_name])
+        respond_to do |format|
+          if updated
+            format.json{render :json=>success  }
+            format.xml{render :xml=>success.to_xml(ROOT) }
+          end
+        end
       end
-       respond_to do |format|
-        format.json{render :json=>success  }
-        format.xml{render :xml=>success.to_xml(ROOT) }
-      end
+       
     else
       render_results(true,resource)
     end
@@ -58,7 +69,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
 
   def show
     respond_to do |format|
-      user = { :user => current_user.serializable_hash(:only=>[:_id, :email, :first_name, :last_name, :job_title, :company, :business_unit, :sign_in_count,:date_of_birth], :root=>:user) }
+      user = { :user => current_user.serializable_hash(:only=>[:_id, :email, :first_name, :last_name, :job_title, :company, :business_unit, :sign_in_count,:date_of_birth, :industry_id], :root=>:user) }
       format.json { render :json=> user.to_success }
       format.xml { render :xml=> user.to_success.to_xml(ROOT) }
     end

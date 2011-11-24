@@ -94,7 +94,7 @@ class V1::CategoriesController < ApplicationController
     @sub_categories = @category.children
   end
   def initialize_string_values
-    @category_val= :meets
+    @category_val= :Meets
     @item_val=:categories_items
   end
 end

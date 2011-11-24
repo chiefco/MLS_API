@@ -56,7 +56,7 @@ class Category
   end
   
   def category_items(text)
-    {text=>self.items.serializable_hash(:except=>:category_ids)}
+    [{text=>self.items.serializable_hash(:except=>:category_ids)}]
   end
   def sub_categories(text1,text2)
     {text1=>self.items.serializable_hash(:except=>:category_ids),text2=>self.children}

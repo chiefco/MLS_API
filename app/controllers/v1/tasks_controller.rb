@@ -88,7 +88,12 @@ class V1::TasksController < ApplicationController
       if @task
         if @task.update_attributes(params[:task])
           reminder = @task.reminders[0]
-          reminder.update_attributes(params[:reminder]) if params[:reminder] && reminder
+          if reminder.blank?
+            reminder = params[:reminder][:time]
+            @task.reminders.new(:task_id => @task.id, :time => reminder).save unless reminder.blank?            
+          else
+            reminder.update_attributes(params[:reminder]) if params[:reminder]
+          end
           @task={:task=>@task.serializable_hash(:only=>[:_id,:description,:title,:is_completed],:methods=>:due_date,:include=>{:item=>{:only =>[ :_id,:name]}})}.to_success
           format.xml  { render :xml => @task.to_xml(ROOT) }
           format.json { render :json => @task}

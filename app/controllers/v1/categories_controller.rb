@@ -62,8 +62,7 @@ class V1::CategoriesController < ApplicationController
   end
 
   def subcategories
-    @sub_categories = @category.children
-
+    sub_categories
     respond_to do |format|
       format.json  { render :json => { :sub_categories=>@sub_categories.to_a.to_json(:only=>[:_id, :name]).parse, :count=>@sub_categories.count, :id=>@category.id}.to_success }
       format.xml  { render :xml =>  @sub_categories.to_xml(:only=>[:_id, :name]).as_hash.merge( :count=> @sub_categories.count, :id=>@category.id).to_success.to_xml(ROOT) }
@@ -72,11 +71,15 @@ class V1::CategoriesController < ApplicationController
 
   def items
     @items = @category.items
+    sub_categories
     respond_to do |format|
-      if params[:group_by]
-        format.json  { render :json =>{:categories=>[params[:group_by]],:items=>@category.category_items(params[:group_by].to_sym)}.to_success}
+      initialize_string_values
+      if params[:group_by]==@category_val.to_s
+        format.json  { render :json =>{:categories=>[@category_val],:items=>@category.category_items(@category_val)}.to_success}
+      elsif params[:group_by]==@item_val.to_s
+        format.json  {render :json =>{:categories=>[@category_val,@item_val],:items=>@category.sub_categories(@category_val,@item_val)}.to_success}
       else
-        format.json  { render :json => { :items=>@items.to_a.to_json(:only=>[:_id, :name],:methods=>[:location_name,:item_date,:created_time,:updated_time]).parse, :count=>@items.count, :id=>@category.id}.to_success }
+        format.json  { render :json => { :items=>@items.to_a.to_json(:only=>[:_id, :name],:methods=>[:location_name,:item_date,:created_time,:updated_time]).parse, :count=>@items.count, :id=>@category.id, :count=>@sub_categories.count}.to_success }
         format.xml  { render :xml =>  @items.to_xml(:only=>[:_id, :name]).as_hash.merge( :count=> @items.count, :id=>@category.id).to_success.to_xml(ROOT) }
       end  
     end
@@ -87,5 +90,11 @@ class V1::CategoriesController < ApplicationController
   def find_category
     @category= @current_user.categories.find(params[:id])
   end
-
+  def sub_categories
+    @sub_categories = @category.children
+  end
+  def initialize_string_values
+    @category_val= :categories
+    @item_val=:categories_items
+  end
 end

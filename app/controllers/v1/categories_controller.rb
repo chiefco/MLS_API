@@ -8,8 +8,8 @@ class V1::CategoriesController < ApplicationController
     paginate_options.store(:per_page,set_page_size)
     @categories = Category.list(@current_user.categories,params,paginate_options)
     respond_to do |format|
-      format.xml  { render :xml =>  @categories.to_xml(:only=>[:_id, :name, :updated_at]).as_hash.merge( :count=> @categories.count).to_success.to_xml(ROOT) }
-      format.json  { render :json => { :categories=>@categories.to_json(:only=>[:_id, :name, :updated_at]).parse, :count=>@categories.count }.to_success }
+      format.xml  { render :xml =>  @categories.to_xml(:only=>[:_id, :name, :updated_at, :parent_id]).as_hash.merge( :count=> @categories.count).to_success.to_xml(ROOT) }
+      format.json  { render :json => { :categories=>@categories.to_json(:only=>[:_id, :name, :updated_at, :parent_id]).parse, :count=>@categories.count }.to_success }
     end
   end
 

@@ -7,7 +7,7 @@ class Topic
   referenced_in :item
   validates_presence_of :item_id, :message=>"item_id - Blank Parameter", :code=>"3026",:on=>:create
   validates_presence_of :name, :message=>"name - Required parameter missing", :code=>"2009"
-  validates :name ,:length => { :minimum => 3 ,:maximum =>20,:message=>"name-invalid length",:code=>3073,:allow_blank=>true}
+  validates :name ,:length => { :minimum => 3 ,:maximum =>80,:message=>"name-invalid length",:code=>3073,:allow_blank=>true}
   validates_inclusion_of :status, :in=>[1,2,3], :message=>"invalid-status", :code=>3072
   has_many :comments, as: :commentable
   has_many :activities, as: :activity, :dependent=>:destroy

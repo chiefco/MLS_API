@@ -85,6 +85,9 @@ class Item
     super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %H:%M:%S")
   end
   
+  def item_date_local
+    self.item_date.to_time.localtime rescue ''
+  end  
   
   def end_time
     super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %H:%M:%S")

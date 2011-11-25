@@ -79,7 +79,7 @@ class V1::CategoriesController < ApplicationController
       elsif params[:group_by]==@item_val.to_s
         format.json  {render :json =>{:categories=>[@category_val,@item_val],:items=>@category.sub_categories(@category_val,@item_val)}.to_success}
       else
-        format.json  { render :json => { :items=>@items.to_a.to_json(:only=>[:_id, :name],:methods=>[:location_name,:item_date,:created_time,:updated_time]).parse, :count=>@items.count, :id=>@category.id, :count=>@sub_categories.count}.to_success }
+        format.json  { render :json => { :items=>@items.to_a.to_json(:only=>[:_id, :name],:methods=>[:location_name,:item_date,:created_time,:updated_time,:item_date_local]).parse, :count=>@items.count, :id=>@category.id, :count=>@sub_categories.count}.to_success }
         format.xml  { render :xml =>  @items.to_xml(:only=>[:_id, :name]).as_hash.merge( :count=> @items.count, :id=>@category.id).to_success.to_xml(ROOT) }
       end  
     end

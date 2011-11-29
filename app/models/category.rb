@@ -18,6 +18,7 @@ class Category
   referenced_in :user
   validates_presence_of :name,:message=>'name - Blank Parameter',:code=>3013
   scope :undeleted,self.excludes(:status=>false)
+  scope :parent_categories,self.where(:parent_id=>nil)
   after_save :sunspot_index
   searchable do
     text :name
@@ -47,6 +48,7 @@ class Category
     query += '.where(show_in_quick_links: params[:show_in_quick_links])' if params[:show_in_quick_links]
     query += '.any_of(:name=>params[:q])' if params[:q]
     query += '.undeleted'
+    query +='.parent_categories'  if params[:parent]==true
     query += '.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)'
     eval(query)
   end

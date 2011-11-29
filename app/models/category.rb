@@ -48,7 +48,7 @@ class Category
     query += '.where(show_in_quick_links: params[:show_in_quick_links])' if params[:show_in_quick_links]
     query += '.any_of(:name=>params[:q])' if params[:q]
     query += '.undeleted'
-    query +='.parent_categories'  if params[:parent]==true
+    query +='.parent_categories'  if params[:parent]
     query += '.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)'
     eval(query)
   end

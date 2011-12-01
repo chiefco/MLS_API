@@ -94,11 +94,11 @@ class Item
   end
 
   def created_time
-    self.created_at.to_time.strftime("%d/%m/%Y %H:%M:%S")
+    self.created_at.utc.strftime("%d/%m/%Y %H:%M:%S")
   end
 
   def updated_time
-    self.updated_at.to_time.strftime("%d/%m/%Y %H:%M:%S")
+    self.updated_at.utc.strftime("%d/%m/%Y %H:%M:%S")
   end
   
   def upcoming

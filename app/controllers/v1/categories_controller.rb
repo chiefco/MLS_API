@@ -95,6 +95,6 @@ class V1::CategoriesController < ApplicationController
   end
   def initialize_string_values
     @category_val= :Meets
-    @item_val=:categories_items
+    @item_val=:Categories
   end
 end

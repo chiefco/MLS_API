@@ -16,7 +16,7 @@ class Item
   field :current_category_id, :type => String
 
   validates_presence_of :name,:message=>'name - Blank Parameter',:code=>3013
-  validates :name ,:length => { :minimum => 3 ,:maximum =>30,:message=>"name - Invalid length",:code=>3077},:allow_blank=>true
+  validates :name ,:length => { :minimum => 3 ,:maximum =>40,:message=>"name - Invalid length",:code=>3077},:allow_blank=>true
   validates_presence_of :template_id,:message=>'template_id - Blank Parameter',:code=>3025
   belongs_to  :template
   belongs_to  :location
@@ -94,11 +94,11 @@ class Item
   end
 
   def created_time
-    self.created_at.to_time.strftime("%d/%m/%Y %H:%M:%S")
+    self.created_at.utc.strftime("%d/%m/%Y %H:%M:%S")
   end
 
   def updated_time
-    self.updated_at.to_time.strftime("%d/%m/%Y %H:%M:%S")
+    self.updated_at.utc.strftime("%d/%m/%Y %H:%M:%S")
   end
   
   def upcoming

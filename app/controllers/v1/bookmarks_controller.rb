@@ -94,6 +94,7 @@ class V1::BookmarksController < ApplicationController
   end
 
   def save_bookmark_content
+    p @v1_bookmark
     @v1_bookmark.save
     respond_to do |format|
       format.json {render :json => success}

@@ -45,6 +45,7 @@ class Category
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
     query = 'categories'
     query += '.where(show_in_quick_links: params[:show_in_quick_links])' if params[:show_in_quick_links]
+    query += '.where(:parent_id=>nil)'  if params[:parent]=='true'
     query += '.any_of(:name=>params[:q])' if params[:q]
     query += '.undeleted'
     query += '.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)'

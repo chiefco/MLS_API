@@ -18,6 +18,11 @@ class Bookmark
     string :name
     string :user_id
   end
+  def self.list
+    query = 'bookmarks'
+    query += '.where()'
+    eval(query)
+  end
 
   def create_activity
     save_activity("BOOKMARK_CREATED")
@@ -29,6 +34,10 @@ class Bookmark
     else 
       save_activity("BOOKMARK_UPDATED")
     end
+  end
+  
+  def bookmark_items(text)
+    [{text=>self.items.serializable_hash(:except=>:bookmark_ids)}]
   end
   
   def save_activity(text)

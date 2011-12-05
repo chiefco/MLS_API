@@ -6,7 +6,7 @@ class V1::BookmarksController < ApplicationController
   def index
     @bookmark=@current_user.bookmarks.undeleted
     respond_to do |format|
-      format.json{render :json=>{:count=>@bookmark.count,:bookmarks=>@bookmark.to_a.to_json(:only=>[:_id,:name],:include=>{:bookmarked_contents=>{:include=>{:bookmarkable=>{:only=>[:_id,:name,:description,:page_order,:attachable_type,:attachable_id,:file_name,:file_type]}},:only=>[:_id,:bookmarkable_type,:bookmarkable_id]}}).parse}}
+      format.json{render :json=>{:count=>@bookmark.count,:bookmarks=>@bookmark.to_a.to_json(:only=>[:_id,:name],:include=>{:bookmarked_contents=>{:include=>{:bookmarkable=>{:only=>[:_id,:name,:description,:page_order,:attachable_type,:attachable_id,:file_name,:file_type,:status]}},:only=>[:_id,:bookmarkable_type,:bookmarkable_id]}}).parse}}
       format.xml
     end
   end

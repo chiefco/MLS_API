@@ -13,7 +13,7 @@ class V1::AttachmentsController < ApplicationController
     @attachments = Attachment.list(@current_user.attachments,params,paginate_options)
 
     respond_to do |format|
-      format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:id, :file_name, :file_type, :size, :content_type,:file]).parse }.to_success }
+      format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file]).parse }.to_success }
       format.xml  { render :xml => @attachments.to_xml(:only=>[:_id, :file_type, :file_name, :size,  :content_type]).as_hash.to_success.to_xml(ROOT) }
     end
   end
@@ -29,13 +29,13 @@ class V1::AttachmentsController < ApplicationController
 
   # POST /v1/attachments
   # POST /v1/attachments.xml
-  def create
-    #~ if params[:attachment][:attachable_id] || params[:attachment][:attachable_type]
-      #~ @attachment = Attachment.new(params[:attachment])
-    #~ else
-      @attachment = @current_user.attachments.new(params[:attachment])
-    #~ end
-
+ def create
+    File.open("#{Rails.root}/public/images/#{params[:attachment][:file_name]}", 'wb') do|f|
+      f.write(Base64.decode64("#{params[:encoded]}"))
+    end    
+    params[:attachment][:file] = File.new("#{Rails.root}/public/images/#{params[:attachment][:file_name]}")
+    @attachment = @current_user.attachments.new(params[:attachment])
+    @attachment.save
     respond_to do |format|
       if @attachment.save
         format.json  { render :json=> { :attachment=>@attachment.to_json(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).parse}.to_success }
@@ -51,7 +51,6 @@ class V1::AttachmentsController < ApplicationController
   # DELETE /v1/attachments/1.xml
   def destroy
     @attachment.destroy
-
     respond_to do |format|
       format.json { render :json=> success }
       format.xml { render :xml=> success.to_xml(ROOT) }

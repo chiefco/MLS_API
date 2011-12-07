@@ -5,9 +5,9 @@ class Attachment
   belongs_to :attachable, polymorphic: true
   belongs_to :user
   has_many :bookmarked_contents, as: :bookmarkable
-  validates_presence_of :attachable_id, :message=>"attachable_id - Blank Parameter", :code=>3034
+  #validates_presence_of :attachable_id, :message=>"attachable_id - Blank Parameter", :code=>3034
   validates_presence_of :attachable_type, :message=>"attachable_type - Blank Parameter", :code=>3022
-  validates_inclusion_of :attachable_type, :in=>["User","Item","Category","Page"], :message=>"attachable_type - Invalid Parameter", :code=>3050
+  validates_inclusion_of :attachable_type, :in=>["User","Item","Page"], :message=>"attachable_type - Invalid Parameter", :code=>3050
   SORT_BY_ALLOWED = [:file_name, :size, :content_type]
   ORDER_BY_ALLOWED =  [:asc,:desc]
   after_create :create_activity

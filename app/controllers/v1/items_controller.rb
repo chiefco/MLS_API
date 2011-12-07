@@ -189,6 +189,15 @@ class V1::ItemsController < ApplicationController
     end
   end
 
+  #Item tasks
+  def tasks
+    @tasks =Task.where(:item_id=>params[:item_id]).all
+    respond_to do |format|
+      format.json {render :json=>{:tasks=>@tasks.as_json(:only=>[:_id,:title,:due_date,:is_completed,:description, :item_id],:include=>{:reminders => {:only => [:time]}, :item=>{:only=>[:_id,:name]}})}.to_success}
+      format.xml
+    end      
+  end
+
   #Lists all attendees of the given item
   def list_item_attendees
     respond_to do |format|

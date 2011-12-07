@@ -1,6 +1,6 @@
 class V1::BookmarksController < ApplicationController
   before_filter :authenticate_request!
-  before_filter :find_bookmark,:only=>([:update,:show,:destroy,:add_bookmark])
+  before_filter :find_bookmark,:only=>([:update,:show,:destroy,:add_bookmark,:remove_bookmark])
   # GET /v1/bookmarks
   # GET /v1/bookmarks.xml
   def index
@@ -92,19 +92,35 @@ class V1::BookmarksController < ApplicationController
       failure_save
     end
   end
+  
+  def remove_bookmark
+      if @v1_bookmark
+        @v1_bookmark.user==@current_user ? remove_in_bookmark_content : failure_save
+    else
+      failure_save
+    end
+  end
 
   def save_bookmark_content
-    p @v1_bookmark
     @v1_bookmark.save
+    respond_to do |format|
+      @bookmark_content={:bookmark_content=>@v1_bookmark.serializable_hash(:only=>[:_id])}.to_success
+      format.json {render :json => @bookmark_content}
+      format.xml {render :xml => success.to_xml(ROOT)}
+    end
+  end
+  
+  def remove_bookmark_content  
     respond_to do |format|
       format.json {render :json => success}
       format.xml {render :xml => success.to_xml(ROOT)}
-    end
+    end    
   end
 
   #Find the Bookmark by param[:id]
   def find_bookmark
-    @v1_bookmark = Bookmark.find(params[:id])
+    p '^^^^^^^^^^'
+    p @v1_bookmark = Bookmark.find(params[:id])   
   end
 
   def process_in_bookmark_content
@@ -119,6 +135,21 @@ class V1::BookmarksController < ApplicationController
       else
         @bookmarkable.user != @current_user ? failure_save : save_bookmark_content
       end
+    end
+    
+    def remove_in_bookmark_content
+     @v1_bookmark=check_in_bookmark_content
+    @v1_bookmark.nil? ?  failure_save  : remove_bookmark_content
+   end
+    
+    def check_in_bookmark_content
+     @v1_bookmark.bookmarked_contents.each do |content|
+       if content.id.to_s==params[:content_id]
+         content.delete
+       end
+     end  
+      #@bookmark_content = @bookmarkable.map(&:bookmarkable_id) 
+     
   end
 
   def  failure_save

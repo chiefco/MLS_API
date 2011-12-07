@@ -25,6 +25,7 @@ MeetlinkshareApi::Application.routes.draw do
     match "/item_tasks/:id" => 'items#get_all_tasks'
     match "/generic_search" => 'searches#search'
     match "/add_bookmark/:id" => 'bookmarks#add_bookmark'
+    match "/remove_bookmark/:id" => 'bookmarks#remove_bookmark'      
     match "/item/statistics" => 'items#get_statistics'
     match "/community_invite/:id" => 'communities#invite_member'
     match "/community_members/:id" => 'communities#members'
@@ -38,6 +39,7 @@ MeetlinkshareApi::Application.routes.draw do
     match "/remove_share/:id" => 'contacts#remove_share'
     match "/shares/:id" => 'contacts#shares'
     match "/items/pages/:item_id" => 'pages#index'
+    match "/items/:item_id/tasks" => 'items#tasks'
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do

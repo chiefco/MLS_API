@@ -29,7 +29,7 @@ class User
   attr_accessible :email,:password,:password_confirmation,:first_name,:last_name,:company,:job_title,:date_of_birth,:industry_id
 
   validates_presence_of :first_name, :message=>"first_name - Blank Parameter", :code=>3010
-  validates_presence_of :last_name, :message=>"last_name - Blank Parameter", :code=>3011
+  validates_length_of :last_name, :message=>"Last name - Parameter length greater than 40", :maximum =>40, :code=>3011, :allow_blank => true
   validates_presence_of   :email, :message=>"email - Blank Parameter", :code=>3002
   validates_uniqueness_of :email, :message=>"Email already exist", :code=>3004, :case_sensitive => (case_insensitive_keys != false), :allow_blank => true
   validates_format_of     :email, :message=>"email - Invalid email format", :code=>4001, :with  => /\A([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})\z/i, :allow_blank => true

@@ -5,7 +5,7 @@ class Bookmark
   field :name, :type => String
   field :status, :type => Boolean,:default=>true
   validates_presence_of :name, :message=>"name - Blank Parameter", :code=>3013
-  validates_length_of     :name, :message=>"name-invalid length", :maximum =>40,:minimum=>2, :code=>3073, :allow_blank => true
+  validates_length_of     :name, :message=>"name-invalid length", :maximum =>40,:minimum=>1, :code=>3073, :allow_blank => true
   references_many :bookmarked_contents,:dependent=>:destroy
   has_many :activities, as: :entity
   referenced_in :user

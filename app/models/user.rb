@@ -31,7 +31,7 @@ class User
   validates_presence_of :first_name, :message=>"first_name - Blank Parameter", :code=>3010
   validates_presence_of :last_name, :message=>"last_name - Blank Parameter", :code=>3011
   validates_presence_of   :email, :message=>"email - Blank Parameter", :code=>3002
-  validates_uniqueness_of :email, :message=>"email - Already exist", :code=>3004, :case_sensitive => (case_insensitive_keys != false), :allow_blank => true
+  validates_uniqueness_of :email, :message=>"Email already exist", :code=>3004, :case_sensitive => (case_insensitive_keys != false), :allow_blank => true
   validates_format_of     :email, :message=>"email - Invalid email format", :code=>4001, :with  => /\A([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})\z/i, :allow_blank => true
   validates_presence_of     :password, :message=>"password - Blank Parameter",:code=>3066, :if=>:pass_create_or_update?
   validates_presence_of     :password_confirmation, :message=>"password_confirmation - Blank Parameter",:code=>3079, :if=>:pass_create_or_update?

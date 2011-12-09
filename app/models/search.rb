@@ -1,7 +1,7 @@
 class Search
   include Mongoid::Document
   field :name
-  validates_uniqueness_of :name, :scope => [:user_id],:code=>7002, :message=>'name - Already exist'
+  validates_uniqueness_of :name, :scope => [:user_id],:code=>7002, :message=>'Name already exist'
   validates_presence_of :name, :code=>3013, :message=>'name - Blank Parameter'
   referenced_in :user
 

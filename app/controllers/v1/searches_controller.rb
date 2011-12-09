@@ -25,8 +25,9 @@ class V1::SearchesController < ApplicationController
         format.xml  { render :xml => render_success.to_xml(:root=>:result)}
         format.json  { render :json => render_success.to_json}
       else
+         p @search.all_errors
+        format.json  { render :json => @search.all_errors }
         format.xml  { render :xml => @search.all_errors.to_xml(:root=>:result), :status => :unprocessable_entity }
-        format.json  { render :json => @search.all_errors, :status => :unprocessable_entity }
       end
     end
   end

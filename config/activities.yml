@@ -1,14 +1,14 @@
-ITEM_CREATED : <%="#{username}"%> have created a new <%="#{item}"%> and called it <%="#{item_name}"%>
-ITEM_UPDATED : <%="#{username}"%> have updated the  <%="#{item} #{item_name}"%>
-CATEGORY_CREATED : <%="#{username}"%> have created a new category and called it <%="#{item}"%>
+ITEM_CREATED : <%="#{username}"%> has  created a new <%="#{item}"%> and called it <%="#{item_name}"%>
+ITEM_UPDATED : <%="#{username}"%> has updated the  <%="#{item} #{item_name}"%>
+CATEGORY_CREATED : <%="#{username}"%> has created a new category and called it <%="#{item}"%>
 CATEGORY_DELETED : <%="#{username}"%> moved category <%="#{item}"%> to trash
-CATEGORY_UPDATED	: <%="#{username}"%> have updated the category <%="#{item}" %>
-BOOKMARK_CREATED : <%="#{username}"%> have created a new bookmark and called it <%="#{item}" %>
-BOOKMARK_UPDATED : <%="#{username}"%> have updated the bookmark <%="#{item}" %>
+CATEGORY_UPDATED	: <%="#{username}"%> has updated the category <%="#{item}" %>
+BOOKMARK_CREATED : <%="#{username}"%> has created a new bookmark and called it <%="#{item}" %>
+BOOKMARK_UPDATED : <%="#{username}"%> has updated the bookmark <%="#{item}" %>
 BOOKMARK_DELETED	: <%="#{username}"%> have moved <%="#{item}" %> to trash
 PAGE_CREATED : New page has been added to <%="#{item}" %>
 PAGE_UPDATED	: Page has been updated in <%="#{item}" %>
 PAGE_DELETED	: <%="#{username}"%> moved <%="#{item}" %> to trash
-CATEGORY_ADDED_ITEM : <%="#{username}"%> have moved the <%="#{item}" %> into the category <%="#{item_name}" %>
+CATEGORY_ADDED_ITEM : <%="#{username}"%> has moved the <%="#{item}" %> into the category <%="#{item_name}" %>
 
 

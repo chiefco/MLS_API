@@ -7,9 +7,10 @@ class V1::CategoriesController < ApplicationController
     paginate_options.store(:page,set_page)
     paginate_options.store(:per_page,set_page_size)
     @categories = Category.list(@current_user.categories,params,paginate_options)
+    @count = (@current_user.categories.select{|c| c['parent_id']==nil}).count
     respond_to do |format|
-      format.xml  { render :xml =>  @categories.to_xml(:only=>[:_id, :name, :updated_at, :parent_id]).as_hash.merge( :count=> @categories.count,:total=>@current_user.categories.count).to_success.to_xml(ROOT) }
-      format.json  { render :json => { :categories=>@categories.to_json(:only=>[:_id, :name, :updated_at, :parent_id]).parse, :count=>@categories.count, :total=>@current_user.categories.count}.to_success }
+      format.xml  { render :xml =>  @categories.to_xml(:only=>[:_id, :name, :updated_at, :parent_id]).as_hash.merge( :count=> @categories.count,:total=>@count).to_success.to_xml(ROOT) }
+      format.json  { render :json => { :categories=>@categories.to_json(:only=>[:_id, :name, :updated_at, :parent_id]).parse, :count=>@categories.count, :total=>@count}.to_success }
     end
   end
 

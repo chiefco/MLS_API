@@ -134,7 +134,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
       if activity.entity_type=="Item" 
         @item_name=activity.entity.name
         #~ @template=activity.entity.template.name unless activity.entity.template.nil? 
-        @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>"Meet",:item_name=>@item_name}})
+        @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>"meeting",:item_name=>@item_name}})
         @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}" }
       end
       if activity.entity_type=="Category" 

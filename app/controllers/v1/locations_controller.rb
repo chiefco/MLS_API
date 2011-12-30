@@ -53,8 +53,14 @@ class V1::LocationsController < ApplicationController
   
   def get_altitude
     respond_to do |format|
-      format.xml  {render :xml=>success, :root=>:result }
-      format.json  {render :json=>success.merge(:altitude=>Location.get_altitude(params[:location])) }
+      @altitude=Location.get_altitude(params[:location])
+      if @altitude
+        format.xml  {render :xml=>success, :root=>:result }
+        format.json  {render :json=>success.merge(:altitude=>@altitude)}
+      else
+        format.xml  {render :xml=>failure, :root=>:result }
+        format.json  {render :json=>failure}
+      end
     end
   end
 

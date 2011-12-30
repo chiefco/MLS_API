@@ -5,7 +5,7 @@ MeetlinkshareApi::Application.routes.draw do
 
   namespace :v1 do
     resources :topics, :template_categories, :templates, :items, :bookmarks, :categories, :searches, :attachments, :custom_pages,:tasks,:locations, :pages, :contacts,:comments,:communities
-
+    match "/altitude" => 'locations#get_altitude',:via=>:get
     match "item_add_attendees" => 'items#item_add_attendees',:via=>:post
     match "item_topics/:id"=> 'items#item_topics'
     match "category_subcategories/:id" => 'categories#subcategories'
@@ -40,6 +40,7 @@ MeetlinkshareApi::Application.routes.draw do
     match "/shares/:id" => 'contacts#shares'
     match "/items/pages/:item_id" => 'pages#index'
     match "/items/:item_id/tasks" => 'items#tasks'
+
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do

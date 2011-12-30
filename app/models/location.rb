@@ -57,4 +57,8 @@ class Location
   def self.get_criteria(query)
     [ {name: query} ]
   end
+  
+  def self.get_altitude(location)
+    Geocoder.coordinates(location)
+  end
 end

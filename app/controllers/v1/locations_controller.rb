@@ -1,5 +1,5 @@
 class V1::LocationsController < ApplicationController
-  before_filter :authenticate_request!
+  before_filter :authenticate_request!,:except=>[:get_altitude]
   before_filter :find_location,:only=>[:show,:update,:destroy]
   LOCATION=[:id,:name,:latitude,:longitude]
   before_filter :paginate_params,:only=>[:index]
@@ -48,6 +48,13 @@ class V1::LocationsController < ApplicationController
     respond_to do |format|
       format.xml  {render :xml=>success, :root=>:result }
       format.json  {render :json=>success }
+    end
+  end
+  
+  def get_altitude
+    respond_to do |format|
+      format.xml  {render :xml=>success, :root=>:result }
+      format.json  {render :json=>success.merge(:altitude=>Location.get_altitude(params[:location])) }
     end
   end
 

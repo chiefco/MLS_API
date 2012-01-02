@@ -132,9 +132,13 @@ class Item
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
     if params[:q]
-      values=user.items.undeleted.any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
+      values = user.items.undeleted.any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym])
+      item_count = values.count unless params[:item_count].nil?
+      values = values.paginate(paginate_options)
     else
-      values=user.items.undeleted.order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
+      values=user.items.undeleted.order_by([params[:sort_by].to_sym,params[:order_by].to_sym])
+      item_count = values.count unless params[:item_count].nil?  
+      values = values.paginate(paginate_options)
     end
     if params[:group_by]
       if params[:group_by]=='categories'
@@ -148,8 +152,13 @@ class Item
         result=user.items.undeleted.order_by([:item_date,params[:order_by].to_sym]).group_by(&:location_name)
       end
       values=group_values(params[:group_by],result)
+      item_count = result.count unless params[:item_count].nil?
     end
-    values
+    unless params[:item_count].nil? 
+      return item_count 
+    else
+      return values
+    end
   end
   
   def save_activity(text)
@@ -170,12 +179,5 @@ class Item
       values<<{k=>b}
     end
      return {group_by=>keys,:items=>values}
-   end
-   
-  
-  #~ def as_json(options={})
-    #~ options[:only]=[:name,:_id]
-    #~ options[:methods]=[:location_name,:item_date,:created_time,:updated_time]
-    #~ super(options)
-  #~ end
+  end
 end

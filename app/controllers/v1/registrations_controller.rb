@@ -135,17 +135,17 @@ class V1::RegistrationsController < Devise::RegistrationsController
         @item_name=activity.entity.name
         #~ @template=activity.entity.template.name unless activity.entity.template.nil? 
         @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>"meeting",:item_name=>@item_name}})
-        @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}" }
+        @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
       end
       if activity.entity_type=="Category" 
         @category_name=activity.entity.name
         @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@category_name,:item_name=>'nil'}})
-        @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}" }
+        @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
       end
       if activity.entity_type=="Bookmark" 
         @bookmark_name=activity.entity.name
         @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@bookmark_name,:item_name=>'nil'}})
-        @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}" }
+        @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
       end
     end
     find_category_ids;insert_items;

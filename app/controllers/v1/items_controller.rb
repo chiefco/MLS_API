@@ -7,12 +7,14 @@ class V1::ItemsController < ApplicationController
   # GET /items.xml
   def index
     @items = Item.list(params,@paginate_options,@current_user)
+    @item_count = Item.list(params.merge({:item_count => true}), {}, @current_user)
+    @item_count
     respond_to do |format|
       format.xml  { render :xml => @items}
       if params[:group_by]
-        format.json {render :json =>@items.merge({:response=>:success}).to_json}
+        format.json {render :json =>@items.merge({:response=>:success, :count=>@item_count}).to_json}
       else
-        format.json {render :json =>{:items=>@items.to_json(:only=>[:name,:_id],:methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id, :item_date_local]).parse,:count=>@items.size}.merge(success)}
+        format.json {render :json =>{:count=>@item_count, :items=>@items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse}.merge(success)}
       end
     end
   end

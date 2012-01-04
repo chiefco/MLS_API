@@ -6,7 +6,11 @@ class V1::CommunitiesController < ApplicationController
   before_filter :detect_missing_params, :only=>[:create]
 
   def index
-    @communities = Community.undeleted
+    @com = CommunityUser.where(:user_id => "#{@current_user._id}")
+    @communities=[]
+    @com.each do |com|
+       @communities<< {:name=>com.community.name,:members=>com.community.community_users.count}
+     end
     respond_to do |format|
       format.json {render :json=>@communities} # index.html.erb
     end
@@ -25,6 +29,7 @@ class V1::CommunitiesController < ApplicationController
 
   def create
     @community = @current_user.communities.new(params[:community])
+    community_invitation if params[:invite_email]['users']!='Enter email address' 
     respond_to do |format|
       if @community.save
         CommunityUser.create(:user_id=>@current_user._id,:community_id=>@community._id,:role_id=>1)
@@ -148,6 +153,22 @@ class V1::CommunitiesController < ApplicationController
   #find parameters needed for the contacts
   def find_parameters
     @community={:community=>@community.serializable_hash(:only=>[:_id,:name,:description])}.to_success
+  end
+  
+  def  community_invitation
+       params[:invite_email]['users'].split(',').each do |invite_email|     
+      @user_id=User.where(:email=>invite_email).first   
+        if @user_id 
+          @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)
+              if @invitation.save
+                   Invite.community_invite(@current_user.email,@invitation,@community.name).deliver
+                else
+                   format.json  { render :json =>@invitation.all_errors}
+                end
+          else
+              Invite.send_invitations(@current_user,invite_email).deliver
+        end
+      end
   end
   
 end

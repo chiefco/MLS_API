@@ -10,7 +10,7 @@ class Invitation
   belongs_to :item
   referenced_in :user
   validates_presence_of :email,:message=>"email - Blank Parameter", :code=>3002
-  validates_uniqueness_of :email, :message=>"email - Already exist", :code=>3004, :allow_blank => true
+  #validates_uniqueness_of :email, :message=>"email - Already exist", :code=>3004, :allow_blank => true
   before_create :create_invitation_token
   
   def create_invitation_token

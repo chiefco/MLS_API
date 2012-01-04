@@ -41,4 +41,5 @@ class Community
   def stale_members
     User.find(stale_user_ids)
   end
+  
 end

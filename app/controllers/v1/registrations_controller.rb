@@ -33,7 +33,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
     @item=[]
     find_activities
     respond_to do |format|
-      format.json {render :json=>{:activities=>@item.paginate(@paginate_options),:count=>@item.paginate(@paginate_options).count}.to_success}
+      format.json {render :json=>{:activities=>@item.paginate(@paginate_options),:count=>@activities_count}.to_success}
     end
   end
 
@@ -130,7 +130,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
   
   def find_activities
     @first_name=@current_user.first_name
-    @current_user.activities_users.reverse.paginate(@paginate_options).each do |activity|
+    activities = @current_user.activities_users
+    @activities_count = activities.count
+    activities.reverse.paginate(@paginate_options).each do |activity|
       if activity.entity_type=="Item" 
         @item_name=activity.entity.name
         #~ @template=activity.entity.template.name unless activity.entity.template.nil? 

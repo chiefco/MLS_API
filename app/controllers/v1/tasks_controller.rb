@@ -34,15 +34,17 @@ class V1::TasksController < ApplicationController
   # POST /v1/tasks.xml
   def create
     @task = @current_user.tasks.new(params[:task])
-    validate_item(params[:task][:item_id]) if params[:task][:item_id]
-    @count.to_i>0 ? save_task : evaluate_item
+    #~ p validate_item(params[:task][:item_id]) if params[:task][:item_id]
+    #~ @count.to_i>0 ? save_task : evaluate_item
+    save_task
   end
 
   # PUT /v1/tasks/1
   # PUT /v1/tasks/1.xml
   def update
-    validate_item(params[:task][:item_id]) if params[:task][:item_id]
-    @count.to_i>0 ? update_task : evaluate_item
+    #~ validate_item(params[:task][:item_id]) if params[:task][:item_id]
+    #~ @count.to_i>0 ? update_task : evaluate_item
+    update_task
   end
 
   # DELETE /v1/tasks/1
@@ -88,7 +90,7 @@ class V1::TasksController < ApplicationController
       if @task
         if @task.update_attributes(params[:task])
           reminder = @task.reminders[0]
-          if reminder.blank?
+          if reminder.blank? && params[:reminder][:time]
             reminder = params[:reminder][:time]
             @task.reminders.new(:task_id => @task.id, :time => reminder).save unless reminder.blank?            
           else

@@ -30,20 +30,15 @@ class V1::AttachmentsController < ApplicationController
   # POST /v1/attachments
   # POST /v1/attachments.xml
  def create
-   p '**********8'
     File.open("#{Rails.root}/#{params[:attachment][:file_name]}", 'wb') do|f|
       f.write(Base64.decode64("#{params[:encoded]}"))
     end    
-    p '!!!!!!!!!!!!'
+    p '************'
     p params[:attachment][:file] = File.new("#{Rails.root}/#{params[:attachment][:file_name]}")
-    p params[:attachment]
-    p '%%%%%%%%%%%%5'
-    p @attachment = @current_user.attachments.create(params[:attachment])
-    p '###########3'
-    p @attachment
-    p File.delete(params[:attachment][:file])
+    p @attachment = @current_user.attachments.new(params[:attachment])
+    p @attachment.save
     respond_to do |format|
-      if @attachment
+      if @attachment.save
         format.json  { render :json=> { :attachment=>@attachment.to_json(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).parse}.to_success }
         format.xml  { render :xml => @attachment.to_xml(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).as_hash.to_success.to_xml(ROOT) }
       else

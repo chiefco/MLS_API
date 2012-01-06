@@ -33,12 +33,10 @@ class V1::AttachmentsController < ApplicationController
     File.open("#{Rails.root}/tmp/#{params[:attachment][:file_name]}", 'wb') do|f|
       f.write(Base64.decode64("#{params[:encoded]}"))
     end    
-    puts '************'
-    puts params[:attachment][:file] = File.new("#{Rails.root}/tmp/#{params[:attachment][:file_name]}")
-    puts params[:attachment]
-    puts @attachment = @current_user.attachments.new(params[:attachment])
-    puts @attachment.save
-    puts File.delete(params[:attachment][:file])
+    params[:attachment][:file] = File.new("#{Rails.root}/tmp/#{params[:attachment][:file_name]}")
+    @attachment = @current_user.attachments.new(params[:attachment])
+    @attachment.save
+    File.delete(params[:attachment][:file])
     respond_to do |format|
       if @attachment.save
         format.json  { render :json=> { :attachment=>@attachment.to_json(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).parse}.to_success }

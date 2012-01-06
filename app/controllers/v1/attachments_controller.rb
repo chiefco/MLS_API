@@ -36,7 +36,7 @@ class V1::AttachmentsController < ApplicationController
     end    
     p '!!!!!!!!!!!!'
     p params[:attachment][:file] = File.new("#{Rails.root}/tmp/#{params[:attachment][:file_name]}")
-    @attachment = @current_user.attachments.new(params[:attachment])
+    p @attachment = @current_user.attachments.new(params[:attachment])
     p '###########3'
     p @attachment.save
     p File.delete(params[:attachment][:file])

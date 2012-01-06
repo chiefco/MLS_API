@@ -1,5 +1,5 @@
 class V1::LocationsController < ApplicationController
-  before_filter :authenticate_request!,:except=>[:get_altitude]
+  before_filter :authenticate_request!,:except=>[:get_altitude,:location_names]
   before_filter :find_location,:only=>[:show,:update,:destroy]
   LOCATION=[:id,:name,:latitude,:longitude]
   before_filter :paginate_params,:only=>[:index]
@@ -55,9 +55,25 @@ class V1::LocationsController < ApplicationController
     respond_to do |format|
       @altitude=Location.get_altitude(params[:location])
       if @altitude
-        format.xml  {render :xml=>success, :root=>:result }
         format.json  {render :json=>success.merge(:altitude=>@altitude)}
       else
+        format.json  {render :json=>failure}
+      end
+    end
+  end
+  
+  def location_names
+    respond_to do |format|
+      @latitude,@longitude=params[:latitude],params[:longitude]
+      if (@latitude and @longitude)
+        @values=Geocoder.search("#{@latitude},#{@longitude}").first.data["address_components"]
+        format.xml  {render :xml=>success, :root=>:result }
+                @country=@values[@values.count-1]["long_name"]
+        @state=@values[@values.count-2]["long_name"]
+        @city=@values[@values.count-3]["long_name"]
+        format.xml  {render :xml=>success, :root=>:result }
+        format.json  {render :json=>success.merge(:country=>@country,:state=>@state,:city=>@city)}
+         else
         format.xml  {render :xml=>failure, :root=>:result }
         format.json  {render :json=>failure}
       end

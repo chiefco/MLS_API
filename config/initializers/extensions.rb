@@ -92,21 +92,21 @@ end
 
 #Error code for routing errors
 
-module ActionDispatch
-  class ShowExceptions
-    def render_exception(env, exception)
-      error=[{:message=>'bad request',:code=>9001}]
-      error2=[{:message=>'Something went wrong',:code=>500}]
-      method='.to_json'
-      method='.to_xml(:root=>"errors")' if env['HTTP_ACCEPT']=='application/xml'
-      if exception.kind_of? ActionController::RoutingError
-        render(404, eval("#{error}#{method}"))
-      else
-        render(500, eval("#{error2}#{method}"))
-      end
-    end
-  end
-end
+#~ module ActionDispatch
+  #~ class ShowExceptions
+    #~ def render_exception(env, exception)
+      #~ error=[{:message=>'bad request',:code=>9001}]
+      #~ error2=[{:message=>'Something went wrong',:code=>500}]
+      #~ method='.to_json'
+      #~ method='.to_xml(:root=>"errors")' if env['HTTP_ACCEPT']=='application/xml'
+      #~ if exception.kind_of? ActionController::RoutingError
+        #~ render(404, eval("#{error}#{method}"))
+      #~ else
+        #~ render(500, eval("#{error2}#{method}"))
+      #~ end
+    #~ end
+  #~ end
+#~ end
 
 #generate the token value
 module ForDevise

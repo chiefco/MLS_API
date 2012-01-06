@@ -31,14 +31,14 @@ class V1::AttachmentsController < ApplicationController
   # POST /v1/attachments.xml
  def create
    p '**********8'
-   p params
     File.open("#{Rails.root}/tmp/#{params[:attachment][:file_name]}", 'wb') do|f|
-      p f.write(Base64.decode64("#{params[:encoded]}"))
+      f.write(Base64.decode64("#{params[:encoded]}"))
     end    
     p '!!!!!!!!!!!!'
     p params[:attachment][:file] = File.new("#{Rails.root}/tmp/#{params[:attachment][:file_name]}")
     @attachment = @current_user.attachments.new(params[:attachment])
-    @attachment.save
+    p '###########3'
+    p @attachment.save
     p File.delete(params[:attachment][:file])
     respond_to do |format|
       if @attachment.save

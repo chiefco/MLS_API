@@ -32,11 +32,11 @@ class V1::AttachmentsController < ApplicationController
  def create
    p '**********8'
    p params
-    File.open("#{Rails.root}/public/images/#{params[:attachment][:file_name]}", 'wb') do|f|
+    File.open("#{Rails.root}/tmp/#{params[:attachment][:file_name]}", 'wb') do|f|
       p f.write(Base64.decode64("#{params[:encoded]}"))
     end    
     p '!!!!!!!!!!!!'
-    p params[:attachment][:file] = File.new("#{Rails.root}/public/images/#{params[:attachment][:file_name]}")
+    p params[:attachment][:file] = File.new("#{Rails.root}/tmp/#{params[:attachment][:file_name]}")
     @attachment = @current_user.attachments.new(params[:attachment])
     @attachment.save
     p File.delete(params[:attachment][:file])

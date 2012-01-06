@@ -39,15 +39,15 @@ class V1::AttachmentsController < ApplicationController
     puts @attachment = @current_user.attachments.new(params[:attachment])
     puts @attachment.save
     #~ puts File.delete(params[:attachment][:file])
-    #~ respond_to do |format|
-      #~ if @attachment.save
-        #~ format.json  { render :json=> { :attachment=>@attachment.to_json(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).parse}.to_success }
-        #~ format.xml  { render :xml => @attachment.to_xml(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).as_hash.to_success.to_xml(ROOT) }
-      #~ else
-        #~ format.json  { render :json => failure.merge(:errors=> @attachment.all_errors)}
-        #~ format.xml  { render :xml => @attachment.all_errors, :root=>"errors" }
-      #~ end
-    #~ end
+    respond_to do |format|
+      if @attachment.save
+        format.json  { render :json=> { :attachment=>@attachment.to_json(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).parse}.to_success }
+        format.xml  { render :xml => @attachment.to_xml(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).as_hash.to_success.to_xml(ROOT) }
+      else
+        format.json  { render :json => failure.merge(:errors=> @attachment.all_errors)}
+        format.xml  { render :xml => @attachment.all_errors, :root=>"errors" }
+      end
+    end
   end
 
   # DELETE /v1/attachments/1

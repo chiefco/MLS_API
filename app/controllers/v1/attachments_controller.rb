@@ -37,6 +37,7 @@ class V1::AttachmentsController < ApplicationController
     p params[:attachment][:file] = File.new("#{Rails.root}/#{params[:attachment][:file_name]}")
     p @attachment = @current_user.attachments.new(params[:attachment])
     p @attachment.save
+    p File.delete(params[:attachment][:file])
     respond_to do |format|
       if @attachment.save
         format.json  { render :json=> { :attachment=>@attachment.to_json(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).parse}.to_success }

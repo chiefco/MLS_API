@@ -1,10 +1,12 @@
 class Share
   include Mongoid::Document
   include Mongoid::Timestamps
-  field :status,:type=>Boolean,:default=>true
+  field :status,:type => Boolean,:default=>true
+  field :shared_type, :type => String
+  field :shared_id, :type => String
   referenced_in :community
   referenced_in :user
-  referenced_in :item
+  #referenced_in :item
   belongs_to :permission
   
   def create_permission(permission)

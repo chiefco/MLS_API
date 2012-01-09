@@ -9,7 +9,7 @@ class V1::CommunitiesController < ApplicationController
     @com = CommunityUser.where(:user_id => "#{@current_user._id}")
     @communities=[]
     @com.each do |com|
-       @communities<< {:name=>com.community.name,:members=>com.community.community_users.count}
+       @communities<< {:id =>com.community.id, :name=>com.community.name,:members=>com.community.community_users.count,:shares=>com.community.shares.count}
      end
     respond_to do |format|
       format.json {render :json=>@communities} # index.html.erb

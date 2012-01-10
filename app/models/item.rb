@@ -16,8 +16,8 @@ class Item
   field :current_category_id, :type => String
 
   validates_presence_of :name,:message=>'name - Blank Parameter',:code=>3013
-  validates :name ,:length => { :minimum => 3 ,:maximum =>40,:message=>"name - Invalid length",:code=>3077},:allow_blank=>true
-  validates_presence_of :template_id,:message=>'template_id - Blank Parameter',:code=>3025
+  validates :name ,:length => { :minimum => 3 ,:maximum =>50,:message=>"name - Invalid length",:code=>3077},:allow_blank=>true
+  #~ validates_presence_of :template_id,:message=>'template_id - Blank Parameter',:code=>3025
   belongs_to  :template
   belongs_to  :location
   belongs_to  :share

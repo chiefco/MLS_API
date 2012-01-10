@@ -56,6 +56,7 @@ MeetlinkshareApi::Application.routes.draw do
     delete "v1/close_account",:to=>'v1/registrations#close_account'
     get "v1/industries",:to=>'v1/registrations#options_for_the_field'
     get "v1/activities",:to=>'v1/registrations#activities'
+    post "v1/synchronisation",:to=>'v1/sessions#synchronisation'
   end
 
   # The priority is based upon order of creation:

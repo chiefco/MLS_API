@@ -45,7 +45,7 @@ class V1::SessionsController < Devise::SessionsController
      @ipad_ids<<created_meet.meet_id
    end
    respond_to do |format|
-      format.json{render :json =>success.merge(:synced_ids=>[@synched_meets],:ipad_ids=>@ipad_ids)}
+      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:ipad_ids=>@ipad_ids)}
     end
   end
   

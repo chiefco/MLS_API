@@ -6,7 +6,8 @@ class Share
   field :shared_id, :type => String
   referenced_in :community
   referenced_in :user
-  #referenced_in :item
+  belongs_to :item
+  belongs_to :attachment
   belongs_to :permission
   
   def create_permission(permission)

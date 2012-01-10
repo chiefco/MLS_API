@@ -1,6 +1,6 @@
 class V1::SharesController < ApplicationController
   before_filter :authenticate_request!
-  before_filter :find_bookmark,:only=>([:update,:show,:destroy,:add_bookmark,:remove_bookmark])
+  before_filter :find_share,:only=>([:show, :destroy])
   # GET /v1/shares
   # GET /v1/shares.xml
   def index
@@ -17,7 +17,10 @@ class V1::SharesController < ApplicationController
   # POST /v1/shares.xml
   def create
     params[:share].each do |key, value| 
-     @v1_share = @current_user.shares.new(value['item'])
+      attachment_id = nil
+      item_id = nil
+      value['item']['shared_type'] == "Attachment" ? attachment_id = value['item']['shared_id'] : item_id = value['item']['shared_id']
+     @v1_share = @current_user.shares.create(:user_id=>@current_user._id,:shared_id=> attachment_id, :community_id=> value['item']['community_id'], :shared_type=> value['item']['shared_type'], :attachment_id => attachment_id, :item_id => item_id)
      @v1_share.save
     end
     respond_to do |format|

@@ -5,6 +5,7 @@ class Attachment
   belongs_to :attachable, polymorphic: true
   belongs_to :user
   has_many :bookmarked_contents, as: :bookmarkable
+  references_many :shares, :dependent => :destroy
   #validates_presence_of :attachable_id, :message=>"attachable_id - Blank Parameter", :code=>3034
   validates_presence_of :attachable_type, :message=>"attachable_type - Blank Parameter", :code=>3022
   validates_inclusion_of :attachable_type, :in=>["User","Item","Page"], :message=>"attachable_type - Invalid Parameter", :code=>3050

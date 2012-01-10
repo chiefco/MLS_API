@@ -6,10 +6,11 @@ class V1::CommunitiesController < ApplicationController
   before_filter :detect_missing_params, :only=>[:create]
 
   def index
-    @com = CommunityUser.where(:user_id => "#{@current_user._id}")
+    @community_user = CommunityUser.where(:user_id => "#{@current_user._id}")
     @communities=[]
-    @com.each do |com|
-       @communities<< {:id =>com.community.id, :name=>com.community.name,:members=>com.community.community_users.count,:shares=>com.community.shares.count}
+    @community_user.each do |com_user|
+       com = Community.find "#{com_user.community_id}"      
+       @communities<< {:id =>com.id, :name=>com.name,:members=>com.community_users.count,:shares=>com.shares.count}
      end
     respond_to do |format|
       format.json {render :json=>@communities} # index.html.erb

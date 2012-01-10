@@ -1,6 +1,6 @@
 require 'net/http'
 require 'net/https'
-require 'rest_client'
+#~ require 'rest_client'
 class V1::SessionsController < Devise::SessionsController
   
   def create

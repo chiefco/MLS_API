@@ -43,8 +43,8 @@ class V1::SessionsController < Devise::SessionsController
      created_meet= user.items.create(meet)
      @synched_meets=@synched_meets.merge({created_meet.meet_id => created_meet._id.to_s})
      @ipad_ids<<created_meet.meet_id
-     get_communities(@user)
    end
+   get_communities(@user)
    respond_to do |format|
       format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:ipad_ids=>@ipad_ids,:communities=>@communities)}
     end

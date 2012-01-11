@@ -43,9 +43,10 @@ class V1::SessionsController < Devise::SessionsController
      created_meet= user.items.create(meet)
      @synched_meets=@synched_meets.merge({created_meet.meet_id => created_meet._id.to_s})
      @ipad_ids<<created_meet.meet_id
+     get_communities(@user)
    end
    respond_to do |format|
-      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:ipad_ids=>@ipad_ids)}
+      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:ipad_ids=>@ipad_ids,:communities=>@communities)}
     end
   end
   
@@ -55,4 +56,10 @@ class V1::SessionsController < Devise::SessionsController
       format.json{render :json =>failure.merge(AUTH_FAILED)}
     end
   end
+  
+  #Retrieves the communities for the user
+  def get_communities(user)
+    @communities=Community.get_communities(user)
+  end
+  
 end

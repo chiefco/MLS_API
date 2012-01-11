@@ -42,4 +42,14 @@ class Community
     User.find(stale_user_ids)
   end
   
+  def self.get_communities(user)
+    @community=[]
+    @community_values={}
+    user.communities.each do |f|
+      @community<<f._id.to_s
+      @community_values=@community_values.merge({"#{f.id}"=>[{:name=>"#{f.name}",:id=>"#{f._id}"}]})     
+    end
+    return {:community_arrays=>@community,:community_hashes=>[@community_values]}
+  end
+  
 end

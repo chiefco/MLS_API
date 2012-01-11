@@ -49,7 +49,7 @@ class Community
       @community<<f._id.to_s
       @community_values=@community_values.merge({"#{f.id}"=>[{:name=>"#{f.name}",:id=>"#{f._id}"}]})     
     end
-    return {:community_arrays=>@community,:community_hashes=>[@community_values]}
+    return {:community_arrays=>@community,:community_hashes=>@community_values}
   end
   
 end

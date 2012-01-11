@@ -6,10 +6,23 @@ class V1::ItemsController < ApplicationController
   # GET /items
   # GET /items.xml
   def index
-    @items = Item.list(params,@paginate_options,@current_user)
-    @item_count = Item.list(params.merge({:item_count => true}), {}, @current_user)
-    @item_count
-    respond_to do |format|
+    if params[:type]
+      if params[:type] == 'today'
+        @items = @current_user.items.today.paginate(@paginate_options)
+        @item_count = @current_user.items.today.count
+      elsif params[:type] == 'tommorrow'
+        @items = @current_user.items.tomorrow.paginate(@paginate_options)
+        @item_count = @current_user.items.tomorrow.count        
+      elsif params[:type] == 'next_week'
+        @items = @current_user.items.next_week.paginate(@paginate_options)
+        @item_count = @current_user.items.next_week.count        
+      end
+    else
+      @items = Item.list(params,@paginate_options,@current_user)
+      p @item_count = Item.list(params.merge({:item_count => true}), {}, @current_user)      
+    end
+
+  respond_to do |format|
       format.xml  { render :xml => @items}
       if params[:group_by]
         format.json {render :json =>@items.merge({:response=>:success, :count=>@item_count}).to_json}

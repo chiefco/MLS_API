@@ -31,10 +31,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
   #Retrieves the Activities of the User
   def activities
     @item=[]
-    find_activities
-    p @item
-    p @paginate_options
-    
+    params[:community_id] ? find_communtiy_activities(params[:community_id]) : find_activities
+    @item
+    @paginate_options
     respond_to do |format|
       format.json {render :json=>{:activities=>@item.paginate(@paginate_options),:count=>@activities_count}.to_success}
     end
@@ -152,9 +151,35 @@ class V1::RegistrationsController < Devise::RegistrationsController
         @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@bookmark_name,:item_name=>'nil'}})
         @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
       end
+      if activity.entity_type=="Community" 
+        @community_name=activity.entity.name
+        @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>'nil'}})
+        @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
+      end
+      if activity.entity_type=="Share" 
+        @share_name=Community.find "#{activity.entity.community_id}"
+        @share_type=activity.entity.shared_type
+        @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@share_type,:item_name=>@share_name.name}})
+        @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
+      end
     end
     find_category_ids;insert_items;
   end
+  
+  def find_communtiy_activities(community_id)
+    @community = Community.find(community_id)
+    activities = @community.activities
+    @activities_count = activities.count
+    @community_name=@community.name
+    activities.reverse.paginate(@paginate_options).each do |activity|
+     @first_name= User.find(activity['user_id']).first_name
+      if activity.entity_type=="Community"             
+        @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>'nil'}})
+        @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
+      end
+    end
+  end
+  
   def find_category_ids
     @categories=[]
     @current_user.activities_users.where(:action=>CATEGORY_ADDED_ITEM).each do |category|

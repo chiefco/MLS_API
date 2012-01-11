@@ -22,10 +22,14 @@ class V1::SharesController < ApplicationController
       value['item']['shared_type'] == "Attachment" ? attachment_id = value['item']['shared_id'] : item_id = value['item']['shared_id']
      @v1_share = @current_user.shares.create(:user_id=>@current_user._id,:shared_id=> attachment_id, :community_id=> value['item']['community_id'], :shared_type=> value['item']['shared_type'], :attachment_id => attachment_id, :item_id => item_id)
      @v1_share.save
+     p "KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK"
+     @v1_share.create_activity("SHARE_CREATED_"+value['item']['shared_type'].upcase,value['item']['community_id'])
+    
     end
     respond_to do |format|
-	format.xml  { render :xml => success.merge(:share=>@v1_share).to_xml(ROOT,:only=>[:name,:_id])}
-	format.json  { render :json =>{:share=>@v1_share.to_json(:only=>[:_id]).parse}.to_success }
+	  format.xml  { render :xml => success.merge(:share=>@v1_share).to_xml(ROOT,:only=>[:name,:_id])}
+	  format.json  { render :json =>{:share=>@v1_share.to_json(:only=>[:_id]).parse}.to_success }
+    
      # if @v1_share.save
       #  format.xml  { render :xml => success.merge(:share=>@v1_share).to_xml(ROOT,:only=>[:name,:_id])}
       #  format.json  { render :json =>{:bookmark=>@v1_share.to_json(:only=>[:name,:_id]).parse}.to_success }

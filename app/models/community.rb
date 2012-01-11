@@ -12,6 +12,21 @@ class Community
   validates_presence_of :name,:code=>3013,:message=>"name - Blank Parameter"
   scope :undeleted,self.excludes(:status=>false)
   
+  after_create :create_activity
+ after_update :update_activity
+
+  def create_activity
+    save_activity("COMMUNITY_CREATED")
+  end
+
+  def update_activity
+    if self.status_changed? 
+      save_activity("COMMUNITY_DELETED") 
+    else 
+      save_activity("COMMUNITY_UPDATED")
+    end
+  end
+  
   def active_users
     community_users.where(:status=>true)
   end
@@ -50,6 +65,10 @@ class Community
       @community_values=@community_values.merge({"#{f.id}"=>{:name=>"#{f.name}",:id=>"#{f._id}"}})     
     end
     return {:community_arrays=>@community,:community_hashes=>@community_values}
+  end
+  
+  def save_activity(text)
+    self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end
   
 end

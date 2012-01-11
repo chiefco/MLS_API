@@ -67,6 +67,17 @@ class V1::ContactsController < ApplicationController
     end
   end
   
+  
+  # POST /contacts
+  # POST /contacts.xml
+  def add_import_contacts
+    params[:all_contact].each_value do |contacts|
+      #~ p params[:first_name]=contacts['contact']['first_name']
+      #~ p params[:email]=contacts['contact']['email']
+      #params[:contact]=>{:first_name=>params[:first_name],:email=>params[:email])}
+      end
+  end
+  
   def invite_member
     Invite.send_invitations(@current_user,params[:invite_member][:email]).deliver
     respond_to do |format|

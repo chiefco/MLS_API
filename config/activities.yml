@@ -10,5 +10,11 @@ PAGE_CREATED : New page has been added to <%="#{item}" %>
 PAGE_UPDATED	: Page has been updated in <%="#{item}" %>
 PAGE_DELETED	: <%="#{username}"%> moved <%="#{item}" %> to trash
 CATEGORY_ADDED_ITEM : <%="#{username}"%> has moved the <%="#{item}" %> into the category <%="#{item_name}" %>
+COMMUNITY_CREATED : <%="#{username}"%> has created a new community and called it <%="#{item}"%>
+COMMUNITY_UPDATED : <%="#{username}"%> has updated the  <%="#{item} #{item_name}"%>
+COMMUNITY_DELETED : <%="#{username}"%> moved community <%="#{item}"%> to trash
+SHARE_CREATED_ATTACHMENT : <%="#{username}"%> has share the  attachment in <%="#{item}"%> community
+SHARE_CREATED_MEET : <%="#{username}"%> has share the  meet in <%="#{item}"%> community
+
 
 

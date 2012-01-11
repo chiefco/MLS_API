@@ -30,7 +30,7 @@ class V1::CommunitiesController < ApplicationController
 
   def create
     @community = @current_user.communities.new(params[:community])
-    community_invitation if params[:invite_email]['users']!='Enter email address' 
+    community_invitation if params[:invite_email]['users']!='use comma separated emails' 
     respond_to do |format|
       if @community.save
         CommunityUser.create(:user_id=>@current_user._id,:community_id=>@community._id,:role_id=>1)

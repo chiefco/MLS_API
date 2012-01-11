@@ -1,6 +1,7 @@
 class Attachment
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Sunspot::Mongoid  
   mount_uploader :file, FileUploader
   belongs_to :attachable, polymorphic: true
   belongs_to :user
@@ -13,12 +14,20 @@ class Attachment
   ORDER_BY_ALLOWED =  [:asc,:desc]
   after_create :create_activity
   after_update :create_activity
+  after_save :sunspot_index  
+  
   field :file_name, type: String
   field :file_type, type: String
   field :content_type, type: String
   field :size, type: Integer
   field :width, type: Integer
   field :height, type: Integer
+  
+  searchable do
+    string :file_name
+    string :user_id
+  end  
+  
   protected
 
   def self.list(attachments,params,paginate_options)

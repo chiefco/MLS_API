@@ -18,15 +18,20 @@ class V1::CommunitiesController < ApplicationController
   end
 
   def show
+    @attachments, @items = [], []
+    shares = @community.shares
+    attachments = shares.select{|i| i.shared_type == 'Attachment'}.map(&:attachment)
+    items = shares.select{|i| i.shared_type == 'Meet'}.map(&:item)
+    
     respond_to do |format|
       if @community.status!=false
-        find_parameters
-        format.json  {render :json =>@community}
+        #~ find_parameters
+        format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :attachments => attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at]).parse }.to_success}
       else
         format.json  {render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
-  end
+  end  
 
   def create
     @community = @current_user.communities.new(params[:community])
@@ -144,7 +149,7 @@ class V1::CommunitiesController < ApplicationController
   private
   
   def find_community 
-    @community=Community.find(params[:id])
+    @community = Community.find(params[:id])
   end
   
   def find_community_members

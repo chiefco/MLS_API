@@ -15,8 +15,8 @@ class Share
   #~ after_update :update_activity
   
   
-  def create_activity(text,community_id)
-    save_activity(text,community_id)
+  def create_activity(text,community_id, shared_id)
+    save_activity(text,community_id, shared_id)
   end
   
   #~ def update_activity
@@ -49,9 +49,9 @@ class Share
     permission=Permission.find(self.permission_id).role_name
   end
   
-  def save_activity(text, community_id)
+  def save_activity(text, community_id, shared_id)
     @community = Community.find "#{community_id}"
-    @community.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
+    @community.activities.create(:action=>text, :shared_id => shared_id, :user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end
   
  end

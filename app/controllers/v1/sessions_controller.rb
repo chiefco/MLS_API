@@ -45,12 +45,15 @@ class V1::SessionsController < Devise::SessionsController
       @pages=meet[:page]
       @meets.delete(:page)
      created_meet= user.items.create(meet)
-     @pages.each do |page|
-       @page=created_meet.pages.create(:page_order=>page[:page_order])
-       @ipad_page_ids<<page[:page_id]
-       @attachment=@page.create_attachment(:attachable_type=>"Page",:attachable_id=>@page.id,:file=>decode_image(@page._id,page[:page_image]))
-       File.delete(@file)
-       @synched_pages=@synched_pages.merge({page[:page_id]=>@attachment._id})
+     unless @pages.nil?
+       @pages.each do |page|
+          unless page[:page_image].empty?
+            @page=created_meet.pages.create(:page_order=>page[:page_order])
+            @ipad_page_ids<<page[:page_id]
+            @attachment=@page.create_attachment(:attachable_type=>"Page",:attachable_id=>@page.id,:file=>decode_image(@page._id,page[:page_image]))
+            @synched_pages=@synched_pages.merge({page[:page_id]=>@attachment._id})
+          end
+        end
       end
      @synched_meets=@synched_meets.merge({created_meet.meet_id => created_meet._id.to_s})
      @ipad_ids<<created_meet.meet_id

@@ -39,14 +39,25 @@ class V1::SessionsController < Devise::SessionsController
     @meets=params[:meet].first[:new]  
     @synched_meets={}
     @ipad_ids=[]
+    @ipad_page_ids=[]
+    @synched_pages={}
     @meets.each do |meet|
+      @pages=meet[:page]
+      @meets.delete(:page)
      created_meet= user.items.create(meet)
+     @pages.each do |page|
+       @page=created_meet.pages.create(:page_order=>page[:page_order])
+       @ipad_page_ids<<page[:page_id]
+       @attachment=@page.create_attachment(:attachable_type=>"Page",:attachable_id=>@page.id,:file=>decode_image(@page._id,page[:page_image]))
+       File.delete(@file)
+       @synched_pages=@synched_pages.merge({page[:page_id]=>@attachment._id})
+      end
      @synched_meets=@synched_meets.merge({created_meet.meet_id => created_meet._id.to_s})
      @ipad_ids<<created_meet.meet_id
    end
    get_communities(@user)
    respond_to do |format|
-      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:ipad_ids=>@ipad_ids,:communities=>@communities)}
+      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:ipad_ids=>@ipad_ids,:communities=>@communities,:synched_page_ids=>@ipad_page_ids,:synched_pages=>@synched_pages)}
     end
   end
   
@@ -60,6 +71,15 @@ class V1::SessionsController < Devise::SessionsController
   #Retrieves the communities for the user
   def get_communities(user)
     @communities=Community.get_communities(user)
+  end
+  
+  #Decodes the encoded image 
+  def decode_image(name,encoded_image)
+    File.open("#{Rails.root}/tmp/#{name}", 'wb') do|f|
+      f.write(Base64.decode64("#{encoded_image}"))
+    end 
+    @file=File.new("#{Rails.root}/tmp/#{name}")
+    return @file
   end
   
 end

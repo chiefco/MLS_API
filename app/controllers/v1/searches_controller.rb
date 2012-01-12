@@ -63,7 +63,7 @@ class V1::SearchesController < ApplicationController
     attachments = @current_user.attachments.solr_search do |search|
       search.with(:file_name).starting_with(params[:q])
     end    
-    p attachments = attachments.results
+    attachments = attachments.results
     #~ bookmarks = @current_user.bookmarks.undeleted.solr_search do |search|
       #~ search.with(:name,params[:q])
     #~ end    
@@ -84,7 +84,7 @@ class V1::SearchesController < ApplicationController
       items << attachments
       respond_to do |format|
         format.xml  { render :xml => {:response=>:success,:searches=>items}.to_xml(:root=>:result,:only=>SEARCH_FIELDS) }
-        format.json {render :json =>{:items=>items.flatten.to_json(:only=>[:name,:_type]).parse}.to_success}
+        format.json {render :json =>{:items=>items.flatten.to_json(:only=>[:name,:_type,:file_name]).parse}.to_success}
       end      
     end
   end

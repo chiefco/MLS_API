@@ -151,17 +151,30 @@ class V1::RegistrationsController < Devise::RegistrationsController
         @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@bookmark_name,:item_name=>'nil'}})
         @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
       end
+      
       if activity.entity_type=="Community" 
         @community_name=activity.entity.name
+        if activity.shared_id.nil? 
         @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>'nil'}})
         @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
+        else 
+          if activity.action == "SHARE_MEET"
+            @item_name = Item.find "#{activity.shared_id}"
+            @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>@item_name.name}})
+            @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
+          elsif activity.action == "SHARE_ATTACHMENT"
+              @attachment_name = Attachment.find (activity.shared_id)
+              @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>@attachment_name.file_name}})
+              @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
+          end
+        end        
       end
-      if activity.entity_type=="Share" 
-        @share_name=Community.find "#{activity.entity.community_id}"
-        @share_type=activity.entity.shared_type
-        @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@share_type,:item_name=>@share_name.name}})
-        @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
-      end
+      #~ if activity.entity_type=="Share" 
+        #~ @share_name=Community.find "#{activity.entity.community_id}"
+        #~ @share_type=activity.entity.shared_type
+        #~ @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@share_type,:item_name=>@share_name.name}})
+        #~ @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
+      #~ end
     end
     find_category_ids;insert_items;
   end
@@ -174,8 +187,22 @@ class V1::RegistrationsController < Devise::RegistrationsController
     activities.reverse.paginate(@paginate_options).each do |activity|
      @first_name= User.find(activity['user_id']).first_name
       if activity.entity_type=="Community"             
+        #~ @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>'nil'}})
+        #~ @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
+        if activity.shared_id.nil? 
         @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>'nil'}})
         @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
+        else 
+            if activity.action == "SHARE_MEET"
+              @item_name = Item.find "#{activity.shared_id}"
+              @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>@item_name.name}})
+              @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
+            elsif activity.action == "SHARE_ATTACHMENT"
+                @attachment_name = Attachment.find (activity.shared_id)
+                @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>@attachment_name.file_name}})
+                @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
+            end
+        end     
       end
     end
   end

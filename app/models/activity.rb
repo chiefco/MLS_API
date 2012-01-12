@@ -4,6 +4,7 @@ class Activity
   SORT_BY_ALLOWED = [ :activity_type,:created_at]
   ORDER_BY_ALLOWED =  [:asc,:desc]
   field :action,:type=>String
+  field :shared_id,:type=>String
 
   belongs_to :entity, polymorphic: true
   belongs_to :subject, polymorphic: true

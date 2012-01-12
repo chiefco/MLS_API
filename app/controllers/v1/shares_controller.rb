@@ -24,7 +24,7 @@ class V1::SharesController < ApplicationController
       @v1_share.save  
     end
     params[:share].each do |key, value| 
-        @v1_share.create_activity("SHARE_CREATED_"+value['item']['shared_type'].upcase,value['item']['community_id'])   
+        @v1_share.create_activity("SHARE_"+value['item']['shared_type'].upcase,value['item']['community_id'],value['item']['shared_id'])   
       end
     
     respond_to do |format|

@@ -182,9 +182,10 @@ class V1::RegistrationsController < Devise::RegistrationsController
   def find_communtiy_activities(community_id)
     @community = Community.find(community_id)
     activities = @community.activities
+    p activities.count
     @activities_count = activities.count
     @community_name=@community.name
-    activities.reverse.paginate(@paginate_options).each do |activity|
+    activities.reverse.each do |activity|
      @first_name= User.find(activity['user_id']).first_name
       if activity.entity_type=="Community"             
         #~ @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>'nil'}})

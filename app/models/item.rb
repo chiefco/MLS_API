@@ -38,8 +38,8 @@ class Item
   scope :undeleted,self.excludes(:status=>false)
   scope :upcoming,self.where(:item_date.gte=>Date.today)
   scope :today,self.where(:item_date.gte=>Date.today, :item_date.lt=>Date.tomorrow) 
-  scope :tomorrow,self.where(:item_date.gte=>Date.tomorrow, :item_date.lt=>(Date.tomorrow+2))    
-  scope :next_week,self.where(:item_date.gte=>Date.tomorrow)      
+  scope :tomorrow,self.where(:item_date.gte=>Date.tomorrow, :item_date.lt=>(Date.tomorrow+1))    
+  scope :next_week,self.where(:item_date.gte=>Date.tomorrow+1)      
   scope :past,self.where(:item_date.lt=>Date.today)
 
   after_save :sunspot_index
@@ -59,7 +59,9 @@ class Item
   end
   
   searchable do
-    text :name
+    text :name do
+      name.downcase
+    end
     text :description
     string :user_id
   end

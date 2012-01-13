@@ -24,7 +24,9 @@ class Attachment
   field :height, type: Integer
   
   searchable do
-    string :file_name
+    string :file_name do
+      file_name.downcase
+    end
     string :user_id
   end  
   

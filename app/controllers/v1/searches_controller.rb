@@ -53,34 +53,31 @@ class V1::SearchesController < ApplicationController
   end
 
   def search
-    @searches=Sunspot.search(Item) do |search|
-      search.keywords params[:q], :boost=>4.0
+    items = Sunspot.search(Item) do |search|
+      search.keywords params[:q].downcase, :boost=>4.0
       search.with(:user_id,@current_user.id)
     end
-    items = @searches.results
-    #~ p items = results.select{|r| r._type == "Item"}
-    #~ p categories = results.select{|r| r._type == "Category"}
+    
     attachments = @current_user.attachments.solr_search do |search|
-      search.with(:file_name).starting_with(params[:q])
+      search.with(:file_name).starting_with(params[:q].downcase)
     end    
-    attachments = attachments.results
-    #~ bookmarks = @current_user.bookmarks.undeleted.solr_search do |search|
-      #~ search.with(:name,params[:q])
-    #~ end    
-    #~ bookmarks = bookmarks.results
-    #~ locations = @current_user.locations.solr_search do |search|
-      #~ search.with(:name,params[:q])
-    #~ end
-    #~ locations = locations.results.map(&:item)
+    
+    if params[:sort] == 'modified'
+      items.results.map(&:name)
+      items.results.sort_by{ |k| k.updated_at }.map(&:name)
+      items = items.results.sort_by{ |k| k.updated_at }.reverse
+      attachments = attachments.results.sort_by{ |k| k.updated_at }.reverse
+    else
+      items = items.results.sort_by{ |k| k.name }
+      attachments = attachments.results.sort_by{ |k| k.file_name }
+    end
+    
     unless params[:limit]
       respond_to do |format|
         format.xml  { render :xml => {:response=>:success,:searches=>results}.to_xml(:root=>:result,:only=>SEARCH_FIELDS) }
         format.json {render :json =>{:items=>items.to_json(:only=>[:name,:_id],:methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id, :item_date_local]).parse, :attachments=>attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at]).parse}.to_success}
       end
     else
-      #~ items << locations
-      #~ items << categories
-      #~ items << bookmarks
       items << attachments
       respond_to do |format|
         format.xml  { render :xml => {:response=>:success,:searches=>items}.to_xml(:root=>:result,:only=>SEARCH_FIELDS) }

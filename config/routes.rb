@@ -8,6 +8,7 @@ MeetlinkshareApi::Application.routes.draw do
     match "/location_names" => 'locations#location_names',:via=>:get
     match "item_add_attendees" => 'items#item_add_attendees',:via=>:post
     match "item_topics/:id"=> 'items#item_topics'
+    match "upcoming_meetings_count" => 'items#upcoming_meetings_count'
     match "category_subcategories/:id" => 'categories#subcategories'
     match "category_items/:id" => 'categories#items'
     match "items/:id/item_categories" => 'items#item_categories'

@@ -32,8 +32,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
   def activities
     @item=[]
     params[:community_id] ? find_communtiy_activities(params[:community_id]) : find_activities
-    @item
-    @paginate_options
+    
     respond_to do |format|
       format.json {render :json=>{:activities=>@item.paginate(@paginate_options),:count=>@activities_count}.to_success}
     end

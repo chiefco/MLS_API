@@ -8,21 +8,24 @@ class V1::ItemsController < ApplicationController
   def index
     if params[:type]
       if params[:type] == 'today'
-        @items = @current_user.items.today.paginate(@paginate_options)
-        @item_count = @current_user.items.today.count
+        items = @current_user.items.today
+        @items = items.paginate(@paginate_options)
+        @item_count = items.count
       elsif params[:type] == 'tommorrow'
-        @items = @current_user.items.tomorrow.paginate(@paginate_options)
-        @item_count = @current_user.items.tomorrow.count        
+        items = @current_user.items.tomorrow        
+        @items = items.paginate(@paginate_options)
+        @item_count = items.count        
       elsif params[:type] == 'next_week'
-        @items = @current_user.items.next_week.paginate(@paginate_options)
-        @item_count = @current_user.items.next_week.count        
+        items = @current_user.items.next_week                
+        @items = items.paginate(@paginate_options)
+        @item_count = items.count        
       end
     else
       @items = Item.list(params,@paginate_options,@current_user)
-      p @item_count = Item.list(params.merge({:item_count => true}), {}, @current_user)      
+      @item_count = Item.list(params.merge({:item_count => true}), {}, @current_user)      
     end
 
-  respond_to do |format|
+    respond_to do |format|
       format.xml  { render :xml => @items}
       if params[:group_by]
         format.json {render :json =>@items.merge({:response=>:success, :count=>@item_count}).to_json}
@@ -284,6 +287,15 @@ class V1::ItemsController < ApplicationController
 
   def item_count
     {:count=>@items.count}
+  end
+  
+  #Upcoming items count
+  def upcoming_meetings_count
+    items_count = @current_user.items.undeleted.upcoming.count
+    respond_to do |format|
+      format.xml  { render :xml => items_count}
+      format.json {render :json => {:items_count => items_count}.to_json}
+    end    
   end
 
 end

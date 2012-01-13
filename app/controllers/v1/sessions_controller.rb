@@ -39,7 +39,9 @@ class V1::SessionsController < Devise::SessionsController
     @synched_meets={}
     @ipad_ids=[]
     @ipad_page_ids=[]
+    @share_ids=[]
     @synched_pages={}
+    @synched_hash={}
     @meets=params[:meet].each do |stat| 
       unless stat.values[0].empty?
         create_or_update_meets(stat)
@@ -47,7 +49,7 @@ class V1::SessionsController < Devise::SessionsController
     end
     get_communities
    respond_to do |format|
-      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:ipad_ids=>@ipad_ids.uniq,:communities=>@communities,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages)}
+      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:ipad_ids=>@ipad_ids.uniq,:communities=>@communities,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash)}
     end
   end
   
@@ -76,9 +78,13 @@ class V1::SessionsController < Devise::SessionsController
     status.values.first.each do |meet|
       if status.keys[0]=="new"
         @pages=meet[:page][:new_page]
+        @shares=meet[:share]
+        meet.delete(:page)
+        meet.delete(:share)
         @meet= @user.items.create(meet)
         @id=@meet._id
-        create_or_update_pages(@pages)
+         create_or_update_share
+         create_or_update_pages(@pages)
       else
         @meet=Item.where(:_id=>meet[:cloud_id]).first
         @pages=meet[:page][:new_page]
@@ -112,6 +118,15 @@ class V1::SessionsController < Devise::SessionsController
           @synched_pages=@synched_pages.merge({page[:page_id]=>@attachment._id})
         end
       end
+    end
+  end
+  
+  def create_or_update_share
+    @shares[0][:communities].each_with_index do |f,i|
+      @share=@meet.shares.create(:user_id=>@user._id,:community_id=>f,:shared_type=>"Meet",:shared_id=>@meet._id)
+      #~ @share.create_activity("SHARE_MEET",f,@meet._id) 
+      @share_ids<<@shares[1][:share_ids][i]
+      @synched_hash=@synched_hash.merge({@shares[1][:share_ids][i]=>@share._id})
     end
   end
 end

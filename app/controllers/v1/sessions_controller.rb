@@ -144,9 +144,9 @@ class V1::SessionsController < Devise::SessionsController
       end
     else
       task[:update].each do |t|
-        @task=Task.update_attributes(f)
+        @task=Task.update_attributes(t)
         @task_ids<<t[:task_id]
-        @synched_tasks=@synched_tasks.merge(f[:task_id]=>@task._id)
+        @synched_tasks=@synched_tasks.merge(t[:task_id]=>@task._id)
       end
     end
   end

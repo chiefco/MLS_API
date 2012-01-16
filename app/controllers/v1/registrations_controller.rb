@@ -175,12 +175,12 @@ class V1::RegistrationsController < Devise::RegistrationsController
           end
         end        
       end
-      if activity.entity_type=="Share" 
-        @share_name=Community.find "#{activity.entity.community_id}"
-        @share_type=activity.entity.shared_type
-        @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@share_type,:item_name=>@share_name.name}})
-        @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
-      end
+      #~ if activity.entity_type=="Share" 
+        #~ @share_name=Community.find "#{activity.entity.community_id}"
+        #~ @share_type=activity.entity.shared_type
+        #~ @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@share_type,:item_name=>@share_name.name}})
+        #~ @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
+      #~ end
     end
     #find_category_ids;insert_items;
   end

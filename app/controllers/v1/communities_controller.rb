@@ -1,5 +1,5 @@
 class V1::CommunitiesController < ApplicationController
-  before_filter :authenticate_request!,:except=>[:accept_invitation]
+  before_filter :authenticate_request!
   before_filter :find_community,:only=>[:update,:show,:destroy,:members,:invite_member]
   before_filter :find_community_members,:only=>[:members]
   before_filter :add_pagination,:only=>[:index]
@@ -9,11 +9,11 @@ class V1::CommunitiesController < ApplicationController
     @community_user = CommunityUser.where(:user_id => "#{@current_user._id}")
     @communities=[]
     @community_user.each do |com_user|
-       com = Community.find "#{com_user.community_id}"      
-       @communities<< {:id =>com.id, :name=>com.name,:members=>com.community_users.count,:shares=>com.shares.count}
-     end
+      com = Community.find "#{com_user.community_id}"      
+      @communities<< {:id =>com.id, :name=>com.name,:members=>com.community_users.count,:shares=>com.shares.count}
+    end
     respond_to do |format|
-      format.json {render :json=>@communities} # index.html.erb
+      format.json {render :json => @communities} # index.html.erb
     end
   end
 
@@ -22,11 +22,12 @@ class V1::CommunitiesController < ApplicationController
     shares = @community.shares
     attachments = shares.select{|i| i.shared_type == 'Attachment'}.map(&:attachment)
     items = shares.select{|i| i.shared_type == 'Meet'}.map(&:item)
+    users = @community.community_users.map(&:user)
     
     respond_to do |format|
       if @community.status!=false
         #~ find_parameters
-        format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :attachments => attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at]).parse }.to_success}
+        format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :attachments => attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at]).parse, :users => users.to_json(:only=>[:first_name]).parse  }.to_success}
       else
         format.json  {render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
@@ -36,6 +37,7 @@ class V1::CommunitiesController < ApplicationController
   def create
     @community = @current_user.communities.new(params[:community])
     community_invitation if params[:invite_email]['users']!='use comma separated emails' 
+    
     respond_to do |format|
       if @community.save
         CommunityUser.create(:user_id=>@current_user._id,:community_id=>@community._id,:role_id=>1)
@@ -121,17 +123,17 @@ class V1::CommunitiesController < ApplicationController
   
   def accept_invitation
     respond_to do |format|
-      @invitation=Invitation.where(:invitation_token=>params[:accept_invitation]).first  
+      @invitation = Invitation.where(:invitation_token=>params[:accept_invitation]).first  
       unless @invitation.nil?
-        unless @invitation.user.nil?
+        unless (@invitation.user.nil? || @invitation.user_id != @current_user.id)
           @invitation.community.community_users.create(:user_id=>@invitation.user_id)
           @invitation.update_attributes(:invitation_token=>nil)
-          format.json {render :json=>success}
+          format.json {render :json => {:community => @invitation.community.to_json(:only => [:_id, :name]).parse}.to_success}
         else
-          format.json {render :json=>failure}
+          format.json {render :json => failure.merge({:message => 'Something went wrong'})}
         end
       else
-        format.json {render :json=>failure}
+        format.json {render :json => failure.merge({:message => 'Invitation already used'})}
       end
     end
   end

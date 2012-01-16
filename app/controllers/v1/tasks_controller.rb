@@ -73,8 +73,8 @@ class V1::TasksController < ApplicationController
   def save_task
     respond_to do |format|
       if @task.save
-        reminder = params[:reminder][:time]
-        @task.reminders.new(:task_id => @task.id, :time => reminder).save unless reminder.blank?
+        #~ reminder = params[:reminder][:time]
+        #~ @task.reminders.new(:task_id => @task.id, :time => reminder).save unless reminder.blank?
         @task={:task=>@task.serializable_hash(:only=>[:_id,:description,:title,:is_completed],:methods=>:due_date,:include=>{:item=>{:only =>[ :_id,:name]}})}.to_success
         format.xml  { render :xml => @task.to_xml(ROOT) }
         format.json { render :json => @task}

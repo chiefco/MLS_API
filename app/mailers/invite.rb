@@ -3,12 +3,14 @@ class Invite < ActionMailer::Base
   
   def community_invite(inviter,invitation,community)
     @inviter,@invitee,@community,@token=inviter,invitation.email,community,invitation.invitation_token
-    mail(:from=>@inviter,:to=>@invitee,:subject =>"Invitation to join in community")
+    mail(:from=>@inviter,:to=>@invitee,:subject =>"Invitation for virtual team from #{@inviter}")
   end
+  
   def send_invitations(user,email)
     @name ="#{user.first_name} #{user.last_name}"
     mail(:to=>email,:subject =>"Invitation for MeetLinkShare", :reply_to=>"info@meetlinkshare.com")
   end 
+  
   def share_community(user,item)
     @user,@item=user,item
     mail(:to=>@user.email,:subject =>"Invitation for MeetLinkShare", :reply_to=>"info@meetlinkshare.com")

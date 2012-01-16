@@ -36,21 +36,26 @@ class V1::SessionsController < Devise::SessionsController
   private
   #perform synchronisation for the user
   def perform_synchronisation(user)
-    @synched_meets={}
-    @ipad_ids=[]
-    @ipad_page_ids=[]
-    @share_ids=[]
-    @synched_pages={}
-    @synched_hash={}
-    @meets=params[:meet].each do |stat| 
-      unless stat.values[0].empty?
-        create_or_update_meets(stat)
+    initialize_values
+    @meets= params[:user][1][:meet].each do |meet| 
+      unless meet.values[0].empty?
+        create_or_update_meets(meet)
+      end
+    end
+    params[:user][0][:task].each do |task|
+      unless task.values[0].empty?
+        create_or_update_tasks(task)
       end
     end
     get_communities
    respond_to do |format|
-      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:ipad_ids=>@ipad_ids.uniq,:communities=>@communities,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash)}
+      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:ipad_ids=>@ipad_ids.uniq,:communities=>@communities,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks)}
     end
+  end
+  
+  def initialize_values
+    @ipad_ids=[];@ipad_page_ids=[]; @share_ids=[];@task_ids=[];@synched_meets={};@synched_pages={};
+    @synched_hash={};@synched_tasks={};
   end
   
   #Invalid user- do not perform synchronisation
@@ -127,6 +132,22 @@ class V1::SessionsController < Devise::SessionsController
       #~ @share.create_activity("SHARE_MEET",f,@meet._id) 
       @share_ids<<@shares[1][:share_ids][i]
       @synched_hash=@synched_hash.merge({@shares[1][:share_ids][i]=>@share._id})
+    end
+  end
+  
+  def create_or_update_tasks(task)
+    if task.has_key?("new")
+      task[:new].each do |f|
+        @task=Task.create(f)
+        @task_ids<<f[:task_id]
+        @synched_tasks=@synched_tasks.merge(f[:task_id]=>@task._id)
+      end
+    else
+      task[:update].each do |t|
+        @task=Task.update_attributes(f)
+        @task_ids<<t[:task_id]
+        @synched_tasks=@synched_tasks.merge(f[:task_id]=>@task._id)
+      end
     end
   end
 end

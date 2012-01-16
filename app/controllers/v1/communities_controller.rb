@@ -76,7 +76,7 @@ class V1::CommunitiesController < ApplicationController
     @invitation=@community.invitations.new(params[:invite_member])
     respond_to do |format|
       if @invitation.save
-        Invite.community_invite(@current_user.email,@invitation,@community.name).deliver
+        Invite.community_invite(@current_user.first_name,@invitation,@community.name).deliver
         format.json {render :json=>@invitation}
       else
         format.json  { render :json =>@invitation.all_errors}
@@ -169,7 +169,7 @@ class V1::CommunitiesController < ApplicationController
         if @user_id 
           @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)
               if @invitation.save
-                   Invite.community_invite(@current_user.email,@invitation,@community.name).deliver
+                   Invite.community_invite(@current_user.first_name,@invitation,@community.name).deliver
                 else
                    format.json  { render :json =>@invitation.all_errors}
                 end

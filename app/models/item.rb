@@ -36,10 +36,10 @@ class Item
   references_and_referenced_in_many :categories
   referenced_in :template
   scope :undeleted,self.excludes(:status=>false)
-  scope :upcoming,self.where(:item_date.gte=>Date.today)
-  scope :today,self.where(:item_date.gte=>Date.today, :item_date.lt=>Date.tomorrow) 
-  scope :tomorrow,self.where(:item_date.gte=>Date.tomorrow, :item_date.lt=>(Date.tomorrow+1))    
-  scope :next_week,self.where(:item_date.gte=>Date.tomorrow+1)      
+  scope :upcoming,self.where(:item_date.gte=>Date.yesterday)
+  scope :today,self.where(:item_date.gte=>Date.yesterday, :item_date.lt=>Date.tomorrow) 
+  scope :tomorrow,self.where(:item_date.gte=>Date.today, :item_date.lt=>(Date.tomorrow+1.days))    
+  scope :next_week,self.where(:item_date.gte=>Date.today+7.days)      
   scope :past,self.where(:item_date.lt=>Date.today)
 
   after_save :sunspot_index
@@ -107,17 +107,18 @@ class Item
   end
   
   def upcoming
-    date=item_date
-    date=Date.strptime(item_date,"%d/%m/%Y %H:%M:%S") if item_date.is_a?(String)
-    if date==Date.today
+    date = item_date
+    date = Date.strptime(item_date,"%d/%m/%Y %H:%M:%S") if item_date.is_a?(String)
+    
+    if date > Date.yesterday && date < Date.tomorrow
       "Today"
-    elsif date==Date.tomorrow
+    elsif date > Date.today && date < (Date.tomorrow + 1.days)
       "Tommorrow"
-    elsif date<(Date.today+7.days) && date>Date.today
+    elsif date > (Date.today + 7.days)
       "Next Week"
-    elsif date==Date.yesterday
+    elsif date == Date.yesterday
       "Yesterday"
-    elsif date<(Date.today) 
+    elsif date < (Date.today) 
       "Past Items" 
     else
       "Later"

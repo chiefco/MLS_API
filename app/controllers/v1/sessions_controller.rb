@@ -144,7 +144,8 @@ class V1::SessionsController < Devise::SessionsController
       end
     else
       task[:update].each do |t|
-        @task=Task.update_attributes(t)
+        @task=Task.where(:_id=>t[:cloud_id]).first
+        @task.update_attributes(t)
         @task_ids<<t[:task_id]
         @synched_tasks=@synched_tasks.merge(t[:task_id]=>@task._id)
       end

@@ -25,7 +25,7 @@ class Attachment
   
   searchable do
     string :file_name do
-      file_name.downcase
+      file_name.to_s.downcase
     end
     string :user_id
   end  

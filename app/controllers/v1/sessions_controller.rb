@@ -114,11 +114,13 @@ class V1::SessionsController < Devise::SessionsController
             if value.nil?
               @page=@meet.pages.create(:page_order=>page[:page_order])
               @ipad_page_ids<<page[:page_id]
-              @attachment=@page.create_attachment(:attachable_type=>"Page",:attachable_id=>@page.id,:file=>decode_image(@page._id,page[:page_image]))
+              @attachment=@page.create_attachment(:attachable_type=>"Page",:attachable_id=>@page._id,:file=>decode_image(@page._id,page[:page_image]))
+              File.delete(@file)
             else
               @attachment=Attachment.where(:_id=>page[:cloud_id]).first
               @ipad_page_ids<<page[:page_id]
               @attachment.update_attributes(:file=>decode_image(@attachment._id,page[:page_image]))
+               File.delete(@file)
             end
           @synched_pages=@synched_pages.merge({page[:page_id]=>@attachment._id})
         end

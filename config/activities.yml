@@ -6,9 +6,9 @@ CATEGORY_UPDATED	: <%="#{username}"%> has updated the category <%="#{item}" %>
 BOOKMARK_CREATED : <%="#{username}"%> has created a new bookmark and called it <%="#{item}" %>
 BOOKMARK_UPDATED : <%="#{username}"%> has updated the bookmark <%="#{item}" %>
 BOOKMARK_DELETED	: <%="#{username}"%> have moved <%="#{item}" %> to trash
-PAGE_CREATED : New page has been added to <%="#{item}" %>
-PAGE_UPDATED	: Page has been updated in <%="#{item}" %>
-PAGE_DELETED	: <%="#{username}"%> moved <%="#{item}" %> to trash
+PAGE_CREATED : New page has been added to <%="#{item_name}" %>
+PAGE_UPDATED	: Page has been updated in <%="#{item_name}" %>
+PAGE_DELETED	: <%="#{username}"%> moved <%="#{item_name}" %> to trash
 CATEGORY_ADDED_ITEM : <%="#{username}"%> has moved the <%="#{item}" %> into the category <%="#{item_name}" %>
 COMMUNITY_CREATED : <%="#{username}"%> has created a new community and called it <%="#{item}"%>
 COMMUNITY_UPDATED : <%="#{username}"%> has updated the  <%="#{item} #{item_name}"%>

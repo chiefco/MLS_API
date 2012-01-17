@@ -288,16 +288,4 @@ class V1::ItemsController < ApplicationController
   def item_count
     {:count=>@items.count}
   end
-  
-  #Upcoming items count
-  def upcoming_meetings_count
-    today = @current_user.items.undeleted.today.group_by(&:upcoming)['Today'].count rescue 0
-    tomorrow = @current_user.items.undeleted.tomorrow.group_by(&:upcoming)['Tommorrow'].count rescue 0
-    next_week = @current_user.items.undeleted.next_week.group_by(&:upcoming)['Next Week'].count rescue 0
-    items_count = today + tomorrow + next_week
-    respond_to do |format|
-      format.xml  { render :xml => items_count}
-      format.json {render :json => {:items_count => items_count}.to_json}
-    end    
-  end
 end

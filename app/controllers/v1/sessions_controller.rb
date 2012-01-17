@@ -98,11 +98,14 @@ class V1::SessionsController < Devise::SessionsController
       else
         @meet=Item.where(:_id=>meet[:cloud_id]).first
         @pages=meet[:page][:new_page]
+        @shares=meet[:share]
         @updated_pages=meet[:updated_page]
         meet.delete(:updated_page)
         meet.delete(:page)
+        meet.delete(:share)
         @meet.update_attributes(meet)
         @id=meet[:cloud_id]
+        create_or_update_share
         create_or_update_pages(@pages)
         create_or_update_pages(@updated_pages,:update)
         @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
@@ -134,8 +137,10 @@ class V1::SessionsController < Devise::SessionsController
   end
   
   def create_or_update_share
+    @deleted_shares=@meet.shares.where(:ipad_share=>true)
+    @deleted_shares.destroy if @deleted_shares
     @shares[0][:communities].each_with_index do |f,i|
-      @share=@meet.shares.create(:user_id=>@user._id,:community_id=>f,:shared_type=>"Meet",:shared_id=>@meet._id)
+      @share=@meet.shares.create(:user_id=>@user._id,:community_id=>f,:shared_type=>"Meet",:shared_id=>@meet._id,:ipad_share=>true)
       #~ @share.create_activity("SHARE_MEET",f,@meet._id) 
       @share_ids<<@shares[1][:share_ids][i]
       @synched_hash=@synched_hash.merge({@shares[1][:share_ids][i]=>@share._id})

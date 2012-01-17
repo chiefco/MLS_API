@@ -145,7 +145,7 @@ class V1::SessionsController < Devise::SessionsController
   def create_or_update_tasks(task)
     if task.has_key?("new")
       task[:new].each do |f|
-        @task=Task.create(f)
+        @task=@user.tasks.create(f)
         @task_ids<<f[:task_id]
         @synched_tasks=@synched_tasks.merge(f[:task_id]=>@task._id)
       end

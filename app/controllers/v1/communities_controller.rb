@@ -27,7 +27,7 @@ class V1::CommunitiesController < ApplicationController
     respond_to do |format|
       if @community.status!=false
         #~ find_parameters
-        format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :attachments => attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at]).parse, :users => users.to_json(:only=>[:first_name]).parse  }.to_success}
+        format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description, :invitees]), :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :attachments => attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at]).parse, :users => users.to_json(:only=>[:first_name]).parse  }.to_success}
       else
         format.json  {render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end

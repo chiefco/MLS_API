@@ -1,9 +1,10 @@
 class Community
   include Mongoid::Document
   include Mongoid::Timestamps
-  field :name,:type=>String
-  field :description,:type=>String
-  field :status,:type=>Boolean,:default=>true
+  field :name, :type => String
+  field :description, :type => String
+  field :status, :type => Boolean, :default => true
+  field :invitees, :type => Array
   referenced_in :user
   references_many :invitations
   references_many :shares
@@ -13,7 +14,7 @@ class Community
   scope :undeleted,self.excludes(:status=>false)
   
   after_create :create_activity
- after_update :update_activity
+  after_update :update_activity
 
   def create_activity
     save_activity("COMMUNITY_CREATED")

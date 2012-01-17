@@ -90,19 +90,24 @@ class V1::SessionsController < Devise::SessionsController
         @id=@meet._id
          create_or_update_share
          create_or_update_pages(@pages)
+        @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
+        @ipad_ids<<meet[:meet_id]
+      elsif status.keys[0]=="delete"
+        @deleted_meet=Item.where(:_id=>meet[:cloud_id]).first
+        @deleted_meet.update_attributes(:status=>false) unless @deleted_meet.nil?
       else
         @meet=Item.where(:_id=>meet[:cloud_id]).first
         @pages=meet[:page][:new_page]
-         @updated_pages=meet[:updated_page]
+        @updated_pages=meet[:updated_page]
         meet.delete(:updated_page)
         meet.delete(:page)
         @meet.update_attributes(meet)
         @id=meet[:cloud_id]
         create_or_update_pages(@pages)
         create_or_update_pages(@updated_pages,:update)
+        @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
+        @ipad_ids<<meet[:meet_id]
       end
-      @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
-      @ipad_ids<<meet[:meet_id]
     end
   end
   

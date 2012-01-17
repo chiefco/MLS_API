@@ -169,10 +169,13 @@ class V1::RegistrationsController < Devise::RegistrationsController
             @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>@item_name.name}})
             @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }
           elsif activity.action == "SHARE_ATTACHMENT"
-              @attachment_name = Attachment.find (activity.shared_id)
-              activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
-              @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>@attachment_name.file_name}})
-              @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }
+              begin
+                @attachment_name = Attachment.find (activity.shared_id)
+                activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
+                @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>@attachment_name.file_name}})
+                @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }
+              rescue
+              end
           end
         end        
       end

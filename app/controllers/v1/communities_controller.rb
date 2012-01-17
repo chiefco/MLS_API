@@ -37,10 +37,11 @@ class V1::CommunitiesController < ApplicationController
   def create
     unless @current_user.communities.undeleted.count > 6
       @community = @current_user.communities.new(params[:community])
-      community_invitation if params[:invite_email]['users']!='use comma separated emails' 
+      @community.invitees = params[:invite_email]['users'].to_a if params[:invite_email]['users'] != 'use comma separated emails' 
       
       respond_to do |format|
         if @community.save
+          community_invitation if params[:invite_email]['users'] != 'use comma separated emails' 
           CommunityUser.create(:user_id=>@current_user._id,:community_id=>@community._id,:role_id=>1)
           find_parameters
           format.json {render :json => @community}

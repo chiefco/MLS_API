@@ -70,8 +70,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
   end
 
   def show
+    meet_count = Item.upcoming_meetings_counts(@current_user)
     respond_to do |format|
-      user = { :user => current_user.serializable_hash(:only=>[:_id, :email, :first_name, :last_name, :job_title, :company, :business_unit, :sign_in_count,:date_of_birth, :industry_id], :root=>:user) }
+      user = { :user => current_user.serializable_hash(:only=>[:_id, :email, :first_name, :last_name, :job_title, :company, :business_unit, :sign_in_count,:date_of_birth, :industry_id], :root=>:user), :meet_count => meet_count.to_json }
       format.json { render :json=> user.to_success }
       format.xml { render :xml=> user.to_success.to_xml(ROOT) }
     end

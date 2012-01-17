@@ -167,6 +167,13 @@ class Item
     end
   end
   
+  def self.upcoming_meetings_counts(user)
+    today = user.items.undeleted.today.group_by(&:upcoming)['Today'].count rescue 0
+    tomorrow = user.items.undeleted.tomorrow.group_by(&:upcoming)['Tommorrow'].count rescue 0
+    next_week = user.items.undeleted.next_week.group_by(&:upcoming)['Next Week'].count rescue 0
+    return items_count = today + tomorrow + next_week 
+  end  
+  
   def save_activity(text)
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end

@@ -9,8 +9,8 @@ class V1::CommunitiesController < ApplicationController
     @community_user = CommunityUser.where(:user_id => "#{@current_user._id}")
     @communities=[]
     @community_user.each do |com_user|
-      com = Community.find "#{com_user.community_id}"      
-      @communities<< {:id =>com.id, :name=>com.name,:members=>com.community_users.count,:shares=>com.shares.count}
+       com = Community.where(:_id => "#{com_user.community_id}", :status => true).first      
+      @communities<< {:id =>com.id, :name=>com.name,:members=>com.community_users.count,:shares=>com.shares.count, :status => com.status} if com
     end
     respond_to do |format|
       format.json {render :json => @communities} # index.html.erb
@@ -35,17 +35,23 @@ class V1::CommunitiesController < ApplicationController
   end  
 
   def create
-    @community = @current_user.communities.new(params[:community])
-    community_invitation if params[:invite_email]['users']!='use comma separated emails' 
-    
-    respond_to do |format|
-      if @community.save
-        CommunityUser.create(:user_id=>@current_user._id,:community_id=>@community._id,:role_id=>1)
-        find_parameters
-        format.json {render :json => @community}
-      else
-        format.json {render :json => @community.all_errors}
+    unless @current_user.communities.undeleted.count > 6
+      @community = @current_user.communities.new(params[:community])
+      community_invitation if params[:invite_email]['users']!='use comma separated emails' 
+      
+      respond_to do |format|
+        if @community.save
+          CommunityUser.create(:user_id=>@current_user._id,:community_id=>@community._id,:role_id=>1)
+          find_parameters
+          format.json {render :json => @community}
+        else
+          format.json {render :json => @community.all_errors}
+        end
       end
+    else
+      respond_to do |format|
+        format.json { render :json=> {:message=>"You can create only 6 teams"}.to_failure }
+      end      
     end
   end
 
@@ -68,6 +74,22 @@ class V1::CommunitiesController < ApplicationController
     @community.update_attributes(:status=>false)
     respond_to do |format|
       format.json {render :json=>success }
+    end
+  end
+  
+  def multiple_delete
+    params[:community].each do |com_id|
+      @community = Community.find(com_id)
+      @community.update_attributes(:status=>false)
+    end
+    @community_user = CommunityUser.where(:user_id => "#{@current_user._id}")
+    @communities=[]
+    @community_user.each do |com_user|
+      com = Community.where(:_id => "#{com_user.community_id}", :status => true).first      
+      @communities<< {:id =>com.id, :name=>com.name,:members=>com.community_users.count,:shares=>com.shares.count, :status => com.status} if com
+    end
+    respond_to do |format|
+      format.json {render :json => {:community =>@communities}.to_success} # index.html.erb
     end
   end
   

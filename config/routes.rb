@@ -41,6 +41,8 @@ MeetlinkshareApi::Application.routes.draw do
     match "/shares/:id" => 'contacts#shares'
     match "/items/pages/:item_id" => 'pages#index'
     match "/items/:item_id/tasks" => 'items#tasks'
+    match "/multiple_delete" => 'communities#multiple_delete'
+    match "/attachments_multiple_delete" => 'attachments#attachments_multiple_delete'
 
   end
 

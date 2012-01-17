@@ -60,7 +60,7 @@ class Community
   def self.get_communities(user)
     @community=[]
     @community_values={}
-    user.communities.each do |f|
+    user.communities.undeleted.each do |f|
       @community<<f._id.to_s
       @community_values=@community_values.merge({"#{f.id}"=>{:name=>"#{f.name}",:id=>"#{f._id}"}})     
     end

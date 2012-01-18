@@ -7,13 +7,14 @@ class Attachment
   belongs_to :user
   has_many :bookmarked_contents, as: :bookmarkable
   references_many :shares, :dependent => :destroy
-  #validates_presence_of :attachable_id, :message=>"attachable_id - Blank Parameter", :code=>3034
+  has_many :activities, as: :entity, :dependent => :destroy
+  validates_presence_of :attachable_id, :message=>"attachable_id - Blank Parameter", :code=>3034
   validates_presence_of :attachable_type, :message=>"attachable_type - Blank Parameter", :code=>3022
   validates_inclusion_of :attachable_type, :in=>["User","Item","Page"], :message=>"attachable_type - Invalid Parameter", :code=>3050
   SORT_BY_ALLOWED = [:file_name, :size, :content_type]
   ORDER_BY_ALLOWED =  [:asc,:desc]
   after_create :create_activity
-  after_update :create_activity
+  after_update :update_activity
   after_save :sunspot_index  
   
   field :file_name, type: String
@@ -47,12 +48,24 @@ class Attachment
   end
   
   def create_activity
-    save_activity("ITEM_UPDATED")
+    save_activity("USER_ATTACHMENT")
   end
+  
+   def update_activity
+  end
+  
   def save_activity(text)
     evaluate_item(a=text) unless self.attachable.nil?
   end
+  
   def  evaluate_item(text)
-    self.attachable.activities.create(:action=>text,:user_id=>self.attachable.user.nil?  ? 'nil' : self.attachable.user._id) unless self.attachable_type=="Page"
+    if self.attachable_type =="User"
+      user_id = self.attachable._id.nil?  ? 'nil' : self.attachable._id
+      self.activities.create(:action=>text, :user_id=> user_id) 
+    else
+      user_id = self.attachable.user.nil?  ? 'nil' : self.attachable.user._id
+      self.attachable.activities.create(:action=>text, :user_id=> user_id) unless self.attachable_type == "Page"
+    end
   end
+  
 end

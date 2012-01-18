@@ -32,7 +32,8 @@ class V1::AttachmentsController < ApplicationController
  def create
     File.open("#{Rails.root}/tmp/#{params[:attachment][:file_name]}", 'wb') do|f|
       f.write(Base64.decode64("#{params[:encoded]}"))
-    end    
+    end   
+    params[:attachment][:attachable_id] =@current_user._id if params[:attachment][:attachable_type] == "User"
     params[:attachment][:file] = File.new("#{Rails.root}/tmp/#{params[:attachment][:file_name]}")
     @attachment = @current_user.attachments.new(params[:attachment])
     @attachment.save
@@ -52,6 +53,8 @@ class V1::AttachmentsController < ApplicationController
   # DELETE /v1/attachments/1.xml
   def destroy
     @attachment.destroy
+    @activity = Activity.where(:shared_id => params[:id]).first
+    @activity.destroy if @activity 
     respond_to do |format|
       format.json { render :json=> success }
       format.xml { render :xml=> success.to_xml(ROOT) }
@@ -64,6 +67,8 @@ class V1::AttachmentsController < ApplicationController
     params[:attachment].each do |id|
       @attachment = Attachment.find(id)
       @attachment.destroy
+      @activity = Activity.where(:shared_id => id)
+      @activity.delete_all if @activity 
     end
       @attachments = Attachment.list(@current_user.attachments,params,{:page =>1, :per_page => 10})
       @count = @current_user.attachments.count

@@ -12,7 +12,7 @@ class Activity
 
   validates_presence_of :entity_id,:code=>3027,:message=>"activity_id - Required parameter missing"
   validates_presence_of :entity_type,:code=> 3020,:message=>"activity_type - Required parameter missing"
-  validates_inclusion_of :entity_type, :in=>["Item","Category","Bookmark","Topic", "Community","Share"], :message=>"activity_type  - Required parameter missing", :code=>2015
+  validates_inclusion_of :entity_type, :in=>["Item","Category","Bookmark","Topic", "Community","Share", "Attachment"], :message=>"activity_type  - Required parameter missing", :code=>2015
 
   def self.list(params,paginate_options,user)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)

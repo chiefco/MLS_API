@@ -156,6 +156,13 @@ class V1::RegistrationsController < Devise::RegistrationsController
         @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }
       end
       
+      if activity.entity_type=="Attachment" 
+        @attachment_name=activity.entity.file_name
+        activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
+        @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@attachment_name,:item_name=>'nil'}})
+        @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }
+      end
+      
       if activity.entity_type=="Community" 
         @community_name=activity.entity.name
         if activity.shared_id.nil? 

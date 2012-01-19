@@ -63,7 +63,7 @@ class Attachment
       user_id = self.attachable._id.nil?  ? 'nil' : self.attachable._id
       self.activities.create(:action=>text, :user_id=> user_id) 
     else
-      user_id = self.attachable.user.nil?  ? 'nil' : self.attachable.user._id
+      user_id = self.attachable.item.user.nil?  ? 'nil' : self.attachable.item.user._id
       self.attachable.activities.create(:action=>text, :user_id=> user_id) unless self.attachable_type == "Page"
     end
   end

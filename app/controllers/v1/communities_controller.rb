@@ -7,13 +7,21 @@ class V1::CommunitiesController < ApplicationController
 
   def index
     @community_user = CommunityUser.where(:user_id => "#{@current_user._id}")
-    @communities=[]
-    @community_user.each do |com_user|
+    @communities, @shared_communities = [], []
+    @community_user.each do |com_user| 
        com = Community.where(:_id => "#{com_user.community_id}", :status => true).first      
-      @communities<< {:id =>com.id, :name=>com.name,:members=>com.community_users.count,:shares=>com.shares.count, :status => com.status} if com
+       if com 
+             if com.user._id == @current_user._id  
+              @communities << {:id =>com.id, :name=>com.name,:members=>com.community_users.count,:shares=>com.shares.count, :status => com.status} 
+            else
+              @shared_communities << {:id =>com.id, :name=>com.name,:members=>com.community_users.count,:shares=>com.shares.count, :status => com.status} 
+            end
+        else
+       end
+     
     end
     respond_to do |format|
-      format.json {render :json => @communities} # index.html.erb
+      format.json {render :json =>  {:communities => @communities.to_json.parse, :shared_communities => @shared_communities.to_json.parse}} # index.html.erb
     end
   end
 
@@ -35,7 +43,7 @@ class V1::CommunitiesController < ApplicationController
   end  
 
   def create
-    unless @current_user.communities.undeleted.count > 6
+    unless @current_user.communities.undeleted.count > 5
       @community = @current_user.communities.new(params[:community])
       @community.invitees = params[:invite_email]['users'].to_a if params[:invite_email]['users'] != 'use comma separated emails' 
       
@@ -148,12 +156,14 @@ class V1::CommunitiesController < ApplicationController
     respond_to do |format|
       @invitation = Invitation.where(:invitation_token=>params[:accept_invitation]).first  
       unless @invitation.nil?
-        unless (@invitation.user.nil? || @invitation.user_id != @current_user.id)
+        if @invitation.user.nil?
+          format.json {render :json => failure.merge({:message => 'Something went wrong'})}
+        elsif @invitation.user_id != @current_user.id
+          format.json {render :json => failure.merge({:message => 'Please login with the invited user to join the community'})}
+        else
           @invitation.community.community_users.create(:user_id=>@invitation.user_id)
           @invitation.update_attributes(:invitation_token=>nil)
           format.json {render :json => {:community => @invitation.community.to_json(:only => [:_id, :name]).parse}.to_success}
-        else
-          format.json {render :json => failure.merge({:message => 'Something went wrong'})}
         end
       else
         format.json {render :json => failure.merge({:message => 'Invitation already used'})}

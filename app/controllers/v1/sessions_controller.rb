@@ -88,19 +88,27 @@ class V1::SessionsController < Devise::SessionsController
         @shares=meet[:share]
         meet.delete(:page)
         meet.delete(:share)
-        @meet= @user.items.create(meet)
-        unless @meet.nil?
-          @id=@meet._id
-           create_or_update_share
-           create_or_update_pages(@pages)
-          @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
-          @ipad_ids<<meet[:meet_id]
+        begin
+          @meet= @user.items.create(meet)
+          puts @meet.errors.inspect
+          logger.info @meet.errors.inspect
+          unless @meet.nil?
+            @id=@meet._id
+             create_or_update_share
+             create_or_update_pages(@pages)
+            @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
+            @ipad_ids<<meet[:meet_id]
+          end
+        rescue Exception => e
+          puts e
+          logger.info e
         end
       elsif status.keys[0]=="delete"
         @deleted_meet=Item.where(:_id=>meet[:cloud_id]).first
         @deleted_meet.update_attributes(:status=>false) unless @deleted_meet.nil?
       else
         @meet=Item.where(:_id=>meet[:cloud_id]).first
+        begin
         unless @meet.nil?
           @pages=meet[:page][:new_page]
           @shares=meet[:share]
@@ -113,9 +121,14 @@ class V1::SessionsController < Devise::SessionsController
           create_or_update_share
           create_or_update_pages(@pages)
           create_or_update_pages(@updated_pages,:update)
+
           @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
           @ipad_ids<<meet[:meet_id]
         end
+                  rescue Exception=> e
+            puts e
+            logger.info e
+          end
       end
     end
   end

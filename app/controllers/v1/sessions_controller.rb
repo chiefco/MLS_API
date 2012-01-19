@@ -81,8 +81,6 @@ class V1::SessionsController < Devise::SessionsController
   
   def  create_or_update_meets(status)
     status.values.first.each do |meet|
-      logger.info meet
-      puts meet
       if status.keys[0]=="new"
         @pages=meet[:page][:new_page]
         @shares=meet[:share]

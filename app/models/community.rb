@@ -14,7 +14,7 @@ class Community
   scope :undeleted,self.excludes(:status=>false)
   
   after_create :create_activity
-  after_update :update_activity
+  #after_update :update_activity
 
   def create_activity
     save_activity("COMMUNITY_CREATED")
@@ -72,4 +72,11 @@ class Community
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end
   
+   def users_count
+    self.community_users.count
+  end
+  
+  def shares_count
+    self.shares.count
+  end  
 end

@@ -43,6 +43,7 @@ MeetlinkshareApi::Application.routes.draw do
     match "/items/:item_id/tasks" => 'items#tasks'
     match "/multiple_delete" => 'communities#multiple_delete'
     match "/attachments_multiple_delete" => 'attachments#attachments_multiple_delete'
+    match "/invite_from_community" => 'communities#invite_from_community', :via => :post
 
   end
 

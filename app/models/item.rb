@@ -186,7 +186,7 @@ class Item
     @meets_values={}
     user.items.undeleted.each do |f|
       @meets<<f._id.to_s
-      @meets_values=@meets_values.merge({f.id=>{:name=>f.name,:id=>f._id,:description=>f.description,:item_date=>f.item_date,:location_name=>f[:location_name]}})     
+      @meets_values=@meets_values.merge({f.id=>{:name=>f.name,:id=>f._id,:description=>f.description,:item_date=>f.item_date,:location_name=>f[:location_name],:created_at=>f.created_time,:updated_at=>f.updated_time}})     
     end
     return {:meet_arrays=>@meets,:meet_hashes=>@meets_values}
   end

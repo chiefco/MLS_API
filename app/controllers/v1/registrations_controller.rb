@@ -16,6 +16,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
   def create
     resource=User.new(params[:user])
     if resource.save
+        CommunityUser.create(:user_id=>resource._id,:community_id=>params[:community][:id],:role_id=>1) if params[:community] && params[:community][:email] == params[:user][:email]
      respond_to do |format|
         format.xml{ render :xml=> success}
         format.json{render :json => success}

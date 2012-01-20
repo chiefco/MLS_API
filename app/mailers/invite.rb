@@ -6,8 +6,10 @@ class Invite < ActionMailer::Base
     mail(:from=>@inviter,:to=>@invitee,:subject =>"Invitation for virtual team from #{@inviter}")
   end
   
-  def send_invitations(user,email)
+  def send_invitations(user,email,community_id="")
     @name ="#{user.first_name} #{user.last_name}"
+    @community_id = community_id if !community_id.blank?
+    @email = email
     mail(:to=>email,:subject =>"Invitation for MeetLinkShare", :reply_to=>"info@meetlinkshare.com")
   end 
   

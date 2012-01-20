@@ -44,7 +44,7 @@ MeetlinkshareApi::Application.routes.draw do
     match "/multiple_delete" => 'communities#multiple_delete'
     match "/attachments_multiple_delete" => 'attachments#attachments_multiple_delete'
     match "/invite_from_community" => 'communities#invite_from_community', :via => :post
-
+    match "/member_delete" => "communities#member_delete"
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
@@ -61,6 +61,7 @@ MeetlinkshareApi::Application.routes.draw do
     get "v1/industries",:to=>'v1/registrations#options_for_the_field'
     get "v1/activities",:to=>'v1/registrations#activities'
     post "v1/synchronisation",:to=>'v1/sessions#synchronisation'
+    #~ get "v1/set_timezone", :to=> "v1/registrations#set_timezone"    
   end
 
   # The priority is based upon order of creation:

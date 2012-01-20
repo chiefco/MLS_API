@@ -49,7 +49,7 @@ class V1::SessionsController < Devise::SessionsController
     end
     get_communities
    respond_to do |format|
-      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:ipad_ids=>@ipad_ids.uniq,:communities=>@communities,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks)}
+      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:ipad_ids=>@ipad_ids.uniq,:communities=>@communities,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks,:meets=>get_meets)}
     end
   end
   
@@ -109,28 +109,31 @@ class V1::SessionsController < Devise::SessionsController
       else
         @meet=Item.where(:_id=>meet[:cloud_id]).first
         begin
-        unless @meet.nil?
-          @pages=meet[:page][:new_page]
-          @shares=meet[:share]
-          @updated_pages=meet[:updated_page]
-          meet.delete(:updated_page)
-          meet.delete(:page)
-          meet.delete(:share)
-          @meet.update_attributes(meet)
-          @id=meet[:cloud_id]
-          create_or_update_share
-          create_or_update_pages(@pages)
-          create_or_update_pages(@updated_pages,:update)
-
-          @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
-          @ipad_ids<<meet[:meet_id]
-        end
-                  rescue Exception=> e
-            puts e
-            logger.info e
+          unless @meet.nil?
+            @pages=meet[:page][:new_page]
+            @shares=meet[:share]
+            @updated_pages=meet[:updated_page]
+            meet.delete(:updated_page)
+            meet.delete(:page)
+            meet.delete(:share)
+            @meet.update_attributes(meet)
+            @id=meet[:cloud_id]
+            create_or_update_share
+            create_or_update_pages(@pages)
+            create_or_update_pages(@updated_pages,:update)
+            @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
+            @ipad_ids<<meet[:meet_id]
           end
+        rescue Exception=> e
+          puts e
+          logger.info e
+        end
       end
     end
+  end
+  
+  def get_meets
+    Item.get_meets(@user)
   end
   
   def create_or_update_pages(pages,value=nil)
@@ -182,4 +185,5 @@ class V1::SessionsController < Devise::SessionsController
       end
     end
   end
+  
 end

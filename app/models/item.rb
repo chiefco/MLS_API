@@ -13,6 +13,7 @@ class Item
   field :frequency_count, :type => Integer
   field :template_id, :type => String
   field :location_id, :type => String
+  field :location_name, :type => String
   field :current_category_id, :type => String
 
   validates_presence_of :name,:message=>'name - Blank Parameter',:code=>3013
@@ -154,6 +155,8 @@ class Item
         result=user.items.undeleted.upcoming.group_by(&:upcoming)
       elsif params[:group_by]=='past'
         result=user.items.undeleted.past.order_by([:item_date,params[:order_by].to_sym]).group_by(&:upcoming)
+      elsif params[:group_by]=='all'
+        result=user.items.undeleted.order_by([:item_date,params[:order_by].to_sym]).group_by(&:_id)
       else
         result=user.items.undeleted.order_by([:item_date,params[:order_by].to_sym]).group_by(&:location_name)
       end
@@ -176,6 +179,16 @@ class Item
   
   def save_activity(text)
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
+  end
+  
+  def self.get_meets(user)
+    @meets=[]
+    @meets_values={}
+    user.items.undeleted.each do |f|
+      @meets<<f._id.to_s
+      @meets_values=@meets_values.merge({f.id=>{:name=>f.name,:id=>f._id,:description=>f.description,:item_date=>f.item_date,:location_name=>f[:location_name]}})     
+    end
+    return {:meet_arrays=>@meets,:meet_hashes=>@meets_values}
   end
   
   def self.group_values(group_by,result)

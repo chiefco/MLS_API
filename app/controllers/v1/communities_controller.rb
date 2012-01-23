@@ -182,15 +182,18 @@ class V1::CommunitiesController < ApplicationController
        @user_id=User.where(:email=>invite_email).first   
         if @user_id 
           @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)
+          @invi_id = []
               if @invitation.save
+                   #@invitation.create_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
                    Invite.community_invite(@current_user.first_name,@invitation,@community.name).deliver
                 else
                    format.json  { render :json =>@invitation.all_errors}
                 end
           else
-              Invite.send_invitations(@current_user, invite_email, @community._id).deliver
-        end
-      end
+              Invite.send_invitations(@current_user, invite_email, @community._id, @community.name).deliver
+            end
+           
+         end
        respond_to do |format|
           format.json {render :json=>success }
        end
@@ -229,12 +232,13 @@ class V1::CommunitiesController < ApplicationController
         if @user_id 
           @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)
               if @invitation.save
+                   #@invitation.create_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
                    Invite.community_invite(@current_user.first_name,@invitation,@community.name).deliver
                 else
                    format.json  { render :json =>@invitation.all_errors}
                 end
           else
-              Invite.send_invitations(@current_user, invite_email, @community._id).deliver
+              Invite.send_invitations(@current_user, invite_email, @community._id, @community.name).deliver
         end
       end
   end

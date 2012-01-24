@@ -5,7 +5,8 @@ class Community
   field :description, :type => String
   field :status, :type => Boolean, :default => true
   field :invitees, :type => Array
-  referenced_in :user
+  #referenced_in :user
+  has_and_belongs_to_many :user
   references_many :invitations
   references_many :shares
   references_many :community_users
@@ -70,6 +71,11 @@ class Community
   
   def save_activity(text)
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
+  end
+  
+  def save_Invitation_activity(text, community_id, shared_id, user_id)
+    @community = Community.find "#{community_id}"
+    @community.activities.create(:action=>text, :shared_id => shared_id, :user_id=>user_id)
   end
   
    def users_count

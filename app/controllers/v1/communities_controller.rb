@@ -152,9 +152,16 @@ class V1::CommunitiesController < ApplicationController
         elsif @invitation.user_id != @current_user.id
           format.json {render :json => failure.merge({:message => 'Please login with the invited user to join the community'})}
         else
-          @invitation.community.community_users.create(:user_id=>@invitation.user_id)
-          @invitation.update_attributes(:invitation_token=>nil)
-          format.json {render :json => {:community => @invitation.community.to_json(:only => [:_id, :name]).parse}.to_success}
+            exist_user = @invitation.community.community_users.where(:user_id => @invitation.user_id).first
+           if exist_user.nil? || exist_user.blank? 
+              @invitation.community.community_users.create(:user_id=>@invitation.user_id)
+              @invitation.update_attributes(:invitation_token=>nil)
+              @community = @invitation.community
+              @community.save_Invitation_activity("COMMUNITY_JOINED", @community._id, @invitation._id, @current_user._id)
+              format.json {render :json => {:community => @invitation.community.to_json(:only => [:_id, :name]).parse}.to_success}
+            else              
+              format.json {render :json => failure.merge({:message => 'Already you have joined this team'})}
+            end
         end
       else
         format.json {render :json => failure.merge({:message => 'Invitation already used'})}
@@ -182,10 +189,9 @@ class V1::CommunitiesController < ApplicationController
        @user_id=User.where(:email=>invite_email).first   
         if @user_id 
           @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)
-          @invi_id = []
               if @invitation.save
-                   #@invitation.create_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
                    Invite.community_invite(@current_user.first_name,@invitation,@community.name).deliver
+                  @community.save_Invitation_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
                 else
                    format.json  { render :json =>@invitation.all_errors}
                 end
@@ -232,8 +238,8 @@ class V1::CommunitiesController < ApplicationController
         if @user_id 
           @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)
               if @invitation.save
-                   #@invitation.create_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
                    Invite.community_invite(@current_user.first_name,@invitation,@community.name).deliver
+                   @community.save_Invitation_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
                 else
                    format.json  { render :json =>@invitation.all_errors}
                 end

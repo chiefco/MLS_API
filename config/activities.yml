@@ -17,4 +17,4 @@ SHARE_ATTACHMENT : <%="#{username}"%> has shared the  file <%=" #{item_name}"%> 
 SHARE_MEET : <%="#{username}"%> has shared the  meet <%=" #{item_name}"%> in <%="#{item}"%> team
 USER_ATTACHMENT : <%="#{username}"%> has uploaded a new file and called it <%="#{item}"%>
 COMMUNITY_INVITED : You have invited <%="#{username}"%> to a virtual team called <%="#{item_name}"%>
-
+COMMUNITY_JOINED : <%="#{username}"%> has joined a virtual team called <%="#{item_name}"%>

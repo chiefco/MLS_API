@@ -49,7 +49,7 @@ class V1::SessionsController < Devise::SessionsController
     end
     get_communities
    respond_to do |format|
-      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:ipad_ids=>@ipad_ids.uniq,:communities=>@communities,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks,:meets=>get_meets)}
+      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:ipad_ids=>@ipad_ids.uniq,:communities=>@communities,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks,:meets=>params[:user][1][:status]=="true" ? get_meets(true) : get_meets(nil) )}
     end
   end
   
@@ -132,8 +132,8 @@ class V1::SessionsController < Devise::SessionsController
     end
   end
   
-  def get_meets
-    Item.get_meets(@user)
+  def get_meets(value)
+    Item.get_meets(@user,value)
   end
   
   def create_or_update_pages(pages,value=nil)

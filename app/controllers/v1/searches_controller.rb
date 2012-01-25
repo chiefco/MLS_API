@@ -59,6 +59,7 @@ class V1::SearchesController < ApplicationController
     end
     
     attachments = @current_user.attachments.solr_search do |search|
+      search.with(:user_id,@current_user.id)
       search.with(:file_name).starting_with(params[:q].downcase)
     end    
     

@@ -181,14 +181,18 @@ class Item
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end
   
-  def self.get_meets(user)
+  def self.get_meets(user,value=nil)
     @meets=[]
     @meets_values={}
-    user.items.undeleted.each do |f|
-      @meets<<f._id.to_s
-      @meets_values=@meets_values.merge({f.id=>{:name=>f.name,:id=>f._id,:description=>f.description,:item_date=>f.item_date,:location_name=>f[:location_name],:created_at=>f.created_time,:updated_at=>f.updated_time}})     
+    unless value.nil?
+      user.items.undeleted.each do |f|
+        @meets<<f._id.to_s
+        @meets_values=@meets_values.merge({f.id=>{:name=>f.name,:id=>f._id,:description=>f.description,:item_date=>f.item_date,:location_name=>f[:location_name],:created_at=>f.created_time,:updated_at=>f.updated_time}})     
+      end
+      return {:meet_arrays=>@meets,:meet_hashes=>@meets_values}
+    else
+      return {:meet_arrays=>[],:meet_hashes=>nil}
     end
-    return {:meet_arrays=>@meets,:meet_hashes=>@meets_values}
   end
   
   def self.group_values(group_by,result)

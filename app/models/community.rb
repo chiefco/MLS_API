@@ -5,8 +5,7 @@ class Community
   field :description, :type => String
   field :status, :type => Boolean, :default => true
   field :invitees, :type => Array
-  #referenced_in :user
-  has_and_belongs_to_many :user
+  referenced_in :user
   references_many :invitations
   references_many :shares
   references_many :community_users

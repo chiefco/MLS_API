@@ -192,7 +192,7 @@ class V1::CommunitiesController < ApplicationController
           @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)
               if @invitation.save
                    Invite.community_invite(@current_user.first_name,@invitation,@community.name).deliver
-                  @community.save_Invitation_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
+                  #@community.save_Invitation_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
                 else
                    format.json  { render :json =>@invitation.all_errors}
                 end
@@ -240,7 +240,7 @@ class V1::CommunitiesController < ApplicationController
           @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)
               if @invitation.save
                    Invite.community_invite(@current_user.first_name,@invitation,@community.name).deliver
-                   @community.save_Invitation_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
+                  #@community.save_Invitation_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
                 else
                    format.json  { render :json =>@invitation.all_errors}
                 end

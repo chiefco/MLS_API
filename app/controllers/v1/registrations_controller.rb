@@ -196,7 +196,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
               @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@username ,:item=>'Community',:item_name=>@community_name}})
                @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }
           end
-        end        
+        end   
       end
       #~ if activity.entity_type=="Share" 
         #~ @share_name=Community.find "#{activity.entity.community_id}"

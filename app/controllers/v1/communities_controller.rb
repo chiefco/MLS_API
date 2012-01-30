@@ -35,10 +35,7 @@ class V1::CommunitiesController < ApplicationController
 
   def create
     unless @current_user.communities.undeleted.count > 5
-    p "==================="
-    p @current_user
-    p "--------------------"
-      p @community = @current_user.communities.new(params[:community])
+      @community = @current_user.communities.new(params[:community])
       @community.invitees = params[:invite_email]['users'].to_a if params[:invite_email]['users'] != 'use comma separated emails' 
       
       respond_to do |format|

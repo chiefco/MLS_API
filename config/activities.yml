@@ -1,5 +1,6 @@
 ITEM_CREATED : <%="#{username}"%> has created a new <%="#{item}"%> and called it <%="#{item_name}"%>
 ITEM_UPDATED : <%="#{username}"%> has updated the  <%="#{item} #{item_name}"%>
+ITEM_DELETED : <%="#{username}"%> moved <%="#{item} #{item_name}"%> to trash
 CATEGORY_CREATED : <%="#{username}"%> has created a new category and called it <%="#{item}"%>
 CATEGORY_DELETED : <%="#{username}"%> moved category <%="#{item}"%> to trash
 CATEGORY_UPDATED	: <%="#{username}"%> has updated the category <%="#{item}" %>
@@ -17,4 +18,4 @@ SHARE_ATTACHMENT : <%="#{username}"%> has shared the  file <%=" #{item_name}"%> 
 SHARE_MEET : <%="#{username}"%> has shared the  meet <%=" #{item_name}"%> in <%="#{item}"%> team
 USER_ATTACHMENT : <%="#{username}"%> has uploaded a new file and called it <%="#{item}"%>
 COMMUNITY_INVITED : You have invited <%="#{username}"%> to a virtual team called <%="#{item_name}"%>
-COMMUNITY_JOINED : <%="#{username}"%> has joined a virtual team called <%="#{item_name}"%>
+COMMUNITY_JOINED : <%="#{username}"%> has joined <%="#{item_name}"%> Virtual Team 

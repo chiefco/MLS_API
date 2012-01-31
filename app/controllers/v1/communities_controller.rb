@@ -182,8 +182,6 @@ class V1::CommunitiesController < ApplicationController
   
   def  invite_from_community
     @community = Community.find(params[:invite_email]['community'])
-    p "----------------------++++++++++++++++++++++++++++-"
-    p @host = request.host
     if params[:invite_email]['users'] != 'use comma separated emails'
       @community.invitees.nil? ? @community.invitees = params[:invite_email]['users'].to_a  : @community.invitees << params[:invite_email]['users'] 
       @community.save
@@ -193,13 +191,13 @@ class V1::CommunitiesController < ApplicationController
         if @user_id
           @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)
               if @invitation.save
-                   Invite.community_invite(@current_user.first_name,@invitation,@community.name, @host).deliver
+                   Invite.community_invite(@current_user.first_name,@invitation,@community.name).deliver
                   #@community.save_Invitation_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
                 else
                    format.json  { render :json =>@invitation.all_errors}
                 end
           else
-              Invite.send_invitations(@current_user, invite_email, @community._id, @community.name, @host).deliver
+              Invite.send_invitations(@current_user, invite_email, @community._id, @community.name).deliver
             end
            
          end

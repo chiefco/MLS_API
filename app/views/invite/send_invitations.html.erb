@@ -1,8 +1,8 @@
 <% if @community_id %>
 <b><%= @name %></b> invites you to join in <b>MeetLinkShare</b><br/><br/>
-<a href="http://www.meetlinkshare.railsfactory.com/users/new?email=<%= @email%>&community=<%= @community_id%>">Click here to join</a><br/><br/>
+<a href="<%=Rails.env=="development" ? "http://localhost:3000" : "#{@host}" %>/users/new?email=<%= @email%>&community=<%= @community_id%>">Click here to join</a><br/><br/>
 <b><%= @name %></b> has invited you to join a virtual team called <b><%= @community %></b>
 <% else %>
 <b><%= @name %></b> invites you to join in <b>MeetLinkShare</b><br/><br/>
-<a href="http://www.meetlinkshare.railsfactory.com/users/new">Click here to join</a>
+<a href="<%=Rails.env=="development" ? "http://localhost:3000" : "#{@host}" %>/users/new">Click here to join</a>
 <% end %>

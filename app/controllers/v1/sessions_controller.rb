@@ -2,12 +2,11 @@ require 'net/http'
 require 'net/https'
 #~ require 'rest_client'
 class V1::SessionsController < Devise::SessionsController
-  
+
   def create
     user=params[:user]
     params[:user]={}
     params[:user][:email],params[:user][:password]=user.decode_credentials if user && user.is_a?(String)
-    p controller_name
     resource = warden.authenticate!(:scope => resource_name, :recall => "V1::Sessions#index")
     respond_to do |format|
       format.xml{ render :xml=>find_user(resource) ,:root => :user}
@@ -81,8 +80,6 @@ class V1::SessionsController < Devise::SessionsController
   
   def  create_or_update_meets(status)
     status.values.first.each do |meet|
-      logger.info meet
-      puts meet
       if status.keys[0]=="new"
         @pages=meet[:page][:new_page]
         @shares=meet[:share]
@@ -185,5 +182,4 @@ class V1::SessionsController < Devise::SessionsController
       end
     end
   end
-  
 end

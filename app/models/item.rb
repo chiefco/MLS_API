@@ -187,7 +187,7 @@ class Item
     unless value.nil?
       user.items.undeleted.each do |f|
         @meets<<f._id.to_s
-        @meets_values=@meets_values.merge({f.id=>{:name=>f.name,:id=>f._id,:description=>f.description,:item_date=>f.item_date,:location_name=>f[:location_name],:created_at=>f.created_time,:updated_at=>f.updated_time}})     
+        @meets_values=@meets_values.merge({f.id=>{:name=>f.name,:id=>f._id,:description=>f.description,:item_date=>f.item_date,:location_name=>f[:location_name],:created_at=>f.created_time,:updated_at=>f.updated_time,:pages=>get_pages(f)}})     
       end
       return {:meet_arrays=>@meets,:meet_hashes=>@meets_values}
     else
@@ -209,5 +209,17 @@ class Item
       values<<{k=>b}
     end
      return {group_by=>keys,:items=>values}
-  end
+   end
+   
+   def self.get_pages(item)
+      @pages_meet=[]
+      item.pages.each do|page|
+        unless page.attachment.nil?
+          puts page.attachment._id
+        @pages_meet<<{:cloud_id=>page.attachment._id,:page_order=>page.page_order,:page_image=>page.attachment.file,:meet_id=>page.item._id}
+        end
+      end
+      puts  @pages_meet
+      return @pages_meet
+    end
 end

@@ -225,7 +225,7 @@ class Item
     @shares_meet=[]
       meet.shares.each do|share|
         unless share.community_id.nil?
-        @shares_meet<<share.community_id.to_s
+        @shares_meet<<{:community_id=>share.community_id.to_s,:meet_id=>share.item._id.to_s}
         end
       end
       return @shares_meet

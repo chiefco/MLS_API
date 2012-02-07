@@ -88,7 +88,7 @@ class Item
   end
 
   def item_date
-    super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %H:%M:%S")
+    super().nil? ? "nil" : super().strftime("%d/%m/%Y %H:%M:%S")
   end
   
   def item_date_local
@@ -100,11 +100,11 @@ class Item
   end
 
   def created_time
-    self.created_at.utc.strftime("%d/%m/%Y %H:%M:%S")
+    self.created_at.strftime("%d/%m/%Y %H:%M:%S")
   end
 
   def updated_time
-    self.updated_at.utc.strftime("%d/%m/%Y %H:%M:%S")
+    self.updated_at.strftime("%d/%m/%Y %H:%M:%S")
   end
   
   def upcoming
@@ -202,7 +202,7 @@ class Item
       keys<<k
       b=[]
       v.each do |i|
-        x=i.attributes.merge({:id=>i.id,:created_time=>i.created_time,:updated_time=>i.updated_time,:item_date=>i.item_date,:location_name=>i.location_name,:end_time=>i.end_time})
+        x=i.attributes.merge({:id=>i.id,:created_time=>i.created_time,:updated_time=>i.updated_at,:item_date=>i.item_date,:location_name=>i.location_name,:end_time=>i.end_time})
         x.reject! {|k, v| %w"created_at updated_at location_id category_ids item_date _id".include? k }
         b<<x
       end
@@ -215,7 +215,6 @@ class Item
       @pages_meet=[]
       item.pages.each do|page|
         unless page.attachment.nil?
-          puts page.attachment._id
         @pages_meet<<{:cloud_id=>page.attachment._id,:page_order=>page.page_order,:page_image=>page.attachment.file,:meet_id=>page.item._id}
         end
       end

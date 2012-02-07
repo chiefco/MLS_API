@@ -187,7 +187,7 @@ class Item
     unless value.nil?
       user.items.undeleted.each do |f|
         @meets<<f._id.to_s
-        @meets_values=@meets_values.merge({f.id=>{:name=>f.name,:id=>f._id,:description=>f.description,:item_date=>f.item_date,:location_name=>f[:location_name],:created_at=>f.created_time,:updated_at=>f.updated_time,:pages=>get_pages(f)}})     
+        @meets_values=@meets_values.merge({f.id=>{:name=>f.name,:id=>f._id,:description=>f.description,:item_date=>f.item_date,:location_name=>f[:location_name],:created_at=>f.created_time,:updated_at=>f.updated_time,:pages=>get_pages(f),:shares=>get_shares(f)}})     
       end
       return {:meet_arrays=>@meets,:meet_hashes=>@meets_values}
     else
@@ -220,4 +220,14 @@ class Item
       end
       return @pages_meet
     end
+    
+  def self.get_shares(meet)
+    @shares_meet=[]
+      meet.shares.each do|share|
+        unless share.community_id.nil?
+        @shares_meet<<share.community_id.to_s
+        end
+      end
+      return @shares_meet
+  end
 end

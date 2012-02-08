@@ -218,6 +218,7 @@ class Item
         @pages_meet<<{:cloud_id=>page.attachment._id,:page_order=>page.page_order,:page_image=>page.attachment.file,:meet_id=>page.item._id}
         end
       end
+      @pages_meet=[nil] if item.pages.empty?
       return @pages_meet
     end
     

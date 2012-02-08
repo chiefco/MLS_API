@@ -140,7 +140,6 @@ class V1::RegistrationsController < Devise::RegistrationsController
       if activity.entity_type=="Item" 
         @item_name=activity.entity.name
         activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
-        #~ @template=activity.entity.template.name unless activity.entity.template.nil? 
         @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>"meeting",:item_name=>@item_name}})
         @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }
       end
@@ -150,21 +149,24 @@ class V1::RegistrationsController < Devise::RegistrationsController
         @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@category_name,:item_name=>'nil'}})
         @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }
       end
+      if activity.entity_type=="Folder" 
+        @folder_name=activity.entity.name
+        activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
+        @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>"folder",:item_name=>@folder_name}})
+        @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }
+      end
       if activity.entity_type=="Bookmark" 
         @bookmark_name=activity.entity.name
         activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
         @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@bookmark_name,:item_name=>'nil'}})
         @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }
       end
-      
       if activity.entity_type=="Attachment" 
         @attachment_name=activity.entity.file_name
         activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
         @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@attachment_name,:item_name=>'nil'}})
         @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }
       end
-      
-      
       if activity.entity_type=="Community" 
         @community_name=activity.entity.name
         if activity.shared_id.nil? 
@@ -183,12 +185,6 @@ class V1::RegistrationsController < Devise::RegistrationsController
                 activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
                 @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>@attachment_name.file_name}})
                 @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }
-             
-          #~ elsif activity.action =="COMMUNITY_INVITED" 
-              #~ @invitation=Invitation.find(activity.shared_id)
-              #~ activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
-              #~ @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@invitation.email ,:item=>'Community',:item_name=>@community_name}})
-               #~ @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }
           elsif activity.action =="COMMUNITY_JOINED" 
               @invitation=Invitation.find(activity.shared_id)
               @username = User.where(:email => @invitation.email).first.first_name rescue ''
@@ -198,12 +194,6 @@ class V1::RegistrationsController < Devise::RegistrationsController
           end
         end   
       end
-      #~ if activity.entity_type=="Share" 
-        #~ @share_name=Community.find "#{activity.entity.community_id}"
-        #~ @share_type=activity.entity.shared_type
-        #~ @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@share_type,:item_name=>@share_name.name}})
-        #~ @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
-      #~ end
     end
     #find_category_ids;insert_items;
   end
@@ -216,8 +206,6 @@ class V1::RegistrationsController < Devise::RegistrationsController
     activities.reverse.paginate(@paginate_options).each do |activity|
      @first_name= User.find(activity['user_id']).first_name
       if activity.entity_type=="Community"             
-        #~ @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>'nil'}})
-        #~ @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity.updated_at }
         if activity.shared_id.nil? 
         @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>'nil'}})
         activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
@@ -233,11 +221,6 @@ class V1::RegistrationsController < Devise::RegistrationsController
                 activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
                 @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>@attachment_name.file_name}})
                 @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }             
-            #~ elsif activity.action =="COMMUNITY_INVITED" 
-              #~ @invitation=Invitation.find(activity.shared_id)
-              #~ activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
-              #~ @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@invitation.email ,:item=>'Community',:item_name=>@community_name}})
-               #~ @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }
             elsif activity.action =="COMMUNITY_JOINED" 
               @invitation=Invitation.find(activity.shared_id)
               @username = User.where(:email => @invitation.email).first.first_name rescue ''

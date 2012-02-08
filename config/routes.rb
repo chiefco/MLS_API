@@ -3,7 +3,7 @@ MeetlinkshareApi::Application.routes.draw do
   API_VERSION1="v1"
 
   namespace :v1 do
-    resources :topics, :template_categories, :templates, :items, :bookmarks, :categories, :searches, :attachments, :custom_pages,:tasks,:locations, :pages, :contacts,:comments,:communities, :shares
+    resources :topics, :template_categories, :templates, :items, :bookmarks, :categories, :searches, :attachments, :custom_pages,:tasks,:locations, :pages, :contacts,:comments,:communities, :shares, :folders
     match "/altitude" => 'locations#get_altitude',:via=>:get
     match "/location_names" => 'locations#location_names',:via=>:get
     match "item_add_attendees" => 'items#item_add_attendees',:via=>:post
@@ -45,6 +45,11 @@ MeetlinkshareApi::Application.routes.draw do
     match "/attachments_multiple_delete" => 'attachments#attachments_multiple_delete'
     match "/invite_from_community" => 'communities#invite_from_community', :via => :post
     match "/member_delete" => "communities#member_delete"
+    match "/attachments_download" => 'attachments#attachments_download'
+    match "/folder_tree" => 'folders#folder_tree'
+    match "/move_attachments" => 'folders#move_attachments'
+    match '/move_multiple_attachments', :to=>'folders#move_multiple_attachments' 
+    match '/move_folders', :to=>'folders#move_folders'  
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do

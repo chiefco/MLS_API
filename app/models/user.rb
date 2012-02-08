@@ -10,6 +10,7 @@ class User
   references_many :categories
   references_many :bookmarks, :dependent=>:destroy
   has_many :attachments
+  references_many :folders
   references_many :tasks,:dependent => :destroy
   references_many :activities_users,:dependent => :destroy,:class_name=>"Activity",:foreign_key=>"user_id"
   has_many :activities, as: :subject

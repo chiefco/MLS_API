@@ -17,5 +17,9 @@ COMMUNITY_DELETED : <%="#{username}"%> moved team <%="#{item}"%> to trash
 SHARE_ATTACHMENT : <%="#{username}"%> has shared the  file <%=" #{item_name}"%> in <%="#{item}"%> team
 SHARE_MEET : <%="#{username}"%> has shared the  meet <%=" #{item_name}"%> in <%="#{item}"%> team
 USER_ATTACHMENT : <%="#{username}"%> has uploaded a new file and called it <%="#{item}"%>
+ATTACHMENT_DOWNLOADED : <%="#{username}"%> has downloaded <%="#{item}"%>
 COMMUNITY_INVITED : You have invited <%="#{username}"%> to a virtual team called <%="#{item_name}"%>
 COMMUNITY_JOINED : <%="#{username}"%> has joined <%="#{item_name}"%> Virtual Team 
+FOLDER_CREATED : <%="#{username}"%> has created a new <%="#{item}"%> and called it <%="#{item_name}"%>
+FOLDER_UPDATED : <%="#{username}"%> has updated the  <%="#{item} #{item_name}"%>
+FOLDER_DELETED : <%="#{username}"%> moved <%="#{item} #{item_name}"%> to trash

@@ -23,6 +23,7 @@ class Attachment
   field :size, type: Integer
   field :width, type: Integer
   field :height, type: Integer
+  field :folder_id, :type => String, :default => nil
   
   searchable do
     string :file_name do
@@ -38,6 +39,7 @@ class Attachment
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
     query = 'attachments'
     query +=  '.where(file_type: params[:file_type])' if params[:file_type]
+    query +=  '.and(:folder_id=> nil)' if params[:folder_id]
     query += '.any_of(self.get_criteria(params[:q]))' if params[:q]
     query += '.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)'
     eval(query)

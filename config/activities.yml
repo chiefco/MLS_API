@@ -1,5 +1,5 @@
 ITEM_CREATED : <%="#{username}"%> has created a new <%="#{item}"%> and called it <%="#{item_name}"%>
-ITEM_UPDATED : <%="#{username}"%> has updated the  <%="#{item} #{item_name}"%>
+ITEM_UPDATED : <%="#{username}"%> has updated the <%="#{item} #{item_name}"%>
 ITEM_DELETED : <%="#{username}"%> moved <%="#{item} #{item_name}"%> to trash
 CATEGORY_CREATED : <%="#{username}"%> has created a new category and called it <%="#{item}"%>
 CATEGORY_DELETED : <%="#{username}"%> moved category <%="#{item}"%> to trash

@@ -18,8 +18,8 @@ class V1::AttachmentsController < ApplicationController
       @count = @current_user.attachments.where(:folder_id => nil).count
     end
     respond_to do |format|
-      format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at]).parse ,:total=>@count}.to_success }
-      format.xml  { render :xml => @attachments.to_xml(:only=>[:_id, :file_type, :file_name, :size,  :content_type]).as_hash.to_success.to_xml(ROOT) }
+      format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :content_type,:file,:created_at]).parse ,:total=>@count}.to_success }
+      format.xml  { render :xml => @attachments.to_xml(:only=>[:_id, :file_type, :file_name, :size, :user_id,  :content_type]).as_hash.to_success.to_xml(ROOT) }
     end
   end
 

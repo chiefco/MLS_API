@@ -3,10 +3,10 @@ class PageText
   include Mongoid::Timestamps
 
   #fields
-  field :position , type: Array
+  field :position , type: String
   field :content , type: String
 
   #associations
-  embedded_in :page
+  referenced_in :page
 
 end

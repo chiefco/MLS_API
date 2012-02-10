@@ -11,7 +11,7 @@ class Page
 #associations
   references_many :page_texts, :dependent=>:destroy
   has_many :bookmarked_contents, as: :bookmarkable
-  embeds_many :page_texts
+  #~ embeds_many :page_texts
   belongs_to :item
   has_one :attachment, as: :attachable, :dependent=>:destroy
   has_many :activities, as: :entity
@@ -30,7 +30,7 @@ class Page
   end
   
   def update_activity
-    if self.status_changed? 
+    if self.status_changed?
       save_activity("PAGE_DELETED") 
     else
       save_activity("PAGE_UPDATED")
@@ -50,5 +50,17 @@ class Page
   
   def save_activity(text)
     self.item.activities.create(:action=>text,:user_id=>self.item.user.nil?  ? 'nil' : self.item.user._id)
+  end
+  
+  def self.create_page_texts(pagetexts,id)
+    @page_texts=[]
+    page=Page.where(:_id=>id).first
+    page.page_texts.delete_all
+    unless pagetexts.nil?
+      pagetexts.each do |text|
+        @text=page.page_texts.create(:position=>text[:page_text_position],:content=>text[:page_text_content])
+        @page_texts<<{text[:pagetext_id]=>@text._id}
+      end
+    end
   end
 end

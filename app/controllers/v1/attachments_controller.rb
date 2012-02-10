@@ -45,6 +45,11 @@ class V1::AttachmentsController < ApplicationController
     File.delete(params[:attachment][:file])
     respond_to do |format|
       if @attachment.save
+         if params[:community]!=''
+          @v1_share = @current_user.shares.create(:user_id => @current_user._id, :shared_id => @attachment._id, :community_id => params[:community], :shared_type=> "Attachment", :attachment_id => @attachment._id, :item_id => nil)          
+          @v1_share.save
+          @v1_share.create_activity("SHARE_ATTACHMENT", params[:community], @attachment._id)   
+        end
         format.json  { render :json=> { :attachment=>@attachment.to_json(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).parse}.to_success }
         format.xml  { render :xml => @attachment.to_xml(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).as_hash.to_success.to_xml(ROOT) }
       else

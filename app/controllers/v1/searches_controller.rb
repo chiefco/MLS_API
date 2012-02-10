@@ -76,7 +76,7 @@ class V1::SearchesController < ApplicationController
     unless params[:limit]
       respond_to do |format|
         format.xml  { render :xml => {:response=>:success,:searches=>results}.to_xml(:root=>:result,:only=>SEARCH_FIELDS) }
-        format.json {render :json =>{:items=>items.to_json(:only=>[:name,:_id],:methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id, :item_date_local]).parse, :attachments=>attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at]).parse}.to_success}
+        format.json {render :json =>{:items=>items.to_json(:only=>[:name,:_id],:methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id, :item_date_local]).parse, :attachments=>attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at], :methods => [:user_name]).parse}.to_success}
       end
     else
       items << attachments

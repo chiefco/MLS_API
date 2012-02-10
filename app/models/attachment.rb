@@ -60,6 +60,10 @@ class Attachment
     evaluate_item(a=text) unless self.attachable.nil?
   end
   
+  def user_name
+    User.find(self.user_id).first_name
+  end
+  
   def  evaluate_item(text)
     if self.attachable_type =="User"
       user_id = self.attachable._id.nil?  ? 'nil' : self.attachable._id

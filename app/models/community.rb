@@ -14,7 +14,7 @@ class Community
   scope :undeleted,self.excludes(:status=>false)
   
   after_create :create_activity
-  #after_update :update_activity
+  after_update :update_activity
 
   def create_activity
     save_activity("COMMUNITY_CREATED")

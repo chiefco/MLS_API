@@ -49,6 +49,14 @@ class Share
     permission=Permission.find(self.permission_id).role_name
   end
   
+  def user_name
+    User.find(self.user_id).first_name
+  end
+  
+  def share_attachments
+    self.attachment
+  end
+  
   def save_activity(text, community_id, shared_id)
     @community = Community.find "#{community_id}"
     @community.activities.create(:action=>text, :shared_id => shared_id, :user_id=>self.user.nil?  ? 'nil' : self.user._id)

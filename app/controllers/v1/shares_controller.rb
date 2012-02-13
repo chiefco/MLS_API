@@ -43,7 +43,10 @@ class V1::SharesController < ApplicationController
   # DELETE /v1/shares/1
   # DELETE /v1/shares/1.xml
   def destroy
-     
+    @share.update_attributes(:status=>false)
+    respond_to do |format|
+      format.json {render :json=>success }
+    end
   end
 
   private

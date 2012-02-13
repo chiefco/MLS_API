@@ -8,7 +8,7 @@ class V1::CommunitiesController < ApplicationController
   
    def index
     @communities = @current_user.communities.undeleted
-    @shared_communities = CommunityUser.where(:user_id => "#{@current_user._id}").map(&:community).select{|c| c.user_id != @current_user.id && c.status == true}
+    @shared_communities = CommunityUser.where(:user_id => "#{@current_user._id}").map(&:community).select{|c| c.user_id != @current_user.id && c.status == true} rescue ''
     respond_to do |format|
       format.json {render :json =>  {:communities => @communities.to_json(:methods => [:users_count, :shares_count]).parse, :shared_communities => @shared_communities.to_json(:methods => [:users_count, :shares_count]).parse}} # index.html.erb
     end
@@ -17,7 +17,7 @@ class V1::CommunitiesController < ApplicationController
   def show
     @attachments, @items = [], []
     shares = @community.shares.order_by(:created_at.desc)
-    attachments = shares.select{|i| i.shared_type == 'Attachment'}.map(&:attachment)
+    share_attachments = shares.select{|i| i.shared_type == 'Attachment' && i.status == true}
     items = shares.select{|i| i.shared_type == 'Meet'}.map(&:item)
     users = @community.community_users.map(&:user)
     community_owner = @community.community_users.select{|i| i.user_id == @community.user_id}.map(&:user)
@@ -26,7 +26,7 @@ class V1::CommunitiesController < ApplicationController
     respond_to do |format|
       if @community.status!=false
         #~ find_parameters
-        format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description, :invitees]), :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :attachments => attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at, :user_id], :methods => [:user_name]).parse, :users => users.to_json(:only=>[:_id, :first_name, :email]).parse, :community_owner => community_owner.to_json(:only=>[:_id, :first_name, :email]).parse}.to_success}
+        format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description, :invitees]), :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :attachments => share_attachments.to_json(:only=>[:_id, :user_id], :methods => [:user_name, :share_attachments]).parse, :users => users.to_json(:only=>[:_id, :first_name, :email]).parse, :community_owner => community_owner.to_json(:only=>[:_id, :first_name, :email]).parse}.to_success}
       else
         format.json  {render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end

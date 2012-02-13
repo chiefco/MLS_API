@@ -217,9 +217,10 @@ class V1::RegistrationsController < Devise::RegistrationsController
               @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>@item_name.name}})
               @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }
             elsif activity.action == "SHARE_ATTACHMENT"
-                @attachment_name = Attachment.find (activity.shared_id)
+                @attachment = Attachment.where(:_id => activity.shared_id).first
+                @attachment_name = @attachment.file_name rescue ''
                 activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
-                @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>@attachment_name.file_name}})
+                @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>@attachment_name}})
                 @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:message=>"#{@activities[activity.action]}", :date=>activity_date }             
             elsif activity.action =="COMMUNITY_JOINED" 
               @invitation=Invitation.find(activity.shared_id)

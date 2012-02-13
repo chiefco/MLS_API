@@ -43,10 +43,14 @@ class V1::AttachmentsController < ApplicationController
     params[:attachment][:file] = File.new("#{Rails.root}/tmp/#{params[:attachment][:file_name]}")
     @attachment = @current_user.attachments.new(params[:attachment])
     @attachment.save
-    File.delete(params[:attachment][:file])
+    #~ File.delete(params[:attachment][:file])
     respond_to do |format|
       if @attachment.save
+<<<<<<< HEAD
          if params[:community]!='' && params.has_key?(:community) 
+=======
+           if params[:community]!='' && params.has_key?(:community) 
+>>>>>>> 0b6912643b048c35a239af7e72ba6bc8b14dc0c1
           @v1_share = @current_user.shares.create(:user_id => @current_user._id, :shared_id => @attachment._id, :community_id => params[:community], :shared_type=> "Attachment", :attachment_id => @attachment._id, :item_id => nil)          
           @v1_share.save
           @v1_share.create_activity("SHARE_ATTACHMENT", params[:community], @attachment._id)   

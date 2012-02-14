@@ -84,4 +84,8 @@ class Community
   def shares_count
     self.shares.count
   end  
+  
+  def get_meets
+    shares.to_a.select{|c| c.shared_type="Meet"}.map(&:item).to_json(:only=>[:_id,:description,:name],:methods=>[:item_date,:created_time,:updated_time]).parse
+  end
 end

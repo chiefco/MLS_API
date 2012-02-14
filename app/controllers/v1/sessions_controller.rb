@@ -98,7 +98,6 @@ class V1::SessionsController < Devise::SessionsController
           end
         rescue Exception => e
           puts e
-          logger.info e
         end
       elsif status.keys[0]=="delete"
         @deleted_meet=Item.where(:_id=>meet[:cloud_id]).first
@@ -164,7 +163,7 @@ class V1::SessionsController < Devise::SessionsController
       @share=@meet.shares.create(:user_id=>@user._id,:community_id=>f,:shared_type=>"Meet",:shared_id=>@meet._id,:ipad_share=>true)
       #~ @share.create_activity("SHARE_MEET",f,@meet._id) 
       @share_ids<<@shares[1][:share_ids][i]
-      @synched_hash=@synched_hash.merge({@shares[1][:share_ids][i]=>@share._id})
+      @synched_hash=@synched_hash.merge({@shares[1][:share_ids][i]=>@share._id.to_s})
     end
   end
   

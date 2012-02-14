@@ -3,7 +3,7 @@ class V1::AttachmentsController < ApplicationController
   before_filter :authenticate_request!
   before_filter :find_resource, :except=>[:create, :index, :attachments_multiple_delete]
   before_filter :detect_missing_file, :only=>[:create]
-  before_filter :set_attachment_options, :only=>[:create]
+  
   # GET /v1/attachments
   # GET /v1/attachments.xml
   def index
@@ -41,6 +41,7 @@ class V1::AttachmentsController < ApplicationController
     end   
     params[:attachment][:attachable_id] =@current_user._id if params[:attachment][:attachable_type] == "User"
     params[:attachment][:file] = File.new("#{Rails.root}/tmp/#{params[:attachment][:file_name]}")
+    params[:attachment][:size] = params[:attachment][:file].size
     @attachment = @current_user.attachments.new(params[:attachment])
     @attachment.save
     File.delete(params[:attachment][:file])
@@ -105,7 +106,7 @@ class V1::AttachmentsController < ApplicationController
 
   def detect_missing_file
     file_missing = true
-    file_missing = false if params.has_key?(:encoded) && params[:attachment].is_a?(Hash) && params[:attachment].has_key?("file")
+    file_missing = false if params.has_key?(:encoded) && params[:attachment].is_a?(Hash) 
     if file_missing
       respond_to do |format|
         format.json { render :json=> {:error=>{:code=>6001, :message=>"The file was not correctly uploaded"}}.to_failure }

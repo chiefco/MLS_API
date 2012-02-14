@@ -96,13 +96,6 @@ class ApplicationController < ActionController::Base
     params[:page_size]=PAGE_SIZE if page_size.zero?
   end
 
-  #sets values to attchment to be created
-  def set_attachment_options
-    params[:attachment][:size] = params[:attachment][:file].size
-    params[:attachment][:file_name] =  params[:attachment][:file_name]
-    #~ params[:attachment][:file_type] =  params[:attachment][:file].content_type.split('/').last if params[:attachment][:file_type].blank?
-  end
-
   #renders missing parameter response
   def render_missing(parameter,code)
     respond_to do |format|

@@ -65,7 +65,7 @@ class ByteBufferTest < Test::Unit::TestCase
     @buf.rewind
     assert_equal 41.2, @buf.get_double
   end
-  
+
   if defined?(Encoding)
     def test_serialize_cstr_converts_encoding_to_utf8
       theta = "hello \xC8".force_encoding("ISO-8859-7")
@@ -73,7 +73,7 @@ class ByteBufferTest < Test::Unit::TestCase
       assert_equal "hello \xCE\x98\0", @buf.to_s
       assert_equal Encoding.find('binary'), @buf.to_s.encoding
     end
-    
+
     def test_serialize_cstr_validates_data_as_utf8
       assert_raises(Encoding::UndefinedConversionError) do
         ByteBuffer.serialize_cstr(@buf, "hello \xFF")
@@ -85,42 +85,42 @@ class ByteBufferTest < Test::Unit::TestCase
       ByteBuffer.serialize_cstr(@buf, "hello \342\230\203")
       assert_equal "hello \342\230\203\0", @buf.to_s
     end
-    
+
     def test_serialize_cstr_validates_data_as_utf8
       assert_raises(BSON::InvalidStringEncoding) do
         ByteBuffer.serialize_cstr(@buf, "hello \xFF")
       end
     end
   end
-  
+
   def test_put_negative_byte
     @buf.put(-1)
     @buf.rewind
     assert_equal 255, @buf.get
     assert_equal "\xFF", @buf.to_s
   end
-  
+
   def test_put_with_offset
     @buf.put(1)
     @buf.put(2, 0)
     @buf.put(3, 3)
     assert_equal "\x02\x00\x00\x03", @buf.to_s
   end
-  
+
   def test_put_array_with_offset
     @buf.put(1)
     @buf.put_array([2, 3], 0)
     @buf.put_array([4, 5], 4)
     assert_equal "\x02\x03\x00\x00\x04\x05", @buf.to_s
   end
-  
+
   def test_put_int_with_offset
     @buf.put(1)
     @buf.put_int(2, 0)
     @buf.put_int(3, 5)
     assert_equal "\x02\x00\x00\x00\x00\x03\x00\x00\x00", @buf.to_s
   end
-  
+
   def test_put_long_with_offset
     @buf.put(1)
     @buf.put_long(2, 0)
@@ -131,14 +131,14 @@ class ByteBufferTest < Test::Unit::TestCase
       "\x03\x00\x00\x00\x00\x00\x00\x00",
       @buf.to_s)
   end
-  
+
   def test_put_binary
     @buf.put(1)
     @buf.put_binary("\x02\x03", 0)
     @buf.put_binary("\x04\x05", 4)
     assert_equal "\x02\x03\x00\x00\x04\x05", @buf.to_s
   end
-  
+
   def test_rewrite
     @buf.put_int(0)
     @buf.rewind
@@ -162,7 +162,7 @@ class ByteBufferTest < Test::Unit::TestCase
     @buf.append!(new_buf)
     assert_equal [4, 0, 0, 0, 5, 0, 0, 0], @buf.to_a
   end
-  
+
   def test_array_as_initial_input
     @buf = ByteBuffer.new([5, 0, 0, 0])
     assert_equal 4, @buf.size
@@ -173,7 +173,7 @@ class ByteBufferTest < Test::Unit::TestCase
     assert_equal 5, @buf.get_int
     assert_equal 32, @buf.get_int
   end
-  
+
   def test_binary_string_as_initial_input
     str = "abcd"
     str.force_encoding('binary') if str.respond_to?(:force_encoding)
@@ -183,7 +183,7 @@ class ByteBufferTest < Test::Unit::TestCase
     @buf.put_int(0)
     assert_equal [97, 98, 99, 100, 0, 0, 0, 0], @buf.to_a
   end
-  
+
   def test_more
     assert !@buf.more?
     @buf.put_int(5)
@@ -193,7 +193,7 @@ class ByteBufferTest < Test::Unit::TestCase
     @buf.get_int
     assert !@buf.more?
   end
-  
+
   def test_equality
     @buf = ByteBuffer.new("foo")
     assert_equal @buf, @buf

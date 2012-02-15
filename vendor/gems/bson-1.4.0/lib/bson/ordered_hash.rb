@@ -62,7 +62,7 @@ module BSON
       end
 
       def yaml_initialize(tag, val)
-        @ordered_keys = []        
+        @ordered_keys = []
         super
       end
 
@@ -84,7 +84,7 @@ module BSON
       alias :each_pair :each
 
       def to_a
-        @ordered_keys.map { |k| [k, self[k]] }      
+        @ordered_keys.map { |k| [k, self[k]] }
       end
 
       def values

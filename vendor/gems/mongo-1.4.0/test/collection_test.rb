@@ -644,7 +644,7 @@ class TestCollection < Test::Unit::TestCase
     cursor      = @@test.find({}, :transformer => transformer)
     assert_equal(transformer, cursor.transformer)
   end
-  
+
   def test_find_one_with_transformer
     klass       = Struct.new(:id, :a)
     transformer = Proc.new { |doc| klass.new(doc['_id'], doc['a']) }
@@ -753,7 +753,7 @@ class TestCollection < Test::Unit::TestCase
   end
 
   context "Grouping with a key function" do
-    setup do 
+    setup do
       @@test.remove
       @@test.save("a" => 1)
       @@test.save("a" => 2)
@@ -805,7 +805,7 @@ class TestCollection < Test::Unit::TestCase
       assert_equal 1, @collection.size
     end
   end
-  
+
   context "Drop index " do
     setup do
       @@db.drop_collection('test-collection')
@@ -818,21 +818,21 @@ class TestCollection < Test::Unit::TestCase
       @collection.drop_index([['a', Mongo::ASCENDING]])
       assert_nil @collection.index_information['a_1']
     end
-    
+
     should "drop an index which was given a specific name" do
       @collection.create_index([['a', Mongo::DESCENDING]], {:name => 'i_will_not_fear'})
       assert @collection.index_information['i_will_not_fear']
       @collection.drop_index([['a', Mongo::DESCENDING]])
       assert_nil @collection.index_information['i_will_not_fear']
     end
-  
+
     should "drops an composite index" do
       @collection.create_index([['a', Mongo::DESCENDING], ['b', Mongo::ASCENDING]])
       assert @collection.index_information['a_-1_b_1']
       @collection.drop_index([['a', Mongo::DESCENDING], ['b', Mongo::ASCENDING]])
       assert_nil @collection.index_information['a_-1_b_1']
     end
-    
+
     should "drops an index with symbols" do
       @collection.create_index([['a', Mongo::DESCENDING], [:b, Mongo::ASCENDING]])
       assert @collection.index_information['a_-1_b_1']

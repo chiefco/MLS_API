@@ -138,7 +138,7 @@ module Mongo
       end
     end
 
-    # Adds a stored Javascript function to the database which can executed  
+    # Adds a stored Javascript function to the database which can executed
     # server-side in map_reduce, db.eval and $where clauses.
     #
     # @param [String] function_name
@@ -148,7 +148,7 @@ module Mongo
     def add_stored_function(function_name, code)
       self[SYSTEM_JS_COLLECTION].save(
         {
-          "_id" => function_name, 
+          "_id" => function_name,
           :value => BSON::Code.new(code)
         }
       )
@@ -392,7 +392,7 @@ module Mongo
     # Evaluate a JavaScript expression in MongoDB.
     #
     # @param [String, Code] code a JavaScript expression to evaluate server-side.
-    # @param [Integer, Hash] args any additional argument to be passed to the +code+ expression when 
+    # @param [Integer, Hash] args any additional argument to be passed to the +code+ expression when
     #   it's run on the server.
     #
     # @return [String] the return value of the function.

@@ -28,7 +28,7 @@ module BSON
 
     # Create a new BSON Timestamp.
     #
-    # @param [Integer] seconds The number of seconds 
+    # @param [Integer] seconds The number of seconds
     # @param increment
     def initialize(seconds, increment)
       @seconds   = seconds

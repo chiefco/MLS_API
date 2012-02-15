@@ -73,7 +73,7 @@ class GridFileSystemTest < Test::Unit::TestCase
       end
 
       should "return the first n bytes even with an offset" do
-        data = @grid.open('sample.file', 'r') do |f| 
+        data = @grid.open('sample.file', 'r') do |f|
           f.seek(1000)
           f.read(288888)
         end

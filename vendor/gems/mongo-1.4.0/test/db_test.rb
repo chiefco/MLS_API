@@ -255,7 +255,7 @@ class DBTest < Test::Unit::TestCase
     @@db.add_stored_function("sum", "function (x, y) { return x + y; }")
     assert_equal @@db.eval("return sum(2,3);"), 5
     assert @@db.remove_stored_function("sum")
-    assert_raise OperationFailure do 
+    assert_raise OperationFailure do
       @@db.eval("return sum(2,3);")
     end
   end

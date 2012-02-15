@@ -47,13 +47,13 @@ module BSON
       NULL_BYTE       = "\0".force_encoding('binary').freeze
       UTF8_ENCODING   = Encoding.find('utf-8')
       BINARY_ENCODING = Encoding.find('binary')
-      
+
       def self.to_utf8_binary(str)
         str.encode(UTF8_ENCODING).force_encoding(BINARY_ENCODING)
       end
     else
       NULL_BYTE = "\0"
-      
+
       def self.to_utf8_binary(str)
         begin
         str.unpack("U*")
@@ -121,7 +121,7 @@ module BSON
       end
       @cursor += 1
     end
-    
+
     def put_binary(data, offset=nil)
       @cursor = offset if offset
       if defined?(BINARY_ENCODING)
@@ -135,7 +135,7 @@ module BSON
       end
       @cursor += data.length
     end
-    
+
     def put_array(array, offset=nil)
       @cursor = offset if offset
       if more?
@@ -232,7 +232,7 @@ module BSON
     def more?
       @cursor < @str.size
     end
-    
+
     def ==(other)
       other.respond_to?(:to_s) && @str == other.to_s
     end
@@ -263,7 +263,7 @@ module BSON
         @str << NULL_BYTE * (length - @str.size)
       end
     end
-    
+
     def chr(byte)
       if byte < 0
         [byte].pack('c')
@@ -271,7 +271,7 @@ module BSON
         byte.chr
       end
     end
-    
+
     def check_read_length(len)
       raise "attempt to read past end of buffer" if @cursor + len > @str.length
     end

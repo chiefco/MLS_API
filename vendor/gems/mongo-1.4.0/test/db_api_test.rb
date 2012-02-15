@@ -188,7 +188,7 @@ class DBAPITest < Test::Unit::TestCase
     # order of the keys won't be guaranteed thus your sort won't make sense.
     oh = BSON::OrderedHash.new
     oh['a'] = -1
-    assert_raise InvalidSortValueError do 
+    assert_raise InvalidSortValueError do
       docs = @@coll.find({'a' => { '$lt' => 10 }}, :sort => oh).to_a
     end
   end
@@ -549,7 +549,7 @@ HERE
                       :initial => {"count" => 0}, :reduce => "function (obj, prev) { prev.count++; }")[0]["count"]
 
     finalize = "function (obj) { obj.f = obj.count - 1; }"
-    assert_equal 2, test.group(:initial => {"count" => 0}, 
+    assert_equal 2, test.group(:initial => {"count" => 0},
                       :reduce => "function (obj, prev) { prev.count++; }", :finalize => finalize)[0]["f"]
 
     test.insert("a" => 2, "b" => 3)

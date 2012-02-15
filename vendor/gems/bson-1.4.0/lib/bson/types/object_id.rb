@@ -87,7 +87,7 @@ module BSON
     #
     # @param [Hash] doc a document requiring an _id.
     #
-    # @return [BSON::ObjectId, Object] returns a newly-created or 
+    # @return [BSON::ObjectId, Object] returns a newly-created or
     #   current _id for the given document.
     def self.create_pk(doc)
       doc.has_key?(:_id) || doc.has_key?('_id') ? doc : doc.merge!(:_id => self.new)
@@ -150,7 +150,7 @@ module BSON
       "{\"$oid\": \"#{to_s}\"}"
     end
 
-    # Create the JSON hash structure convert to MongoDB extended format. Rails 2.3.3 
+    # Create the JSON hash structure convert to MongoDB extended format. Rails 2.3.3
     # introduced as_json to create the needed hash structure to encode objects into JSON.
     #
     # @return [Hash] the hash representation as MongoDB extended JSON

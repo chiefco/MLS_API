@@ -348,7 +348,7 @@ module Mongo
       self["admin"].command(oh)
     end
 
-    # Checks if a server is alive. This command will return immediately 
+    # Checks if a server is alive. This command will return immediately
     # even if the server is in a lock.
     #
     # @return [Hash]

@@ -71,7 +71,7 @@ class ObjectIdTest < Test::Unit::TestCase
   end
 
   def test_illegal_from_string
-    assert_raise InvalidObjectId do 
+    assert_raise InvalidObjectId do
       ObjectId.from_string("")
     end
   end

@@ -1,4 +1,4 @@
-class CustomDatas 
+class CustomDatas
 	def list
 		@methods=["Item","Category","Location","Industry","Template","Search","Contact","Comment","User","Activity"]
 		Dir.mkdir("#{Rails.root.to_s}/dummy_jsons") if (!File.directory?("#{Rails.root.to_s}/dummy_jsons"))

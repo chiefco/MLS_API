@@ -76,7 +76,7 @@ industry=['Automotive','Banking','Consumer','Education','Energy','Fast-Moving Co
 		industry.each do |ind|
 			Industry.create(:name=>ind)
 		end
-		
+
 #Creating Default Permissions
 Permission.create(:role_name=>"Admin",:can_edit=>true,:can_share=>true,:can_comment=>true)
 Permission.create(:role_name=>"View")

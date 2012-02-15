@@ -15,9 +15,9 @@ class Invitation
   before_create :create_invitation_token
 
   def create_invitation_token
-    self.invitation_token=SecureRandom.base64(6).tr('+/=', 'xyz')    
+    self.invitation_token=SecureRandom.base64(6).tr('+/=', 'xyz')
     self.invited_at=Time.current
     create_invitation_token unless Invitation.where(:invitation_token=>self.invitation_token).first.nil?
   end
-  
+
 end

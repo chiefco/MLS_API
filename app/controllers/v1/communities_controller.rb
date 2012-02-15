@@ -5,7 +5,7 @@ class V1::CommunitiesController < ApplicationController
   before_filter :add_pagination,:only=>[:index]
   before_filter :detect_missing_params, :only=>[:create]
 
-  
+
    def index
     @communities = @current_user.communities.undeleted
     @shared_communities = CommunityUser.where(:user_id => "#{@current_user._id}").map(&:community).select{|c| c.user_id != @current_user.id && c.status == true} rescue ''
@@ -22,7 +22,7 @@ class V1::CommunitiesController < ApplicationController
     users = @community.community_users.map(&:user)
     community_owner = @community.community_users.select{|i| i.user_id == @community.user_id}.map(&:user)
     users = users - community_owner
-    
+
     respond_to do |format|
       if @community.status!=false
         #~ find_parameters
@@ -31,16 +31,16 @@ class V1::CommunitiesController < ApplicationController
         format.json  {render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
-  end  
+  end
 
   def create
     unless @current_user.communities.undeleted.count > 5
       @community = @current_user.communities.new(params[:community])
-      @community.invitees = params[:invite_email]['users'].to_a if params[:invite_email]['users'] != 'use comma separated emails' 
-      
+      @community.invitees = params[:invite_email]['users'].to_a if params[:invite_email]['users'] != 'use comma separated emails'
+
       respond_to do |format|
         if @community.save
-          community_invitation if params[:invite_email]['users'] != 'use comma separated emails' 
+          community_invitation if params[:invite_email]['users'] != 'use comma separated emails'
           CommunityUser.create(:user_id=>@current_user._id,:community_id=>@community._id,:role_id=>1)
           find_parameters
           format.json {render :json => @community}
@@ -51,7 +51,7 @@ class V1::CommunitiesController < ApplicationController
     else
       respond_to do |format|
         format.json { render :json=> {:message=>"You can create only 6 teams"}.to_failure }
-      end      
+      end
     end
   end
 
@@ -76,7 +76,7 @@ class V1::CommunitiesController < ApplicationController
       format.json {render :json=>success }
     end
   end
-  
+
   def multiple_delete
     params[:community].each do |com_id|
       @community = Community.find(com_id)
@@ -85,15 +85,15 @@ class V1::CommunitiesController < ApplicationController
     @community_user = CommunityUser.where(:user_id => "#{@current_user._id}")
     @communities=[]
     @community_user.each do |com_user|
-      com = Community.where(:_id => "#{com_user.community_id}", :status => true).first      
+      com = Community.where(:_id => "#{com_user.community_id}", :status => true).first
       @communities<< {:id =>com.id, :name=>com.name,:members=>com.community_users.count,:shares=>com.shares.count, :status => com.status} if com
     end
     respond_to do |format|
       format.json {render :json => {:community =>@communities}.to_success} # index.html.erb
     end
   end
-  
-  # Invitation is sent to the member 
+
+  # Invitation is sent to the member
   def invite_member
     @invitation=@community.invitations.new(params[:invite_member])
     respond_to do |format|
@@ -105,7 +105,7 @@ class V1::CommunitiesController < ApplicationController
       end
     end
   end
-  
+
   #Retrieves members of the given community
   def members
     respond_to do |format|
@@ -125,13 +125,13 @@ class V1::CommunitiesController < ApplicationController
       end
     end
   end
-  
+
   #Change the role of the CommunityUser
   def change_role
     respond_to do |format|
       @community_user=CommunityUser.where(:community_id=>params[:change_role][:community_id],:user_id=>params[:change_role][:user_id]).first
       if @community_user
-        if @community_user.community.user_id==@current_user._id 
+        if @community_user.community.user_id==@current_user._id
           @community_user.update_attributes(:role_id=>params[:change_role][:role_id].nil? ? '0' : params[:change_role][:role_id])
           format.json  { render :json=> success}
         else
@@ -142,10 +142,10 @@ class V1::CommunitiesController < ApplicationController
       end
     end
   end
-  
+
   def accept_invitation
     respond_to do |format|
-      @invitation = Invitation.where(:invitation_token=>params[:accept_invitation]).first  
+      @invitation = Invitation.where(:invitation_token=>params[:accept_invitation]).first
       unless @invitation.nil?
         if @invitation.user.nil?
           format.json {render :json => failure.merge({:message => 'Something went wrong'})}
@@ -153,13 +153,13 @@ class V1::CommunitiesController < ApplicationController
           format.json {render :json => failure.merge({:message => 'Please login with the invited user to join the community'})}
         else
             exist_user = @invitation.community.community_users.where(:user_id => @invitation.user_id).first
-           if exist_user.nil? || exist_user.blank? 
+           if exist_user.nil? || exist_user.blank?
               @invitation.community.community_users.create(:user_id=>@invitation.user_id)
               @invitation.update_attributes(:invitation_token=>nil)
               @community = @invitation.community
               @community.save_Invitation_activity("COMMUNITY_JOINED", @community._id, @invitation._id, @current_user._id)
               format.json {render :json => {:community => @invitation.community.to_json(:only => [:_id, :name]).parse}.to_success}
-            else   
+            else
               @invitation.update_attributes(:invitation_token=>nil)
               format.json {render :json => failure.merge({:message => 'Already you have joined this team'})}
             end
@@ -169,7 +169,7 @@ class V1::CommunitiesController < ApplicationController
       end
     end
   end
-  
+
   def detect_missing_params
     param_must = [:name]
     if params.has_key?(:community) && params[:community].is_a?(Hash)
@@ -179,15 +179,15 @@ class V1::CommunitiesController < ApplicationController
     end
     render_missing_params(missing_params) unless missing_params.blank?
   end
-  
+
   def  invite_from_community
     @community = Community.find(params[:invite_email]['community'])
     if params[:invite_email]['users'] != 'use comma separated emails'
-      @community.invitees.nil? ? @community.invitees = params[:invite_email]['users'].to_a  : @community.invitees << params[:invite_email]['users'] 
+      @community.invitees.nil? ? @community.invitees = params[:invite_email]['users'].to_a  : @community.invitees << params[:invite_email]['users']
       @community.save
     end
-      params[:invite_email]['users'].split(',').each do |invite_email|     
-       @user_id=User.where(:email=>invite_email).first   
+      params[:invite_email]['users'].split(',').each do |invite_email|
+       @user_id=User.where(:email=>invite_email).first
         if @user_id
           @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)
               if @invitation.save
@@ -199,7 +199,7 @@ class V1::CommunitiesController < ApplicationController
           else
               Invite.send_invitations(@current_user, invite_email, @community._id, @community.name).deliver
             end
-           
+
          end
        respond_to do |format|
           format.json {render :json=>success }
@@ -212,31 +212,31 @@ class V1::CommunitiesController < ApplicationController
       if community_user.delete
         format.json  { render :json => success}
       else
-        format.json  { render :json => failure}      
+        format.json  { render :json => failure}
       end
     end
-  end  
-  
+  end
+
   private
-  
-  def find_community 
+
+  def find_community
     @community = Community.find(params[:id])
   end
-  
+
   def find_community_members
     @community=Community.find(params[:id]) if @current_user.community_membership_ids.include?(params[:id])
   end
-  
+
   #find parameters needed for the contacts
   def find_parameters
     @community={:community=>@community.serializable_hash(:only=>[:_id,:name,:description])}.to_success
   end
-  
+
   def  community_invitation
-       params[:invite_email]['users'].split(',').each do |invite_email|    
+       params[:invite_email]['users'].split(',').each do |invite_email|
         invite_email = invite_email.strip
-      @user_id=User.where(:email=>invite_email).first   
-        if @user_id 
+      @user_id=User.where(:email=>invite_email).first
+        if @user_id
           @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)
               if @invitation.save
                    Invite.community_invite(@current_user.first_name,@invitation,@community.name).deliver
@@ -249,5 +249,5 @@ class V1::CommunitiesController < ApplicationController
         end
       end
   end
-  
+
 end

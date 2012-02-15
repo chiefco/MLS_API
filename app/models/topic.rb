@@ -19,7 +19,7 @@ class Topic
   def topic_item
     item=self.item.to_json(:only=>[:_id,:name,:description]).parse
   end
-  
+
   def create_activity
     save_activity("ITEM_UPDATED")
   end

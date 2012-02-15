@@ -5,7 +5,7 @@ class  V1::TopicsController < ApplicationController
   # GET /topics/1.xml
   def show
     respond_to do |format|
-      unless @topic.delete_status==false 
+      unless @topic.delete_status==false
         if @topic
           @topic={:topic=>@topic.serializable_hash(:only=>[:name,:_id,:status],:methods=>:topic_item)}.merge(success)
           format.json  { render :json =>@topic}
@@ -43,7 +43,7 @@ class  V1::TopicsController < ApplicationController
   # PUT /topics/1.xml
   def update
     respond_to do |format|
-      unless @topic.delete_status==false 
+      unless @topic.delete_status==false
         if @topic
           if @topic.update_attributes(params[:topic])
             @topic={:topic=>@topic.serializable_hash(:only=>[:name,:status,:item_id]) }.to_success
@@ -111,7 +111,7 @@ class  V1::TopicsController < ApplicationController
       request.post? ? save_task : update_task
    end
  end
- 
+
    #Retrieves the Topic comments
   def comments
     respond_to do |format|

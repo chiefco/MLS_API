@@ -50,7 +50,7 @@ class V1::LocationsController < ApplicationController
       format.json  {render :json=>success }
     end
   end
-  
+
   def get_altitude
     respond_to do |format|
       @altitude=Location.get_altitude(params[:location])
@@ -61,7 +61,7 @@ class V1::LocationsController < ApplicationController
       end
     end
   end
-  
+
   def location_names
     respond_to do |format|
       @latitude,@longitude=params[:latitude],params[:longitude]

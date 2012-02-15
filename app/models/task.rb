@@ -8,9 +8,10 @@ class Task
   #~ STATUS_TASK=[:current_task,:late_task,:pending_task]
   field :title, :type => String
   field :due_date, :type => Time
-  field :is_completed,:type=> Boolean,:default=>false
+  field :is_completed,:type=>Boolean,:default=>false
   field :assignee_id,:type=> String
   field :description,:type=> String
+  field :sync_status,:type=> Boolean,:default=>false
   references_many :reminders
   has_many :activities, as: :activity, :dependent=>:destroy
   referenced_in :user
@@ -38,19 +39,19 @@ class Task
     query +='.where(:due_date.lt=>Date.today)' if params.include? "late_task"
     query +='.where(:due_date.gt=>Date.today)' if params.include? "pending_task"
     if params.include? "completed"
-      query +='.where(:is_completed=>true)' 
+      query +='.where(:is_completed=>true)'
     else
-      query +='.where(:is_completed=>false)' 
+      query +='.where(:is_completed=>false)'
     end
     query +='.where(:activity_type=>params[:activity_type])' if params[:activity_type]
     query += '.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)'
     eval(query)
   end
-  
+
   #~ def self.today_completed_percentage(user)
     #~ today_tasks=user.tasks.today_tasks.count.to_i
     #~ today_completed_tasks=user.tasks.completed_tasks.count.to_i
-    #~ completed_percentage=today_tasks.zero? ? 0 : today_completed_tasks/today_tasks * 100 
+    #~ completed_percentage=today_tasks.zero? ? 0 : today_completed_tasks/today_tasks * 100
   #~ end
 
   def self.get_criteria(query)

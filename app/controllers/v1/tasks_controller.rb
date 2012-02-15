@@ -92,7 +92,7 @@ class V1::TasksController < ApplicationController
           reminder = @task.reminders[0]
           if reminder.blank? && params[:reminder][:time]
             reminder = params[:reminder][:time]
-            @task.reminders.new(:task_id => @task.id, :time => reminder).save unless reminder.blank?            
+            @task.reminders.new(:task_id => @task.id, :time => reminder).save unless reminder.blank?
           else
             reminder.update_attributes(params[:reminder]) if params[:reminder]
           end

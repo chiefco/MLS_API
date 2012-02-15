@@ -27,19 +27,19 @@ class Bookmark
   def create_activity
     save_activity("BOOKMARK_CREATED")
   end
-  
+
   def update_activity
-    if self.status_changed? 
-      save_activity("BOOKMARK_DELETED") 
-    else 
+    if self.status_changed?
+      save_activity("BOOKMARK_DELETED")
+    else
       save_activity("BOOKMARK_UPDATED")
     end
   end
-  
+
   def bookmark_items(text)
     [{text=>self.items.serializable_hash(:except=>:bookmark_ids)}]
   end
-  
+
   def save_activity(text)
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end

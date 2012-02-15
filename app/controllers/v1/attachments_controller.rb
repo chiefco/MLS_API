@@ -3,7 +3,7 @@ class V1::AttachmentsController < ApplicationController
   before_filter :authenticate_request!
   before_filter :find_resource, :except=>[:create, :index, :attachments_multiple_delete]
   before_filter :detect_missing_file, :only=>[:create]
-  
+
   # GET /v1/attachments
   # GET /v1/attachments.xml
   def index
@@ -34,11 +34,11 @@ class V1::AttachmentsController < ApplicationController
 
   # POST /v1/attachments
   # POST /v1/attachments.xml
- 
+
  def create
     File.open("#{Rails.root}/tmp/#{params[:attachment][:file_name]}", 'wb') do|f|
       f.write(Base64.decode64("#{params[:encoded]}"))
-    end   
+    end
     params[:attachment][:attachable_id] =@current_user._id if params[:attachment][:attachable_type] == "User"
     params[:attachment][:file] = File.new("#{Rails.root}/tmp/#{params[:attachment][:file_name]}")
     params[:attachment][:size] = params[:attachment][:file].size
@@ -47,10 +47,10 @@ class V1::AttachmentsController < ApplicationController
     File.delete(params[:attachment][:file])
     respond_to do |format|
       if @attachment.save
-         if params[:community]!='' && params.has_key?(:community) 
-          @v1_share = @current_user.shares.create(:user_id => @current_user._id, :shared_id => @attachment._id, :community_id => params[:community], :shared_type=> "Attachment", :attachment_id => @attachment._id, :item_id => nil)          
+         if params[:community]!='' && params.has_key?(:community)
+          @v1_share = @current_user.shares.create(:user_id => @current_user._id, :shared_id => @attachment._id, :community_id => params[:community], :shared_type=> "Attachment", :attachment_id => @attachment._id, :item_id => nil)
           @v1_share.save
-          @v1_share.create_activity("SHARE_ATTACHMENT", params[:community], @attachment._id)   
+          @v1_share.create_activity("SHARE_ATTACHMENT", params[:community], @attachment._id)
         end
         format.json  { render :json=> { :attachment=>@attachment.to_json(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).parse}.to_success }
         format.xml  { render :xml => @attachment.to_xml(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).as_hash.to_success.to_xml(ROOT) }
@@ -66,7 +66,7 @@ class V1::AttachmentsController < ApplicationController
   def destroy
     @attachment.destroy
     @activity = Activity.where(:shared_id => params[:id]).first
-    @activity.destroy if @activity 
+    @activity.destroy if @activity
     respond_to do |format|
       format.json { render :json=> success }
       format.xml { render :xml=> success.to_xml(ROOT) }
@@ -80,7 +80,7 @@ class V1::AttachmentsController < ApplicationController
       @attachment = Attachment.find(id)
       @attachment.destroy
       @activity = Activity.where(:shared_id => id)
-      @activity.delete_all if @activity 
+      @activity.delete_all if @activity
     end
       @attachments = Attachment.list(@current_user.attachments,params,{:page =>1, :per_page => 10})
       @count = @current_user.attachments.count
@@ -89,15 +89,15 @@ class V1::AttachmentsController < ApplicationController
       format.xml  { render :xml => @attachments.to_xml(:only=>[:_id, :file_type, :file_name, :size,  :content_type]).as_hash.to_success.to_xml(ROOT) }
     end
   end
-  
+
   def attachments_download
-    @attachment.activities.create(:action=>"ATTACHMENT_DOWNLOADED", :user_id=> @current_user._id) 
+    @attachment.activities.create(:action=>"ATTACHMENT_DOWNLOADED", :user_id=> @current_user._id)
     respond_to do |format|
       format.json { render :json=> success }
       format.xml { render :xml=> success.to_xml(ROOT) }
     end
   end
-  
+
   private
 
   def find_resource
@@ -106,7 +106,7 @@ class V1::AttachmentsController < ApplicationController
 
   def detect_missing_file
     file_missing = true
-    file_missing = false if params.has_key?(:encoded) && params[:attachment].is_a?(Hash) 
+    file_missing = false if params.has_key?(:encoded) && params[:attachment].is_a?(Hash)
     if file_missing
       respond_to do |format|
         format.json { render :json=> {:error=>{:code=>6001, :message=>"The file was not correctly uploaded"}}.to_failure }

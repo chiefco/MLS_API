@@ -24,19 +24,19 @@ class Page
   ORDER_BY_ALLOWED = [:asc, :desc]
   after_create :create_activity
   after_update :update_activity
-  
+
   def create_activity
     save_activity("PAGE_CREATED")
   end
-  
+
   def update_activity
     if self.status_changed?
-      save_activity("PAGE_DELETED") 
+      save_activity("PAGE_DELETED")
     else
       save_activity("PAGE_UPDATED")
     end
   end
-  
+
   def self.list(pages,params,paginate_options)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
@@ -47,11 +47,11 @@ class Page
     query += '.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)'
     eval(query)
   end
-  
+
   def save_activity(text)
     self.item.activities.create(:action=>text,:user_id=>self.item.user.nil?  ? 'nil' : self.item.user._id)
   end
-  
+
   def self.create_page_texts(pagetexts,id)
     @page_texts=[]
     page=Page.where(:_id=>id).first

@@ -38,27 +38,27 @@ class Item
   referenced_in :template
   scope :undeleted,self.excludes(:status=>false)
   scope :upcoming,self.where(:item_date.gte=>Date.yesterday)
-  scope :today,self.where(:item_date.gte=>Date.yesterday, :item_date.lt=>Date.tomorrow) 
-  scope :tomorrow,self.where(:item_date.gte=>Date.today, :item_date.lt=>(Date.tomorrow+1.days))    
-  scope :next_week,self.where(:item_date.gte=>Date.today+7.days)      
+  scope :today,self.where(:item_date.gte=>Date.yesterday, :item_date.lt=>Date.tomorrow)
+  scope :tomorrow,self.where(:item_date.gte=>Date.today, :item_date.lt=>(Date.tomorrow+1.days))
+  scope :next_week,self.where(:item_date.gte=>Date.today+7.days)
   scope :past,self.where(:item_date.lt=>Date.today)
 
   after_save :sunspot_index
   after_create :create_activity
   after_update :update_activity
-  
+
   def create_activity
     save_activity("ITEM_CREATED")
   end
-  
+
   def update_activity
-    if self.status_changed? 
-      save_activity("ITEM_DELETED") 
-    else 
+    if self.status_changed?
+      save_activity("ITEM_DELETED")
+    else
       save_activity("ITEM_UPDATED")
     end
   end
-  
+
   searchable do
     text :name do
       name.downcase
@@ -90,11 +90,11 @@ class Item
   def item_date
     super().nil? ? "nil" : super().strftime("%d/%m/%Y %H:%M:%S")
   end
-  
+
   def item_date_local
     self.item_date.to_time.localtime rescue ''
-  end  
-  
+  end
+
   def end_time
     super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %H:%M:%S")
   end
@@ -106,11 +106,11 @@ class Item
   def updated_time
     self.updated_at.strftime("%d/%m/%Y %H:%M:%S")
   end
-  
+
   def upcoming
     date = item_date
     date = Date.strptime(item_date,"%d/%m/%Y %H:%M:%S") if item_date.is_a?(String)
-    
+
     if date > Date.yesterday && date < Date.tomorrow
       "Today"
     elsif date > Date.today && date < (Date.tomorrow + 1.days)
@@ -119,13 +119,13 @@ class Item
       "Next Week"
     elsif date == Date.yesterday
       "Yesterday"
-    elsif date < (Date.today) 
-      "Past Items" 
+    elsif date < (Date.today)
+      "Past Items"
     else
       "Later"
     end
   end
-  
+
   def self.stats(params,user,item)
     query=""
     query = '{:tasks=>item.tasks.serializable_hash(:only=>[:_id,:description,:due_date,:is_completed])}' if (params[:tasks] == "true")
@@ -144,7 +144,7 @@ class Item
       values = values.paginate(paginate_options)
     else
       values=user.items.undeleted.order_by([params[:sort_by].to_sym,params[:order_by].to_sym])
-      item_count = values.count unless params[:item_count].nil?  
+      item_count = values.count unless params[:item_count].nil?
       values = values.paginate(paginate_options)
     end
     if params[:group_by]
@@ -163,38 +163,38 @@ class Item
       values=group_values(params[:group_by],result)
       item_count = result.count unless params[:item_count].nil?
     end
-    unless params[:item_count].nil? 
-      return item_count 
+    unless params[:item_count].nil?
+      return item_count
     else
       return values
     end
   end
-  
+
   def self.upcoming_meetings_counts(user)
     today = user.items.undeleted.today.group_by(&:upcoming)['Today'].count rescue 0
     tomorrow = user.items.undeleted.tomorrow.group_by(&:upcoming)['Tommorrow'].count rescue 0
     next_week = user.items.undeleted.next_week.group_by(&:upcoming)['Next Week'].count rescue 0
-    return items_count = today + tomorrow + next_week 
-  end  
-  
+    return items_count = today + tomorrow + next_week
+  end
+
   def save_activity(text)
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end
-  
+
   def self.get_meets(user,value=nil)
     @meets=[]
     @meets_values={}
     unless value.nil?
       user.items.undeleted.each do |f|
         @meets<<f._id.to_s
-        @meets_values=@meets_values.merge({f.id=>{:name=>f.name,:id=>f._id,:description=>f.description,:item_date=>f.item_date,:location_name=>f[:location_name],:created_at=>f.created_time,:updated_at=>f.updated_time,:pages=>get_pages(f),:shares=>get_shares(f)}})     
+        @meets_values=@meets_values.merge({f.id=>{:name=>f.name,:id=>f._id,:description=>f.description,:item_date=>f.item_date,:location_name=>f[:location_name],:created_at=>f.created_time,:updated_at=>f.updated_time,:pages=>get_pages(f),:shares=>get_shares(f)}})
       end
       return {:meet_arrays=>@meets,:meet_hashes=>@meets_values}
     else
       return {:meet_arrays=>[],:meet_hashes=>nil}
     end
   end
-  
+
   def self.group_values(group_by,result)
     values=[]
     keys=[]
@@ -210,17 +210,17 @@ class Item
     end
      return {group_by=>keys,:items=>values}
    end
-   
+
    def self.get_pages(item)
       @pages_meet=[]
       item.pages.each do|page|
         unless page.attachment.nil?
-        @pages_meet<<{:cloud_id=>page.attachment._id,:page_order=>page.page_order,:page_image=>page.attachment.file,:meet_id=>page.item._id}
+        @pages_meet<<{:cloud_id=>page.attachment._id,:page_order=>page.page_order,:page_image=>page.attachment.file,:meet_id=>page.item._id,:page_texts=>page.page_texts.to_a.to_json(:only=>[:_id,:content,:position]).parse}
         end
       end
       return @pages_meet
     end
-    
+
   def self.get_shares(meet)
     @shares_meet=[]
       meet.shares.each do|share|

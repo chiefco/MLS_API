@@ -12,17 +12,17 @@ class V1::ItemsController < ApplicationController
         @items = items.paginate(@paginate_options)
         @item_count = items.count
       elsif params[:type] == 'tommorrow'
-        items = @current_user.items.tomorrow        
+        items = @current_user.items.tomorrow
         @items = items.paginate(@paginate_options)
-        @item_count = items.count        
+        @item_count = items.count
       elsif params[:type] == 'next_week'
-        items = @current_user.items.next_week                
+        items = @current_user.items.next_week
         @items = items.paginate(@paginate_options)
-        @item_count = items.count        
+        @item_count = items.count
       end
     else
       @items = Item.list(params,@paginate_options,@current_user)
-      @item_count = Item.list(params.merge({:item_count => true}), {}, @current_user)      
+      @item_count = Item.list(params.merge({:item_count => true}), {}, @current_user)
     end
 
     respond_to do |format|
@@ -213,7 +213,7 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       format.json {render :json=>{:tasks=>@tasks.as_json(:only=>[:_id,:title,:due_date,:is_completed,:description, :item_id],:include=>{:reminders => {:only => [:time]}, :item=>{:only=>[:_id,:name]}})}.to_success}
       format.xml
-    end      
+    end
   end
 
   #Lists all attendees of the given item
@@ -273,14 +273,14 @@ class V1::ItemsController < ApplicationController
       end
     end
   end
-  
+
   #Retrieves the Item comments
   def comments
     respond_to do |format|
       format.json {render :json=>{:comments=>@item.comments.to_a.to_json(:only=>[:_id,:message,:commentable_type,:commentable_id]).parse}.to_success}
     end
   end
-  
+
   def get_item
     @item=@current_user.items.find(params[:id])
   end

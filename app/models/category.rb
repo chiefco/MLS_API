@@ -26,21 +26,21 @@ class Category
   end
   after_create :create_activity
   after_update :update_activity
-  
+
   def create_activity
     save_activity("CATEGORY_CREATED")
   end
-  
+
   def update_activity
-    if self.status_changed? 
-      save_activity("CATEGORY_DELETED") 
+    if self.status_changed?
+      save_activity("CATEGORY_DELETED")
     elsif self.item_ids_changed?
       save_activity("CATEGORY_ADDED_ITEM")
     else
       save_activity("CATEGORY_UPDATED")
     end
   end
-  
+
   def self.list(categories,params,paginate_options)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
@@ -53,11 +53,11 @@ class Category
     query += '.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)'
     eval(query)
   end
-  
+
   def save_activity(text)
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end
-  
+
   def category_items(text)
     [{text=>self.items.serializable_hash(:except=>:category_ids)}]
   end

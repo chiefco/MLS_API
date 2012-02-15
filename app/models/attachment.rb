@@ -1,7 +1,7 @@
 class Attachment
   include Mongoid::Document
   include Mongoid::Timestamps
-  include Sunspot::Mongoid  
+  include Sunspot::Mongoid
   mount_uploader :file, FileUploader
   belongs_to :attachable, polymorphic: true
   belongs_to :user
@@ -15,8 +15,8 @@ class Attachment
   ORDER_BY_ALLOWED =  [:asc,:desc]
   after_create :create_activity
   after_update :update_activity
-  after_save :sunspot_index  
-  
+  after_save :sunspot_index
+
   field :file_name, type: String
   field :file_type, type: String
   field :content_type, type: String
@@ -24,14 +24,14 @@ class Attachment
   field :width, type: Integer
   field :height, type: Integer
   field :folder_id, :type => String, :default => nil
-  
+
   searchable do
     string :file_name do
       file_name.to_s.downcase
     end
     string :user_id
-  end  
-  
+  end
+
   protected
 
   def self.list(attachments,params,paginate_options)
@@ -48,30 +48,30 @@ class Attachment
   def self.get_criteria(query)
     [ {file_name: query} , { size: query }, { content_type: query }]
   end
-  
+
   def create_activity
     save_activity("USER_ATTACHMENT")
   end
-  
+
    def update_activity
   end
-  
+
   def save_activity(text)
     evaluate_item(a=text) unless self.attachable.nil?
   end
-  
+
   def user_name
     User.find(self.user_id).first_name
   end
-  
+
   def  evaluate_item(text)
     if self.attachable_type =="User"
       user_id = self.attachable._id.nil?  ? 'nil' : self.attachable._id
-      self.activities.create(:action=>text, :user_id=> user_id) 
+      self.activities.create(:action=>text, :user_id=> user_id)
     else
       user_id = self.attachable.item.user.nil?  ? 'nil' : self.attachable.item.user._id
       self.attachable.activities.create(:action=>text, :user_id=> user_id) unless self.attachable_type == "Page"
     end
   end
-  
+
 end

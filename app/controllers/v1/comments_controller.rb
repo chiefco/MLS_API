@@ -18,7 +18,7 @@ class V1::CommentsController < ApplicationController
       if @comment.status!=false
         get_parameters
         format.json  { render :json =>success.merge({:comment=>@comment})}
-      else 
+      else
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
@@ -57,7 +57,7 @@ class V1::CommentsController < ApplicationController
         else
         format.json {render :json=>failure.merge(INVALID_COMMENTABLE)}
         end
-      else 
+      else
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
@@ -71,7 +71,7 @@ class V1::CommentsController < ApplicationController
       format.json {render :json=>success}
     end
   end
-  
+
   def get_parameters
     @comment=@comment.serializable_hash(:only=>[:_id,:message,:is_public,:commentable_type,:commentable_id])
   end

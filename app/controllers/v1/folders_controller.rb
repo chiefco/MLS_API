@@ -5,7 +5,7 @@ class V1::FoldersController < ApplicationController
   def index
     @folder = @current_user.folders.undeleted
     respond_to do |format|
-      format.json {render :json =>  {:folders => @folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at]).parse}} 
+      format.json {render :json =>  {:folders => @folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at]).parse}}
     end
   end
 
@@ -31,7 +31,7 @@ class V1::FoldersController < ApplicationController
 
   def update
   respond_to do |format|
-      unless @folder.status==false 
+      unless @folder.status==false
         if @folder
           if @folder.update_attributes(params[:folder])
             @folder={:folder=>@folder.serializable_hash(:only=>[:name,:status,:_id]) }.to_success
@@ -64,14 +64,14 @@ class V1::FoldersController < ApplicationController
       end
     end
   end
-  
+
    def folder_tree
      @folder = @current_user.folders.select{|f| f['parent_id']==nil && f['status']== true}
       respond_to do |format|
-        format.json {render :json =>  {:folders => @folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at], :methods => [:children_count]).parse}} 
+        format.json {render :json =>  {:folders => @folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at], :methods => [:children_count]).parse}}
       end
     end
-    
+
   def move_attachments
    @attachment = Attachment.find(params[:attachment_id])
    @attachment.update_attributes(:folder_id=>params[:id]) if @attachment
@@ -83,7 +83,7 @@ class V1::FoldersController < ApplicationController
         end
     end
   end
-  
+
   def move_multiple_attachments
     params[:id] = nil if params[:id] == ''
     params[:move_file].each do |key, value|
@@ -98,10 +98,10 @@ class V1::FoldersController < ApplicationController
         end
     end
   end
-  
+
   def move_folders
    params[:folder_id] = nil if params[:folder_id] == ''
-  @folder.update_attributes(:parent_id=>params[:folder_id]) 
+  @folder.update_attributes(:parent_id=>params[:folder_id])
     respond_to do |format|
         if  @folder
           format.json  { render :json => success }
@@ -110,13 +110,13 @@ class V1::FoldersController < ApplicationController
         end
     end
   end
-  
+
   private
-  
+
   def find_folder
     @folder = Folder.find(params[:id])
   end
-  
+
   def sub_folders
     @sub_folders = @folder.children
   end

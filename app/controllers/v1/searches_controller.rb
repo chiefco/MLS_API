@@ -57,12 +57,12 @@ class V1::SearchesController < ApplicationController
       search.keywords params[:q].downcase, :boost=>4.0
       search.with(:user_id,@current_user.id)
     end
-    
+
     attachments = @current_user.attachments.solr_search do |search|
       search.with(:user_id,@current_user.id)
       search.with(:file_name).starting_with(params[:q].downcase)
-    end    
-    
+    end
+
     if params[:sort] == 'modified'
       items.results.map(&:name)
       items.results.sort_by{ |k| k.updated_at }.map(&:name)
@@ -72,7 +72,7 @@ class V1::SearchesController < ApplicationController
       items = items.results.sort_by{ |k| k.name }
       attachments = attachments.results.sort_by{ |k| k.file_name }
     end
-    
+
     unless params[:limit]
       respond_to do |format|
         format.xml  { render :xml => {:response=>:success,:searches=>results}.to_xml(:root=>:result,:only=>SEARCH_FIELDS) }
@@ -83,12 +83,12 @@ class V1::SearchesController < ApplicationController
       respond_to do |format|
         format.xml  { render :xml => {:response=>:success,:searches=>items}.to_xml(:root=>:result,:only=>SEARCH_FIELDS) }
         format.json {render :json =>{:items=>items.flatten.to_json(:only=>[:name,:_type,:file_name]).parse}.to_success}
-      end      
+      end
     end
   end
-  
-  
-  
+
+
+
   private
 
   def find_search

@@ -66,8 +66,8 @@ class V1::ContactsController < ApplicationController
       format.json  { render :json=> success}
     end
   end
-  
-  
+
+
   # POST /contacts
   # POST /contacts.xml
   def add_import_contacts
@@ -77,14 +77,14 @@ class V1::ContactsController < ApplicationController
       #params[:contact]=>{:first_name=>params[:first_name],:email=>params[:email])}
       end
   end
-  
+
   def invite_member
     Invite.send_invitations(@current_user,params[:invite_member][:email]).deliver
     respond_to do |format|
       format.json  { render :json=> success}
     end
   end
-  
+
   #Share's the Item to Community Members and Contacts
   def share
     find_item
@@ -95,7 +95,7 @@ class V1::ContactsController < ApplicationController
       format.json {render :json=>success}
     end
   end
-  
+
   def remove_share
     respond_to do |format|
       @share=Share.where(:_id=>params[:id]).first
@@ -107,7 +107,7 @@ class V1::ContactsController < ApplicationController
       end
     end
   end
-    
+
   def share_to_members
     @community.members.each do |member|
       @share=@item.shares.create(:user_id=>member[:id])
@@ -115,7 +115,7 @@ class V1::ContactsController < ApplicationController
       Invite.share_community(@share.user,@item).deliver
     end
   end
-  
+
   #~ # Retrieves the shares of the item
   def shares
     @item=Item.find(params[:id])
@@ -124,35 +124,35 @@ class V1::ContactsController < ApplicationController
       format.json{render :json=>{:shares=>@share}}
     end
   end
-  
+
   def send_shares_emails
     params[:share][:emails].split(',').each do |email|
       @user=User.where(:email=>email).first
       @user.nil? ? send_invites(email) : create_shares
     end
   end
-  
+
   def create_shares
     @share=@item.shares.create(:user_id=>@user._id)
     @share.create_permission(params[:share][:permission_id])
     Invite.share_community(@user,@item).deliver
   end
-  
+
   def send_invites(email)
     @item.invitations.find_or_create_by(:email=>email)
     Invite.send_invitations(@current_user,email).deliver
   end
-  
+
   #finds the contact
-  def find_contact 
+  def find_contact
     @contact=@current_user.contacts.find(params[:id])
   end
-  
+
   #find parameters needed for the contacts
   def find_parameters
     @contact={:contact=>@contact.serializable_hash(:only=>[:_id,:first_name,:last_name,:job_title,:company,:email])}.to_success
   end
-  
+
   def find_item
     @item=Item.find(params[:share][:item_id])
   end

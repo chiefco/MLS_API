@@ -26,7 +26,7 @@ MeetlinkshareApi::Application.routes.draw do
     match "/item_tasks/:id" => 'items#get_all_tasks'
     match "/generic_search" => 'searches#search'
     match "/add_bookmark/:id" => 'bookmarks#add_bookmark'
-    match "/remove_bookmark/:id" => 'bookmarks#remove_bookmark'      
+    match "/remove_bookmark/:id" => 'bookmarks#remove_bookmark'
     match "/item/statistics" => 'items#get_statistics'
     match "/community_invite/:id" => 'communities#invite_member'
     match "/community_members/:id" => 'communities#members'
@@ -48,8 +48,8 @@ MeetlinkshareApi::Application.routes.draw do
     match "/attachments_download" => 'attachments#attachments_download'
     match "/folder_tree" => 'folders#folder_tree'
     match "/move_attachments" => 'folders#move_attachments'
-    match '/move_multiple_attachments', :to=>'folders#move_multiple_attachments' 
-    match '/move_folders', :to=>'folders#move_folders'  
+    match '/move_multiple_attachments', :to=>'folders#move_multiple_attachments'
+    match '/move_folders', :to=>'folders#move_folders'
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
@@ -66,7 +66,7 @@ MeetlinkshareApi::Application.routes.draw do
     get "v1/industries",:to=>'v1/registrations#options_for_the_field'
     get "v1/activities",:to=>'v1/registrations#activities'
     post "v1/synchronisation",:to=>'v1/sessions#synchronisation'
-    #~ get "v1/set_timezone", :to=> "v1/registrations#set_timezone"    
+    #~ get "v1/set_timezone", :to=> "v1/registrations#set_timezone"
   end
 
   # The priority is based upon order of creation:

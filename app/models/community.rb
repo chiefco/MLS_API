@@ -86,6 +86,6 @@ class Community
   end
 
   def get_meets
-    shares.to_a.select{|c| c.shared_type="Meet"}.map(&:item).uniq.to_json(:only=>[:_id,:description,:name],:methods=>[:item_date,:created_time,:updated_time],:include=>{:pages=>{:only=>[:_id],:include=>{:attachment=>{:only=>[:file,:_id]}},:methods=>[:page_texts]}}).parse
+    shares.to_a.select{|c| c.shared_type="Meet"}.map(&:item).uniq.to_json(:only=>[:_id,:description,:name],:methods=>[:item_date,:created_time,:updated_time,:shared_id],:include=>{:pages=>{:only=>[:_id],:include=>{:attachment=>{:only=>[:file,:_id]}},:methods=>[:page_texts]}}).parse
   end
 end

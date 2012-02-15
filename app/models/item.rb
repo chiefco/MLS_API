@@ -106,6 +106,10 @@ class Item
   def updated_time
     self.updated_at.strftime("%d/%m/%Y %H:%M:%S")
   end
+  
+  def shared_id
+    self.share._id.to_s
+  end
 
   def upcoming
     date = item_date

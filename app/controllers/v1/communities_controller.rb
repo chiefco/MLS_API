@@ -217,7 +217,8 @@ class V1::CommunitiesController < ApplicationController
   def  community_invitation
        params[:invite_email]['users'].split(',').each do |invite_email|
         invite_email = invite_email.strip
-        CommunityInvitee.create(:community_id => @community._id, :email => invite_email)
+        invited = CommunityInvitee.where(:email => invite_email, :community_id => @community._id).first
+        invited.nil? ? CommunityInvitee.create(:community_id => @community._id, :email => invite_email) : invited.update_attributes(:invited_count => invited.invited_count + 1)
         @user_id=User.where(:email=>invite_email).first
         if @user_id
           @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)

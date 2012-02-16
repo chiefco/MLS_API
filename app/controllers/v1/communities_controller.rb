@@ -7,37 +7,37 @@ class V1::CommunitiesController < ApplicationController
 
 
    def index
-    @communities = @current_user.communities.undeleted
-    @shared_communities = CommunityUser.where(:user_id => "#{@current_user._id}").map(&:community).select{|c| c.user_id != @current_user.id && c.status == true} rescue ''
+    communities = @current_user.communities.undeleted
+    shared_communities = CommunityUser.where(:user_id => "#{@current_user._id}").map(&:community).select{|c| c.user_id != @current_user.id && c.status == true}
+    invited_members = communities.map(&:community_invitees).flatten.map(&:email).uniq
+    
     respond_to do |format|
-      format.json {render :json =>  {:communities => @communities.to_json(:methods => [:users_count, :shares_count]).parse, :shared_communities => @shared_communities.to_json(:methods => [:users_count, :shares_count]).parse}} # index.html.erb
+      format.json {render :json =>  {:communities => communities.to_json(:methods => [:users_count, :shares_count]).parse, :invited_members => invited_members.to_json.parse, :shared_communities => shared_communities.to_json(:methods => [:users_count, :shares_count]).parse}} # index.html.erb
     end
   end
 
   def show
     @attachments, @items = [], []
-    shares = @community.shares.order_by(:created_at.desc)
-    share_attachments = shares.select{|i| i.shared_type == 'Attachment' && i.status == true}
+    shares = @community.shares
+    attachments = shares.select{|i| i.shared_type == 'Attachment'}.map(&:attachment)
     items = shares.select{|i| i.shared_type == 'Meet'}.map(&:item)
-    users = @community.community_users.map(&:user)
     community_owner = @community.community_users.select{|i| i.user_id == @community.user_id}.map(&:user)
-    users = users - community_owner
-
+    users = @community.community_users.map(&:user) - community_owner
+    invitees = @community.community_invitees.map(&:email)
+    
     respond_to do |format|
       if @community.status!=false
-        #~ find_parameters
-        format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description, :invitees]), :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :attachments => share_attachments.to_json(:only=>[:_id, :user_id], :methods => [:user_name, :share_attachments]).parse, :users => users.to_json(:only=>[:_id, :first_name, :email]).parse, :community_owner => community_owner.to_json(:only=>[:_id, :first_name, :email]).parse}.to_success}
+        format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :invitees => invitees.to_json.parse, :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :attachments => attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at, :user_id]).parse, :users => users.to_json(:only=>[:_id, :first_name, :email]).parse, :community_owner => community_owner.to_json(:only=>[:_id, :first_name, :email]).parse}.to_success}
       else
         format.json  {render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
     end
-  end
+  end  
 
   def create
     unless @current_user.communities.undeleted.count > 5
       @community = @current_user.communities.new(params[:community])
-      @community.invitees = params[:invite_email]['users'].to_a if params[:invite_email]['users'] != 'use comma separated emails'
-
+      
       respond_to do |format|
         if @community.save
           community_invitation if params[:invite_email]['users'] != 'use comma separated emails'
@@ -182,28 +182,10 @@ class V1::CommunitiesController < ApplicationController
 
   def  invite_from_community
     @community = Community.find(params[:invite_email]['community'])
-    if params[:invite_email]['users'] != 'use comma separated emails'
-      @community.invitees.nil? ? @community.invitees = params[:invite_email]['users'].to_a  : @community.invitees << params[:invite_email]['users']
-      @community.save
+    community_invitation if params[:invite_email]['users'] != 'use comma separated emails'
+    respond_to do |format|
+      format.json {render :json => success }
     end
-      params[:invite_email]['users'].split(',').each do |invite_email|
-       @user_id=User.where(:email=>invite_email).first
-        if @user_id
-          @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)
-              if @invitation.save
-                   Invite.community_invite(@current_user.first_name,@invitation,@community.name).deliver
-                  #@community.save_Invitation_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
-                else
-                   format.json  { render :json =>@invitation.all_errors}
-                end
-          else
-              Invite.send_invitations(@current_user, invite_email, @community._id, @community.name).deliver
-            end
-
-         end
-       respond_to do |format|
-          format.json {render :json=>success }
-       end
   end
 
   def member_delete
@@ -235,7 +217,8 @@ class V1::CommunitiesController < ApplicationController
   def  community_invitation
        params[:invite_email]['users'].split(',').each do |invite_email|
         invite_email = invite_email.strip
-      @user_id=User.where(:email=>invite_email).first
+        CommunityInvitee.create(:community_id => @community._id, :email => invite_email)
+        @user_id=User.where(:email=>invite_email).first
         if @user_id
           @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)
               if @invitation.save

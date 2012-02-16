@@ -22,7 +22,7 @@ class V1::FoldersController < ApplicationController
       @folder = @current_user.folders.new(params[:folder])
       respond_to do |format|
         if @folder.save
-          format.json  { render :json =>{:folder=>@folder.to_json(:only=>[:_id]).parse}.to_success }
+          format.json  { render :json =>{:folder=>@folder.to_json(:only=>[:_id, :name, :parent_id, :created_at, :updated_at]).parse}.to_success }
         else
           format.json {render :json => @folder.all_errors}
         end
@@ -73,6 +73,7 @@ class V1::FoldersController < ApplicationController
     end
 
   def move_attachments
+   params[:id] = nil if params[:id] == ''
    @attachment = Attachment.find(params[:attachment_id])
    @attachment.update_attributes(:folder_id=>params[:id]) if @attachment
     respond_to do |format|

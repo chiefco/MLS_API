@@ -83,7 +83,7 @@ class V1::AttachmentsController < ApplicationController
       @activity.delete_all if @activity
     end
       @attachments = Attachment.list(@current_user.attachments,params,{:page =>1, :per_page => 10})
-      @count = @current_user.attachments.count
+      @count = @current_user.attachments.where(:folder_id => nil).count
     respond_to do |format|
       format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at, :user_id]).parse ,:total=>@count}.to_success }
       format.xml  { render :xml => @attachments.to_xml(:only=>[:_id, :file_type, :file_name, :size,  :content_type]).as_hash.to_success.to_xml(ROOT) }

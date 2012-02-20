@@ -77,7 +77,7 @@ class V1::AttachmentsController < ApplicationController
   # DELETE MULTIPLE /v1/attachments/1.xml
  def attachments_multiple_delete
     Attachment.any_in(_id: params[:attachment]).update_all(:is_deleted => true)
-    attachments = Attachment.list(@current_user.attachments,params,{:page =>1, :per_page => 10}).reject{|a| a.is_deleted?}
+    attachments = Attachment.list(@current_user.attachments.where(:is_deleted => false),params,{:page =>1, :per_page => 10})
     count = @current_user.attachments.where(:folder_id => nil).count
     Attachment.delay.delete(params[:attachment])
 

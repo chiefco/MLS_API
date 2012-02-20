@@ -83,12 +83,14 @@ class V1::SessionsController < Devise::SessionsController
       if status.keys[0]=="new"
         @pages=meet[:page][:new_page]
         @shares=meet[:share]
+        location=meet[:location_name]
         meet.delete(:page)
         meet.delete(:share)
         begin
+          @location=@user.locations.find_or_create_by(:name=>location.downcase)
+          meet[:location_id]=@location._id
           @meet= @user.items.create(meet)
           puts @meet.errors.inspect
-          logger.info @meet.errors.inspect
           unless @meet.nil?
             @id=@meet._id
              create_or_update_share
@@ -108,10 +110,13 @@ class V1::SessionsController < Devise::SessionsController
           unless @meet.nil?
             @pages=meet[:page][:new_page]
             @shares=meet[:share]
+            location=meet[:location_name]
             @updated_pages=meet[:updated_page]
             meet.delete(:updated_page)
             meet.delete(:page)
             meet.delete(:share)
+            @location=@user.locations.find_or_create_by(:name=>location.downcase)
+            meet[:location_id]=@location._id
             @meet.update_attributes(meet)
             @id=meet[:cloud_id]
             create_or_update_share

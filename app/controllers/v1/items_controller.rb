@@ -87,7 +87,7 @@ class V1::ItemsController < ApplicationController
         begin
           @item.categories.find(params[:item][:current_category_id]) if params[:item][:current_category_id]
           if params[:item][:location_name]
-            p @location=@current_user.locations.find_or_create_by(:name=>params[:item][:location_name].downcase)
+            @location=@current_user.locations.find_or_create_by(:name=>params[:item][:location_name].downcase)
             params[:item][:location_id]=@location._id
           end
           get_item

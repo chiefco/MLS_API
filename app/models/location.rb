@@ -22,13 +22,13 @@ class Location
     string :user_id
   end
   
-  #~ def latitude
-    #~ super().nil? ? "nil" : super().to_f
-  #~ end
+  def latitude
+    super().nil? ? "nil" : super().to_f.to_s
+  end
   
-   #~ def longitude
-    #~ super().nil? ? "nil" : super().to_f
-  #~ end
+   def longitude
+    super().nil? ? "nil" : super().to_f.to_s
+  end
 
   def find_co_ordinates
     latitude,longitude=Geocoder.coordinates(self.name) if self.latitude.nil? || self.longitude.nil?

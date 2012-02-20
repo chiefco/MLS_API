@@ -24,6 +24,7 @@ class Attachment
   field :width, type: Integer
   field :height, type: Integer
   field :folder_id, :type => String, :default => nil
+  field :is_deleted, :type => Boolean, :default => false
 
   searchable do
     string :file_name do
@@ -43,6 +44,11 @@ class Attachment
     query += '.any_of(self.get_criteria(params[:q]))' if params[:q]
     query += '.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)'
     eval(query)
+  end
+
+  def self.delete(attachments)
+    Attachment.any_in(_id: attachments).destroy_all
+    Activity.any_in(:shared_id => attachments).delete_all
   end
 
   def self.get_criteria(query)

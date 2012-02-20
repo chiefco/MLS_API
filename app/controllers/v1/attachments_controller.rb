@@ -76,16 +76,13 @@ class V1::AttachmentsController < ApplicationController
  # DELETE  MULTIPLE/v1/attachments/1
   # DELETE MULTIPLE /v1/attachments/1.xml
  def attachments_multiple_delete
-    params[:attachment].each do |id|
-      @attachment = Attachment.find(id)
-      @attachment.destroy
-      @activity = Activity.where(:shared_id => id)
-      @activity.delete_all if @activity
-    end
-      @attachments = Attachment.list(@current_user.attachments,params,{:page =>1, :per_page => 10})
-      @count = @current_user.attachments.where(:folder_id => nil).count
+    Attachment.any_in(_id: params[:attachment]).update_all(:is_deleted => true)
+    attachments = Attachment.list(@current_user.attachments,params,{:page =>1, :per_page => 10}).reject{|a| a.is_deleted?}
+    count = @current_user.attachments.where(:folder_id => nil).count
+    Attachment.delay.delete(params[:attachment])
+
     respond_to do |format|
-      format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at, :user_id]).parse ,:total=>@count}.to_success }
+      format.json  { render :json => { :attachments => attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at, :user_id]).parse ,:total => count}.to_success }
       format.xml  { render :xml => @attachments.to_xml(:only=>[:_id, :file_type, :file_name, :size,  :content_type]).as_hash.to_success.to_xml(ROOT) }
     end
   end

@@ -21,6 +21,14 @@ class Location
     string :name
     string :user_id
   end
+  
+  def latitude
+    super().nil? ? "nil" : super().to_f
+  end
+  
+   def longitude
+    super().nil? ? "nil" : super().to_f
+  end
 
   def find_co_ordinates
     latitude,longitude=Geocoder.coordinates(self.name) if self.latitude.nil? || self.longitude.nil?

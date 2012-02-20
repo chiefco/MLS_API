@@ -191,7 +191,7 @@ class Item
     unless value.nil?
       user.items.undeleted.each do |f|
         @meets<<f._id.to_s
-        @meets_values=@meets_values.merge({f.id=>{:name=>f.name,:id=>f._id,:description=>f.description,:item_date=>f.item_date,:location_name=>f[:location_name],:created_at=>f.created_time,:updated_at=>f.updated_time,:pages=>get_pages(f),:shares=>get_shares(f)}})
+        @meets_values=@meets_values.merge({f.id=>{:name=>f.name,:id=>f._id,:description=>f.description,:location_name=>f.location_name.downcase,:latitude=>f.location.latitude,:longitude=>f.location.longitude,:item_date=>f.item_date,:location_name=>f[:location_name],:created_at=>f.created_time,:updated_at=>f.updated_time,:pages=>get_pages(f),:shares=>get_shares(f)}})
       end
       return {:meet_arrays=>@meets,:meet_hashes=>@meets_values}
     else

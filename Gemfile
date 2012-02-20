@@ -33,7 +33,8 @@ gem 'fog'
 gem 'yamler'
 gem 'httparty'
 gem 'json'
-
+gem 'delayed_job'
+gem 'delayed_job_mongoid'
 
 # Deploy with Capistrano
 # gem 'capistrano'

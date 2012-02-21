@@ -9,7 +9,7 @@ class V1::CommunitiesController < ApplicationController
    def index
     communities = @current_user.communities.undeleted
     shared_communities = CommunityUser.where(:user_id => "#{@current_user._id}").map(&:community).select{|c| c.user_id != @current_user.id && c.status == true}
-    invited_members = communities.map(&:community_invitees).flatten.map(&:email).uniq
+    invited_members = (communities.map(&:community_invitees).flatten.map(&:email) + communities.map(&:invitations).flatten.map(&:email)).uniq
     
     respond_to do |format|
       format.json {render :json =>  {:communities => communities.to_json(:methods => [:users_count, :shares_count]).parse, :invited_members => invited_members.to_json.parse, :shared_communities => shared_communities.to_json(:methods => [:users_count, :shares_count]).parse}} # index.html.erb
@@ -23,7 +23,7 @@ class V1::CommunitiesController < ApplicationController
     items = shares.select{|i| i.shared_type == 'Meet'}.map(&:item)
     community_owner = @community.community_users.select{|i| i.user_id == @community.user_id}.map(&:user)
     users = @community.community_users.map(&:user) - community_owner
-    invitees = @community.community_invitees.map(&:email)
+    invitees = (@community.invitations.map(&:email) + @community.community_invitees.map(&:email)).uniq 
     
     respond_to do |format|
       if @community.status!=false
@@ -187,8 +187,7 @@ class V1::CommunitiesController < ApplicationController
       format.json {render :json => success }
     end
   end
-
-  def member_delete
+ def member_delete
     community_user = CommunityUser.where(:user_id => params[:id], :community_id => params[:community_id]).first
     respond_to do |format|
       if community_user.delete
@@ -215,23 +214,25 @@ class V1::CommunitiesController < ApplicationController
   end
 
   def  community_invitation
-       params[:invite_email]['users'].split(',').each do |invite_email|
-        invite_email = invite_email.strip
+    @community_invites, @user_invites = [], []
+    params[:invite_email]['users'].split(',').each do |invite_email|
+      invite_email = invite_email.strip
+      @user_id=User.where(:email=>invite_email).first
+      if @user_id
+        @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)
+        if @invitation.save
+          @community_invites << [@current_user.first_name, @invitation.id, @community.name]
+          #@community.save_Invitation_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
+        else
+          format.json  { render :json =>@invitation.all_errors}
+        end
+      else
         invited = CommunityInvitee.where(:email => invite_email, :community_id => @community._id).first
         invited.nil? ? CommunityInvitee.create(:community_id => @community._id, :email => invite_email) : invited.update_attributes(:invited_count => invited.invited_count + 1)
-        @user_id=User.where(:email=>invite_email).first
-        if @user_id
-          @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)
-              if @invitation.save
-                   Invite.community_invite(@current_user.first_name,@invitation,@community.name).deliver
-                  #@community.save_Invitation_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
-                else
-                   format.json  { render :json =>@invitation.all_errors}
-                end
-          else
-              Invite.send_invitations(@current_user, invite_email, @community._id, @community.name).deliver
-        end
+        @user_invites << [@current_user.id, invite_email, @community.id, @community.name]
       end
+    end
+      Community.delay.community_invite(@community_invites) unless @community_invites.blank?
+      Community.delay.user_invite(@user_invites) unless @user_invites.blank?    
   end
-
 end

@@ -69,6 +69,20 @@ class Community
     return {:community_arrays=>@community,:community_hashes=>@community_values}
   end
 
+  def self.community_invite(invites)
+    invites.each do |invite|
+      invitation = Invitation.find(invite[1])
+      Invite.community_invite(invite[0], invitation, invite[2]).deliver
+    end
+  end
+
+  def self.user_invite(invites)
+    invites.each do |invite|
+      user = User.find(invite[0])
+      Invite.send_invitations(user, invite[1], invite[2], invite[3]).deliver
+    end
+  end
+
   def save_activity(text)
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end

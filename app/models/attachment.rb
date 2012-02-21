@@ -16,7 +16,6 @@ class Attachment
   after_create :create_activity
   after_update :update_activity
   after_save :sunspot_index
-  scope :undeleted, self.excludes(:is_deleted => false)
   
   field :file_name, type: String
   field :file_type, type: String
@@ -40,6 +39,7 @@ class Attachment
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
     query = 'attachments'
+    query +=  '.where(is_deleted: false)'
     query +=  '.where(file_type: params[:file_type])' if params[:file_type]
     query +=  '.and(:folder_id=> nil)' if params[:folder_id]
     query += '.any_of(self.get_criteria(params[:q]))' if params[:q]

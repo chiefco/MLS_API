@@ -53,20 +53,20 @@ class V1::FoldersController < ApplicationController
   end
 
   def destroy
-     respond_to do |format|
-      if @folder
-         @folder.update_attributes(:status=>false)
-         format.xml  { render :xml => success.to_xml(ROOT) }
-         format.json  { render :json=> success}
+    @folder = Folder.find(params[:id]).destroy
+    respond_to do |format|
+      if  @folder 
+        format.json { render :json=> success }
+        format.xml { render :xml=> success.to_xml(ROOT) }
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+         format.xml  { render :xml => failure.merge(@folder.all_errors).to_xml(ROOT)}
+         format.json  { render :json => @folder.all_errors }
       end
     end
   end
 
    def folder_tree
-     @folder = @current_user.folders.select{|f| f['parent_id']==nil && f['status']== true}
+     @folder = @current_user.folders.select{|f| f['parent_id']==nil && f[:is_deleted]== false}
       respond_to do |format|
         format.json {render :json =>  {:folders => @folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at], :methods => [:children_count]).parse}}
       end
@@ -119,7 +119,7 @@ class V1::FoldersController < ApplicationController
   end
 
   def sub_folders
-    @sub_folders = @folder.children
+    @sub_folders = @folder.children.select{|f| f[:is_deleted]== false}
   end
 
 end

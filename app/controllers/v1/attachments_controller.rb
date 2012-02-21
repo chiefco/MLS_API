@@ -42,6 +42,8 @@ class V1::AttachmentsController < ApplicationController
     params[:attachment][:attachable_id] =@current_user._id if params[:attachment][:attachable_type] == "User"
     params[:attachment][:file] = File.new("#{Rails.root}/tmp/#{params[:attachment][:file_name]}")
     params[:attachment][:size] = params[:attachment][:file].size
+    folder = Folder.find(params[:attachment][:folder_id]) if params[:attachment][:folder_id]
+    params[:attachment][:folder_id] = folder._id if params[:attachment][:folder_id]
     @attachment = @current_user.attachments.new(params[:attachment])
     @attachment.save
     File.delete(params[:attachment][:file])
@@ -79,7 +81,10 @@ class V1::AttachmentsController < ApplicationController
     Attachment.any_in(_id: params[:attachment]).update_all(:is_deleted => true)
     attachments = Attachment.list(@current_user.attachments, params, {:page =>1, :per_page => 10})
     count = @current_user.attachments.where(:folder_id => nil).count
+    Folder.any_in(_id: params[:folder]).update_all(:is_deleted => true) if params[:folder] 
+    folders = @current_user.folders.where(:parent_id => nil, :is_deleted => false)
     Attachment.delay.delete(params[:attachment])
+    Folder.delay.delete(params[:folder]) if params[:folder] 
 
     respond_to do |format|
       format.json  { render :json => { :attachments => attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at, :user_id]).parse ,:total => count}.to_success }

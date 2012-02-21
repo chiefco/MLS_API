@@ -2,15 +2,19 @@ class Folder
   include Mongoid::Document
   include Mongoid::Timestamps
   include Mongoid::Acts::Tree
+  acts_as_tree
+  
+  referenced_in :user
+  has_many :activities, as: :entity, :dependent => :destroy
+  references_many :attachments, :dependent => :destroy
+  
   field :name, :type => String
   field :parent_id, :type => String
   field :status, :type => Boolean, :default => true
-  acts_as_tree
-  referenced_in :user
-  has_many :activities, as: :entity
-  references_many :attachments, :dependent => :destory
+  field :is_deleted, :type => Boolean, :default => false
+  
   validates_presence_of :name,:code=>3013,:message=>"name - Blank Parameter"
-  scope :undeleted,self.excludes(:status => false)
+  scope :undeleted,self.excludes(:status => false, :is_deleted => true)
 
   after_create :create_activity
   after_update :update_activity
@@ -37,6 +41,11 @@ class Folder
 
   def children_count
     self.children.count
+  end
+  
+  def self.delete(folders)
+    Folder.any_in(:_id => folders).destroy_all
+    #Activity.any_in(:shared_id => folders).delete_all
   end
 
 end

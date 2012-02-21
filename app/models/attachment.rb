@@ -5,6 +5,7 @@ class Attachment
   mount_uploader :file, FileUploader
   belongs_to :attachable, polymorphic: true
   belongs_to :user
+  referenced_in :folder
   has_many :bookmarked_contents, as: :bookmarkable
   references_many :shares, :dependent => :destroy
   has_many :activities, as: :entity, :dependent => :destroy
@@ -23,7 +24,6 @@ class Attachment
   field :size, type: Integer
   field :width, type: Integer
   field :height, type: Integer
-  field :folder_id, :type => String, :default => nil
   field :is_deleted, :type => Boolean, :default => false
 
   searchable do

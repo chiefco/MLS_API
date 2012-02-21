@@ -16,7 +16,8 @@ class Attachment
   after_create :create_activity
   after_update :update_activity
   after_save :sunspot_index
-
+  scope :undeleted, self.excludes(:is_deleted => false)
+  
   field :file_name, type: String
   field :file_type, type: String
   field :content_type, type: String

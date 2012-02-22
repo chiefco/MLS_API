@@ -46,6 +46,11 @@ class Item
   after_save :sunspot_index
   after_create :create_activity
   after_update :update_activity
+  
+  def location_details
+    val=self.location
+    {:name => val.name, :latitude => val.latitude_val, :longitude => val.longitude_val,:id=>val._id.to_s}
+  end
 
   def create_activity
     save_activity("ITEM_CREATED")

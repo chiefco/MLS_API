@@ -87,12 +87,10 @@ class V1::FoldersController < ApplicationController
 
   def move_multiple_attachments
     params[:id] = nil if params[:id] == ''
-    params[:move_file].each do |key, value|
-      @attachment = Attachment.find(value[:item][:attachment_id])
-      @attachment.update_attributes(:folder_id=>params[:id]) if @attachment
-    end
+    files_move_to_folder if  params[:move_files]
+    folders_move_to_folder if  params[:move_folders]
     respond_to do |format|
-        if  @attachment
+        if  @attachment ||  @folder
           format.json  { render :json => success }
         else
           format.json {render :json => failure  }
@@ -120,6 +118,22 @@ class V1::FoldersController < ApplicationController
 
   def sub_folders
     @sub_folders = @folder.children.select{|f| f[:is_deleted]== false}
+  end
+  
+   def files_move_to_folder
+      params[:move_files].each do |v|
+        attachment = Attachment.find(v)
+        @attachment = attachment.update_attributes(:folder_id=>params[:id]) if attachment
+      end
+  end
+  
+  def folders_move_to_folder
+      params[:move_folders].each do |v|
+        unless params[:id] == v
+          folder = Folder.find(v)
+          @folder = folder.update_attributes(:parent_id=>params[:id]) if folder
+        end
+      end
   end
 
 end

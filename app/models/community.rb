@@ -97,7 +97,7 @@ class Community
   end
 
   def shares_count
-    self.shares.count
+    self.shares.uniq_by{|a| a.shared_id}.count
   end
 
   def get_meets

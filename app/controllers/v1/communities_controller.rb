@@ -20,7 +20,7 @@ class V1::CommunitiesController < ApplicationController
     @attachments, @items = [], []
     shares = @community.shares.order_by(:created_at.desc)
     share_attachments = shares.select{|i| i.shared_type == 'Attachment' && i.status == true}
-    items = shares.select{|i| i.shared_type == 'Meet'}.map(&:item)
+    items = shares.select{|i| i.shared_type == 'Meet'}.map(&:item).uniq
     community_owner = @community.community_users.select{|i| i.user_id == @community.user_id}.map(&:user)
     users = @community.community_users.map(&:user) - community_owner
     invitees = (@community.invitations.map(&:email) + @community.community_invitees.map(&:email)).uniq 

@@ -22,12 +22,14 @@ class Location
     string :user_id
   end
   
-  def latitude
-    super().nil? ? "nil" : super().to_f.to_s
+  def latitude_val
+    val=self.latitude
+    val.nil? ? "nil" : val.to_f.to_s
   end
   
-   def longitude
-    super().nil? ? "nil" : super().to_f.to_s
+   def longitude_val
+    val=self.longitude
+    val.nil? ? "nil" : val.to_f.to_s
   end
 
   def find_co_ordinates

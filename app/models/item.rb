@@ -49,7 +49,9 @@ class Item
   
   def location_details
     val=self.location
-    {:name => val.name, :latitude => val.latitude_val, :longitude => val.longitude_val,:id=>val._id.to_s}
+    unless val.nil?
+      {:name => val.name, :latitude => val.latitude_val, :longitude => val.longitude_val,:id=>val._id.to_s}
+    end
   end
 
   def create_activity

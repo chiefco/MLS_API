@@ -50,7 +50,7 @@ class Item
   def location_details
     val=self.location
     unless val.nil?
-      {:name => val.name, :latitude_val => val.latitude_val, :longitude_val => val.longitude_val,:id=>val._id.to_s}
+      [{:name => val.name, :latitude_val => val.latitude_val, :longitude_val => val.longitude_val,:id=>val._id.to_s}]
     end
   end
 
@@ -241,7 +241,5 @@ class Item
       end
       return @shares_meet
     end
-    
-  def members
-  end
+
 end

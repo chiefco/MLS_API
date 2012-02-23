@@ -87,8 +87,10 @@ class V1::SessionsController < Devise::SessionsController
         meet.delete(:page)
         meet.delete(:share)
         begin
-          @location=@user.locations.find_or_create_by(:name=>location.downcase)
-          meet[:location_id]=@location._id
+          unless location.nil?
+            @location=@user.locations.find_or_create_by(:name=>location.downcase)
+            meet[:location_id]=@location._id unless @location.nil?
+          end
           @meet= @user.items.create(meet)
           puts @meet.errors.inspect
           unless @meet.nil?
@@ -115,8 +117,10 @@ class V1::SessionsController < Devise::SessionsController
             meet.delete(:updated_page)
             meet.delete(:page)
             meet.delete(:share)
-            @location=@user.locations.find_or_create_by(:name=>location.downcase)
-            meet[:location_id]=@location._id
+            unless location.nil?
+              @location=@user.locations.find_or_create_by(:name=>location.downcase)
+              meet[:location_id]=@location._id unless @location.nil?
+            end
             @meet.update_attributes(meet)
             @id=meet[:cloud_id]
             create_or_update_share

@@ -234,9 +234,9 @@ class Item
 
   def self.get_shares(meet)
     @shares_meet=[]
-      meet.shares.each do|share|
+      meet.shares.uniq_by{|a| a.community_id}.each do|share|
         unless share.community_id.nil?
-        @shares_meet<<{:community_id=>share.community_id.to_s,:meet_id=>share.item._id.to_s,:share_id=>share._id.to_s}
+        @shares_meet<<{:community_id=>share.community_id.to_s,:meet_id=>meet._id.to_s,:share_id=>share._id.to_s}
         end
       end
       return @shares_meet

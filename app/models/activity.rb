@@ -10,6 +10,8 @@ class Activity
   belongs_to :subject, polymorphic: true
   referenced_in :user
 
+  scope :todays_activities,self.where(:created_at => Date.today)
+
   validates_presence_of :entity_id,:code=>3027,:message=>"activity_id - Required parameter missing"
   validates_presence_of :entity_type,:code=> 3020,:message=>"activity_type - Required parameter missing"
   validates_inclusion_of :entity_type, :in=>["Item","Category","Bookmark","Topic", "Community","Share", "Attachment", "Invitation", "Folder"], :message=>"activity_type  - Required parameter missing", :code=>2015

@@ -13,9 +13,9 @@ class V1::AttachmentsController < ApplicationController
     @attachments = Attachment.list(@current_user.attachments,params,paginate_options)
     if params[:user_attachments]
       @attachments = @attachments.reject{|attachment| attachment.shares.count > 0}
-      @count = @current_user.attachments.where(:folder_id => nil).reject{|attachment| attachment.shares.count > 0}.count
+      @count = @current_user.attachments.where(:folder_id => nil, :is_deleted => false).reject{|attachment| attachment.shares.count > 0}.count
     else
-      @count = @current_user.attachments.where(:folder_id => nil).count
+      @count = @current_user.attachments.where(:folder_id => nil, :is_deleted => false).count
     end
     respond_to do |format|
       format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :content_type,:file,:created_at], :methods => [:user_name]).parse ,:total=>@count}.to_success }
@@ -80,7 +80,7 @@ class V1::AttachmentsController < ApplicationController
  def attachments_multiple_delete
     Attachment.any_in(_id: params[:attachment]).update_all(:is_deleted => true)
     attachments = Attachment.list(@current_user.attachments, params, {:page =>1, :per_page => 10})
-    count = @current_user.attachments.where(:folder_id => nil).count
+    count = @current_user.attachments.where(:folder_id => nil, :is_deleted => false).count
     Folder.any_in(_id: params[:folder]).update_all(:is_deleted => true) if params[:folder] 
     folders = @current_user.folders.where(:parent_id => nil, :is_deleted => false)
     Attachment.delay.delete(params[:attachment])

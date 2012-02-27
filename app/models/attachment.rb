@@ -43,7 +43,8 @@ class Attachment
     query +=  '.where(file_type: params[:file_type])' if params[:file_type]
     query +=  '.and(:folder_id=> nil)' if params[:folder_id]
     query += '.any_of(self.get_criteria(params[:q]))' if params[:q]
-    query += '.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)'
+    #~ query += '.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)'
+    query += '.order_by([params[:sort_by],params[:order_by]])'
     eval(query)
   end
 

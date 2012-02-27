@@ -35,22 +35,18 @@ class V1::CommunitiesController < ApplicationController
   end  
 
   def create
-    unless @current_user.communities.undeleted.count > 5
-      @community = @current_user.communities.new(params[:community])
-      
-      respond_to do |format|
-        if @community.save
-          community_invitation if params[:invite_email]['users'] != 'use comma separated emails'
-          CommunityUser.create(:user_id=>@current_user._id,:community_id=>@community._id,:role_id=>1)
-          find_parameters
-          format.json {render :json => @community}
-        else
-          format.json {render :json => @community.all_errors}
+    @community = @current_user.communities.new(params[:community])
+    
+    respond_to do |format|
+      if @community.save
+        if !params[:invite_email].nil?
+          community_invitation unless params[:invite_email][:users].blank?
         end
-      end
-    else
-      respond_to do |format|
-        format.json { render :json=> {:message=>"You can create only 6 teams"}.to_failure }
+        CommunityUser.create(:user_id=>@current_user._id,:community_id=>@community._id,:role_id=>1)
+        find_parameters
+        format.json {render :json => @community}
+      else
+        format.json {render :json => @community.all_errors}
       end
     end
   end

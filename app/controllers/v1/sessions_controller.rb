@@ -156,7 +156,7 @@ class V1::SessionsController < Devise::SessionsController
               @attachment=Attachment.where(:_id=>page[:cloud_id]).first
               Page.create_page_texts(page[:page_text],@attachment.attachable._id)
               @ipad_page_ids<<page[:page_id]
-              @attachment.update_attributes(:file=>decode_image(@attachment._id,page[:page_image]))
+              @attachment.update_attributes(:file=>decode_image(ActiveSupport::SecureRandom.hex(16),page[:page_image]))
                File.delete(@file)
              end
           @synched_pages=@synched_pages.merge({page[:page_id]=>@attachment._id,:page_texts=>@page_texts})

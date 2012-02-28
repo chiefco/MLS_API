@@ -17,6 +17,7 @@ class Attachment
   validates_inclusion_of :attachable_type, :in=>["User","Item","Page"], :message=>"attachable_type - Invalid Parameter", :code=>3050
   SORT_BY_ALLOWED = [:file_name, :size, :content_type]
   ORDER_BY_ALLOWED =  [:asc,:desc]
+  after_destroy :delete_parent
   after_create :create_activity
   after_update :update_activity
   after_save :sunspot_index
@@ -56,7 +57,7 @@ class Attachment
   end
 
   def self.delete(attachments)
-    Attachment.any_in(_id: attachments).destroy_all
+    Attachment.any_in(_id: attachments).each{|a| a.destroy}
     Activity.any_in(:shared_id => attachments).delete_all
   end
 
@@ -89,4 +90,7 @@ class Attachment
     end
   end
 
+  def delete_parent
+    self.parent.destroy if self.parent
+  end
 end

@@ -30,4 +30,8 @@ class Activity
   def self.get_criteria(query)
     [ {activity_type: query} , { description: query }]
   end
+
+  def self.update(attachment, new_attachment)
+    Activity.where(:shared_id => attachment._id).each{|a| a.update_attributes(:shared_id => new_attachment._id)}
+  end
 end

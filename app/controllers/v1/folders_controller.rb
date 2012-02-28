@@ -19,15 +19,23 @@ class V1::FoldersController < ApplicationController
   end
 
   def create
-      @folder = @current_user.folders.new(params[:folder])
+    check_folder_uniqueness
+    if @folder.nil?
+       @folder = @current_user.folders.new(params[:folder])
       respond_to do |format|
-        if @folder.save
+        if @folder.save          
           format.json  { render :json =>{:folder=>@folder.to_json(:only=>[:_id, :name, :parent_id, :created_at, :updated_at]).parse}.to_success }
         else
           format.json {render :json => @folder.all_errors}
         end
        end
+    else
+      respond_to do |format|
+        format.json {render :json => failure.merge({:message => 'Folder name already exists'})}
+      end
+    end
   end
+
 
   def update
     respond_to do |format|
@@ -136,4 +144,7 @@ class V1::FoldersController < ApplicationController
       end
   end
 
+  def check_folder_uniqueness
+    params[:folder][:parent_id].blank? ? @folder = @current_user.folders.where(:name =>params[:folder][:name], :parent_id => nil).first : @folder = @current_user.folders.where(:name =>params[:folder][:name], :parent_id => params[:folder][:parent_id]).first
+  end
 end

@@ -40,7 +40,7 @@ class V1::AttachmentsController < ApplicationController
     attachment_present = attachments_present.where(:file_name => "#{params[:attachment][:file_name]}", :attachable_id => @current_user.id, :is_current_version => true, :is_deleted => false).first
     parent_file = attachments_present.where(:parent_id => nil).first
 
-    attachment_present.update_attributes(:is_current_version => false) if !attachment_present.blank?
+    attachment_present.update_attributes(:is_current_version => false) if attachment_present
 
     File.open("#{Rails.root}/tmp/#{params[:attachment][:file_name]}", 'wb') do|f|
       f.write(Base64.decode64("#{params[:encoded]}"))
@@ -63,6 +63,7 @@ class V1::AttachmentsController < ApplicationController
     @attachment = @current_user.attachments.new(params[:attachment])
     @attachment.save
     File.delete(params[:attachment][:file])
+    Activity.update(attachment_present, @attachment) if attachment_present
 
     respond_to do |format|
       if @attachment.save
@@ -84,8 +85,9 @@ class V1::AttachmentsController < ApplicationController
   # DELETE /v1/attachments/1.xml
   def destroy
     @attachment.destroy
-    @activity = Activity.where(:shared_id => params[:id]).first
-    @activity.destroy if @activity
+    @activity = Activity.where(:shared_id => params[:id])
+    @activity.destroy_all if @activity
+
     respond_to do |format|
       format.json { render :json=> success }
       format.xml { render :xml=> success.to_xml(ROOT) }
@@ -95,7 +97,7 @@ class V1::AttachmentsController < ApplicationController
   def get_revisions
     attachment = Attachment.where(:_id => params[:id]).first
     parent_attachment = attachment.parent
-    parent_attachment ? attachment_revisions = parent_attachment.to_a + parent_attachment.children : attachment_revisions = attachment + attachment.children
+    parent_attachment ? attachment_revisions = parent_attachment.to_a + parent_attachment.children : attachment_revisions = attachment.to_a + attachment.children
 
     if !attachment_revisions.blank?
       respond_to do |format|

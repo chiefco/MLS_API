@@ -1,7 +1,7 @@
 class V1::AttachmentsController < ApplicationController
 
   before_filter :authenticate_request!
-  before_filter :find_resource, :except=>[:create, :index, :attachments_multiple_delete]
+  before_filter :find_resource, :except=>[:create, :index, :attachments_multiple_delete, :get_revisions]
   before_filter :detect_missing_file, :only=>[:create]
 
   # GET /v1/attachments
@@ -35,18 +35,35 @@ class V1::AttachmentsController < ApplicationController
   # POST /v1/attachments
   # POST /v1/attachments.xml
 
- def create
+   def create
+    attachments_present = Attachment.where(:file_name => "#{params[:attachment][:file_name]}", :attachable_id => @current_user.id, :folder_id => params[:attachment][:folder_id])
+    attachment_present = attachments_present.where(:file_name => "#{params[:attachment][:file_name]}", :attachable_id => @current_user.id, :is_current_version => true, :is_deleted => false).first
+    parent_file = attachments_present.where(:parent_id => nil).first
+
+    attachment_present.update_attributes(:is_current_version => false) if !attachment_present.blank?
+
     File.open("#{Rails.root}/tmp/#{params[:attachment][:file_name]}", 'wb') do|f|
       f.write(Base64.decode64("#{params[:encoded]}"))
     end
     params[:attachment][:attachable_id] =@current_user._id if params[:attachment][:attachable_type] == "User"
     params[:attachment][:file] = File.new("#{Rails.root}/tmp/#{params[:attachment][:file_name]}")
     params[:attachment][:size] = params[:attachment][:file].size
+    params[:attachment][:changed_by] = @current_user._id
+
+    if attachments_present.size > 0 
+      params[:attachment][:version] = attachments_present.size + 1 
+      params[:attachment][:event] = "Edited"
+      params[:attachment][:parent_id] = parent_file._id
+    else
+      params[:attachment][:version] = 1
+      params[:attachment][:event] = "Added"      
+    end
     folder = Folder.find(params[:attachment][:folder_id]) if params[:attachment][:folder_id]
     params[:attachment][:folder_id] = folder._id if params[:attachment][:folder_id]
     @attachment = @current_user.attachments.new(params[:attachment])
     @attachment.save
     File.delete(params[:attachment][:file])
+
     respond_to do |format|
       if @attachment.save
          if params[:community]!='' && params.has_key?(:community)
@@ -72,6 +89,19 @@ class V1::AttachmentsController < ApplicationController
     respond_to do |format|
       format.json { render :json=> success }
       format.xml { render :xml=> success.to_xml(ROOT) }
+    end
+  end
+
+  def get_revisions
+    attachment = Attachment.where(:_id => params[:id]).first
+    parent_attachment = attachment.parent
+    parent_attachment ? attachment_revisions = parent_attachment.to_a + parent_attachment.children : attachment_revisions = attachment + attachment.children
+
+    if !attachment_revisions.blank?
+      respond_to do |format|
+        format.json  { render :json => { :file_name => attachment_revisions.first.file_name, :attachment_revisions => attachment_revisions.reverse.to_json(:only=>[:_id, :size, :file, :updated_at, :event]).parse}.to_success }
+        format.xml  { render :xml => attachment_revisions.to_xml(:only=>[:_id, :file_type, :file_name, :size,  :content_type]).as_hash.to_success.to_xml(ROOT) }
+      end      
     end
   end
 

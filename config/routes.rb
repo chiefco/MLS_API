@@ -43,6 +43,7 @@ MeetlinkshareApi::Application.routes.draw do
     match "/items/:item_id/tasks" => 'items#tasks'
     match "/multiple_delete" => 'communities#multiple_delete'
     match "/attachments_multiple_delete" => 'attachments#attachments_multiple_delete'
+    match "attachment_update" => "attachments#attachment_update"
     match "/invite_from_community" => 'communities#invite_from_community', :via => :post
     match "/member_delete" => "communities#member_delete"
     match "/attachments_download" => 'attachments#attachments_download'
@@ -50,6 +51,7 @@ MeetlinkshareApi::Application.routes.draw do
     match "/move_attachments" => 'folders#move_attachments'
     match '/move_multiple_attachments', :to=>'folders#move_multiple_attachments'
     match '/move_folders', :to=>'folders#move_folders'
+    match '/get_file_revisions', :to => 'attachments#get_revisions'
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do

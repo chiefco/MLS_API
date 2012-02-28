@@ -2,6 +2,9 @@ class Attachment
   include Mongoid::Document
   include Mongoid::Timestamps
   include Sunspot::Mongoid
+  include Mongoid::Acts::Tree  
+  acts_as_tree
+
   mount_uploader :file, FileUploader
   belongs_to :attachable, polymorphic: true
   belongs_to :user
@@ -25,6 +28,10 @@ class Attachment
   field :width, type: Integer
   field :height, type: Integer
   field :is_deleted, :type => Boolean, :default => false
+  field :is_current_version, :type => Boolean, :default => true  
+  field :event, type: String
+  field :version, type: Integer, default: 1
+  field :changed_by, type: String  
 
   searchable do
     string :file_name do
@@ -39,7 +46,7 @@ class Attachment
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
     query = 'attachments'
-    query +=  '.where(is_deleted: false)'
+    query +=  '.where(is_deleted: false, is_current_version: true)'
     query +=  '.where(file_type: params[:file_type])' if params[:file_type]
     query +=  '.and(:folder_id=> nil)' if params[:folder_id]
     query += '.any_of(self.get_criteria(params[:q]))' if params[:q]

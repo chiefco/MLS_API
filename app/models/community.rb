@@ -108,6 +108,6 @@ class Community
     owner = user
     members = (community_users.map(&:user) - owner.to_a).uniq
     invitees = ((invitations.map(&:email) + community_invitees.map(&:email))).uniq 
-   {:owner => owner.email, :members => members.map(&:email), :invitees =>invitees - (members.map(&:email) + owner.email.to_a),:id => _id.to_s }
+   {:owner => owner.first_name, :members => members.map(&:email), :invitees =>invitees - (members.map(&:email) + owner.email.to_a),:id => _id.to_s }
   end
 end

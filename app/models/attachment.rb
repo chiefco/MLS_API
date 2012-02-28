@@ -57,8 +57,8 @@ class Attachment
   end
 
   def self.delete(attachments)
-    Attachment.any_in(_id: attachments).each{|a| a.destroy}
     Activity.any_in(:shared_id => attachments).delete_all
+    Attachment.any_in(_id: attachments).each{|a| a.destroy}
   end
 
   def self.get_criteria(query)

@@ -28,10 +28,17 @@ class V1::SessionsController < Devise::SessionsController
   def synchronisation
     uri = URI.parse("http://localhost:3000")
 		req = Net::HTTP::Get.new("#{request.path}?".concat(request.query_string))
-    @user=User.where(:authentication_token=>params[:access_token]).first
+    get_user
     @user.nil?  ? stop_synchronisation: perform_synchronisation(@user)
   end
-
+  
+  def community_synchronisation
+    get_user;get_communities
+    respond_to do |format|
+      format.json{render :json =>success.merge(:communities=>@communities)}
+    end
+  end
+  
   private
   #perform synchronisation for the user
   def perform_synchronisation(user)
@@ -192,4 +199,9 @@ class V1::SessionsController < Devise::SessionsController
       end
     end
   end
+  
+  def get_user
+    @user=User.where(:authentication_token=>params[:access_token]).first
+  end
+  
 end

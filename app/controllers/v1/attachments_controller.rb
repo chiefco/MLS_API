@@ -39,12 +39,11 @@ class V1::AttachmentsController < ApplicationController
     attachments_present = Attachment.where(:file_name => "#{params[:attachment][:file_name]}", :attachable_id => @current_user.id, :folder_id => params[:attachment][:folder_id])
     attachment_present = attachments_present.where(:file_name => "#{params[:attachment][:file_name]}", :attachable_id => @current_user.id, :is_current_version => true, :is_deleted => false).first
     parent_file = attachments_present.where(:parent_id => nil).first
-
     attachment_present.update_attributes(:is_current_version => false) if attachment_present
-
     File.open("#{Rails.root}/tmp/#{params[:attachment][:file_name]}", 'wb') do|f|
       f.write(Base64.decode64("#{params[:encoded]}"))
     end
+
     params[:attachment][:attachable_id] =@current_user._id if params[:attachment][:attachable_type] == "User"
     params[:attachment][:file] = File.new("#{Rails.root}/tmp/#{params[:attachment][:file_name]}")
     params[:attachment][:size] = params[:attachment][:file].size
@@ -52,18 +51,19 @@ class V1::AttachmentsController < ApplicationController
 
     if attachments_present.size > 0 
       params[:attachment][:version] = attachments_present.size + 1 
-      params[:attachment][:event] = "Edited"
+      params[:attachment][:event] = "Updated"
       params[:attachment][:parent_id] = parent_file._id
     else
       params[:attachment][:version] = 1
       params[:attachment][:event] = "Added"      
     end
+
     folder = Folder.find(params[:attachment][:folder_id]) if params[:attachment][:folder_id]
-    params[:attachment][:folder_id] = folder._id if params[:attachment][:folder_id]
+    params[:attachment][:folder_id] = folder._id if folder
     @attachment = @current_user.attachments.new(params[:attachment])
     @attachment.save
     File.delete(params[:attachment][:file])
-    Activity.update(attachment_present, @attachment) if attachment_present
+    Share.update(attachment_present._id, @attachment._id, @current_user._id) if attachment_present
 
     respond_to do |format|
       if @attachment.save
@@ -78,6 +78,47 @@ class V1::AttachmentsController < ApplicationController
         format.json  { render :json => failure.merge(:errors=> @attachment.all_errors)}
         format.xml  { render :xml => @attachment.all_errors, :root=>"errors" }
       end
+    end
+  end
+
+  def update
+    if @attachment
+      if params[:encoded]
+        File.open("#{Rails.root}/tmp/#{@attachment.file_name}", 'wb') do|f|
+          f.write(Base64.decode64("#{params[:encoded]}"))
+        end    
+        params[:attachment] && params[:attachment][:file_name] ? file_name = params[:attachment][:file_name] : file_name = @attachment.file_name
+        params[:attachment] && params[:attachment][:file_type] ? file_type = params[:attachment][:file_type] : file_type = @attachment.file_type
+        params[:attachment] && params[:attachment][:content_type] ? content_type = params[:attachment][:content_type] : content_type = @attachment.content_type
+        @attachment.parent ? parent = @attachment.parent : parent = @attachment
+        version = parent.children.size + 2            
+        folder = Folder.find(params[:attachment][:folder_id]) if params[:attachment] && params[:attachment][:folder_id]
+        folder ? folder_id = folder._id : folder_id = @attachment.folder_id   
+        file = File.new("#{Rails.root}/tmp/#{@attachment.file_name}")
+
+        @new_attachment = @current_user.attachments.new(:attachable_id => @current_user._id, :attachable_type => @attachment.attachable_type, :file_name => file_name, :file_type => file_type, :content_type => content_type, :version => version, :folder_id => folder_id, :file => file, :size => file.size, :changed_by => @current_user._id, :event => "Updated", :parent_id => parent._id)
+
+        respond_to do |format|
+          if @new_attachment.save
+            File.delete(file)
+            @attachment.update_attributes(:is_current_version => false)
+            Share.update(@attachment._id, @new_attachment._id, @current_user._id)
+            format.json  { render :json=> { :attachment => @new_attachment.to_json(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).parse}.to_success }
+            format.xml  { render :xml => @new_attachment.to_xml(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).as_hash.to_success.to_xml(ROOT) }
+          else
+            format.json  { render :json => failure.merge(:errors=> @new_attachment.all_errors)}
+            format.xml  { render :xml => @new_attachment.all_errors, :root=>"errors" }
+          end
+        end
+      else
+        respond_to do |format|
+          format.json { render :json=> {:error=>{:message => 'File content(encoded) - Blank Parameter'}}.to_failure }
+        end   
+      end
+    else
+      respond_to do |format|
+        format.json { render :json=> {:error=>{:message=>"File not found"}}.to_failure }
+      end 
     end
   end
 
@@ -135,7 +176,7 @@ class V1::AttachmentsController < ApplicationController
   private
 
   def find_resource
-    @attachment = Attachment.find(params[:id])
+    @attachment = Attachment.find(params[:id]) rescue nil
   end
 
   def detect_missing_file

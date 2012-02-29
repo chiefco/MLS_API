@@ -30,7 +30,7 @@ class Attachment
   field :height, type: Integer
   field :is_deleted, :type => Boolean, :default => false
   field :is_current_version, :type => Boolean, :default => true  
-  field :event, type: String
+  field :event, type: String, :default => 'Added'
   field :version, type: Integer, default: 1
   field :changed_by, type: String  
 

@@ -24,15 +24,15 @@ MeetlinkshareApi::Application.configure do
   config.action_dispatch.best_standards_support = :builtin
   config.action_controller.allow_forgery_protection = false
   config.session_store = nil
-  config.action_mailer.raise_delivery_errors = true
+  #~ config.action_mailer.raise_delivery_errors = true
 
-  ActionMailer::Base.smtp_settings = {
-    :address => "smtp.gmail.com",
-    :enable_starttls_auto => true,
-    :port => 587,
-    :authentication => :plain,
-    :user_name => "sriman.kandeepan@gmail.com",
-    :password => '16171158'
-}
+  #~ ActionMailer::Base.smtp_settings = {
+    #~ :address => "smtp.gmail.com",
+    #~ :enable_starttls_auto => true,
+    #~ :port => 587,
+    #~ :authentication => :plain,
+    #~ :user_name => "sriman.kandeepan@gmail.com",
+    #~ :password => '16171158'
+#~ }
 end
 

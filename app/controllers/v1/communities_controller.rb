@@ -40,7 +40,7 @@ class V1::CommunitiesController < ApplicationController
     respond_to do |format|
       if @community.save
         if !params[:invite_email].nil?
-          community_invitation unless params[:invite_email][:users].blank?
+          @community.invite(params[:invite_email][:users], current_user) unless params[:invite_email][:users].blank?
         end
         CommunityUser.create(:user_id=>@current_user._id,:community_id=>@community._id,:role_id=>1)
         find_parameters
@@ -178,7 +178,7 @@ class V1::CommunitiesController < ApplicationController
 
   def  invite_from_community
     @community = Community.find(params[:invite_email]['community'])
-    community_invitation if params[:invite_email]['users'] != 'use comma separated emails'
+    @community.invite(params[:invite_email][:users], current_user) if params[:invite_email][:users] != 'use comma separated emails'
     respond_to do |format|
       format.json {render :json => success }
     end
@@ -207,28 +207,5 @@ class V1::CommunitiesController < ApplicationController
   #find parameters needed for the contacts
   def find_parameters
     @community={:community=>@community.serializable_hash(:only=>[:_id,:name,:description])}.to_success
-  end
-
-  def  community_invitation
-    @community_invites, @user_invites = [], []
-    params[:invite_email]['users'].split(',').each do |invite_email|
-      invite_email = invite_email.strip
-      @user_id=User.where(:email=>invite_email).first
-      if @user_id
-        @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)
-        if @invitation.save
-          @community_invites << [@current_user.first_name, @invitation.id, @community.name]
-          #@community.save_Invitation_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
-        else
-          format.json  { render :json =>@invitation.all_errors}
-        end
-      else
-        invited = CommunityInvitee.where(:email => invite_email, :community_id => @community._id).first
-        invited.nil? ? CommunityInvitee.create(:community_id => @community._id, :email => invite_email) : invited.update_attributes(:invited_count => invited.invited_count + 1)
-        @user_invites << [@current_user.id, invite_email, @community.id, @community.name]
-      end
-    end
-      Community.delay.community_invite(@community_invites) unless @community_invites.blank?
-      Community.delay.user_invite(@user_invites) unless @user_invites.blank?    
   end
 end

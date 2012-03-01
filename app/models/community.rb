@@ -114,4 +114,27 @@ class Community
     invitees = ((invitations.map(&:email) + community_invitees.map(&:email))).uniq 
    {:members => members.map(&:email), :invitees =>invitees - (members.map(&:email) + owner.email.to_a),:id => _id.to_s }
   end
+
+  def invite(invites, current_user)
+    community_invites, user_invites = [], []
+    invites.split(',').each do |invite_email|
+      invite_email = invite_email.strip
+      user_id = User.where(:email=>invite_email).first
+      if user_id
+        invitation = self.invitations.new(:email => invite_email, :user_id => user_id._id)
+        if invitation.save
+          community_invites << [current_user.first_name, invitation.id, self.name]
+          #@community.save_Invitation_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
+        else
+          format.json  { render :json => invitation.all_errors}
+        end
+      else
+        invited = CommunityInvitee.where(:email => invite_email, :community_id => self._id).first
+        invited.nil? ? CommunityInvitee.create(:community_id => self._id, :email => invite_email) : invited.update_attributes(:invited_count => invited.invited_count + 1)
+        user_invites << [current_user.id, invite_email, self.id, self.name]
+      end
+    end
+      Community.delay.community_invite(community_invites) unless community_invites.blank?
+      Community.delay.user_invite(user_invites) unless user_invites.blank?      
+  end
 end

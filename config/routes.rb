@@ -52,6 +52,7 @@ MeetlinkshareApi::Application.routes.draw do
     match '/move_multiple_attachments', :to=>'folders#move_multiple_attachments'
     match '/move_folders', :to=>'folders#move_folders'
     match '/get_file_revisions', :to => 'attachments#get_revisions'
+    match '/shares_multiple_delete', :to => 'shares#shares_multiple_delete'
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do

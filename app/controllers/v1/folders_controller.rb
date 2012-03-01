@@ -5,7 +5,7 @@ class V1::FoldersController < ApplicationController
   def index
     @folder = @current_user.folders.undeleted
     respond_to do |format|
-      format.json {render :json =>  {:folders => @folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at]).parse}}
+      format.json {render :json =>  {:folders => @folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at],:methods => [:user_name]).parse}}
     end
   end
 
@@ -13,7 +13,7 @@ class V1::FoldersController < ApplicationController
    sub_folders
    @folder_attachments = @folder.attachments.where(:is_deleted => false, :is_current_version => true).order_by(:created_at.desc).entries
     respond_to do |format|
-      format.json  { render :json => { :sub_folders=>@sub_folders.to_json(:only=>[:_id, :name, :parent_id, :created_at, :updated_at], :methods => [:children_count]).parse,:parent_folder => @folder.to_json(:only=>[:name,:_id, :parent_id]).parse, :folder_attachments => @folder_attachments.to_json(:only =>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at,:user_id], :methods =>[:user_name]).parse}.to_success }
+      format.json  { render :json => { :sub_folders=>@sub_folders.to_json(:only=>[:_id, :name, :parent_id, :created_at, :updated_at], :methods => [:children_count, :user_name]).parse,:parent_folder => @folder.to_json(:only=>[:name,:_id, :parent_id]).parse, :folder_attachments => @folder_attachments.to_json(:only =>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at,:user_id], :methods =>[:user_name]).parse}.to_success }
       format.xml  { render :xml =>  @sub_folders.to_xml(:only=>[:_id, :name, :parent_id]).as_hash.merge( :count=> @sub_folders.count).to_success.to_xml(ROOT) }
     end
   end
@@ -24,7 +24,8 @@ class V1::FoldersController < ApplicationController
        @folder = @current_user.folders.new(params[:folder])
       respond_to do |format|
         if @folder.save          
-          format.json  { render :json =>{:folder=>@folder.to_json(:only=>[:_id, :name, :parent_id, :created_at, :updated_at]).parse}.to_success }
+          create_share if params[:community] !='' && params.has_key?(:community) && params[:folder][:parent_id] == ''
+          format.json  { render :json =>{:folder=>@folder.serializable_hash(:only=>[:_id, :name, :parent_id, :created_at, :updated_at]), :shared_id => (@v1_share.nil? ? 'nil' : @v1_share._id)}.to_success }
         else
           format.json {render :json => @folder.all_errors}
         end
@@ -61,7 +62,9 @@ class V1::FoldersController < ApplicationController
   end
 
   def destroy
-    @folder = Folder.find(params[:id]).destroy
+    @activity = Activity.where(:shared_id => params[:id])
+    @activity.destroy_all if @activity
+    @folder = @folder.destroy
     respond_to do |format|
       if  @folder 
         format.json { render :json=> success }
@@ -117,6 +120,7 @@ class V1::FoldersController < ApplicationController
         end
     end
   end
+  
 
   private
 
@@ -146,5 +150,11 @@ class V1::FoldersController < ApplicationController
 
   def check_folder_uniqueness
     params[:folder][:parent_id].blank? ? @folder = @current_user.folders.where(:name =>params[:folder][:name], :parent_id => nil).first : @folder = @current_user.folders.where(:name =>params[:folder][:name], :parent_id => params[:folder][:parent_id]).first
+  end
+  
+  def create_share
+      @v1_share = @current_user.shares.create(:user_id => @current_user._id, :shared_id => @folder._id, :community_id => params[:community], :shared_type=> "Folder", :attachment_id =>nil, :item_id => nil, :folder_id => @folder._id)
+      @v1_share.save
+      @v1_share.create_activity("SHARE_FOLDER", params[:community], @folder._id)
   end
 end

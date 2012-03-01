@@ -7,6 +7,7 @@ class Folder
   referenced_in :user
   has_many :activities, as: :entity, :dependent => :destroy
   references_many :attachments, :dependent => :destroy
+  references_many :shares, :dependent => :destroy
   
   field :name, :type => String
   field :parent_id, :type => String
@@ -43,9 +44,13 @@ class Folder
     self.children.count
   end
   
+  def user_name
+    User.find(self.user_id).first_name
+  end
+  
   def self.delete(folders)
     Folder.any_in(:_id => folders).destroy_all
-    #Activity.any_in(:shared_id => folders).delete_all
+    Activity.any_in(:shared_id => folders).delete_all
   end
 
 end

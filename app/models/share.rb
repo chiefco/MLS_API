@@ -8,6 +8,7 @@ class Share
   referenced_in :user
   belongs_to :item
   belongs_to :attachment
+  belongs_to :folder
   belongs_to :permission
   has_many :activities, as: :entity
 
@@ -55,6 +56,10 @@ class Share
 
   def share_attachments
     self.attachment
+  end
+  
+  def share_folders
+   self.folder
   end
 
   def save_activity(text, community_id, shared_id)

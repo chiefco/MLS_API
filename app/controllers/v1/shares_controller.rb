@@ -19,8 +19,15 @@ class V1::SharesController < ApplicationController
     params[:share].each do |key, value|
       attachment_id = nil
       item_id = nil
-      value['item']['shared_type'] == "Attachment" ? attachment_id = value['item']['shared_id'] : item_id = value['item']['shared_id']
-     @v1_share = @current_user.shares.create(:user_id=>@current_user._id,:shared_id=> attachment_id, :community_id=> value['item']['community_id'], :shared_type=> value['item']['shared_type'], :attachment_id => attachment_id, :item_id => item_id)
+      folder_id = nil
+      if value['item']['shared_type'] == "Attachment" 
+        attachment_id = value['item']['shared_id'] 
+      elsif value['item']['shared_type'] == "Folder" 
+        folder_id = value['item']['shared_id']
+      else
+        item_id = value['item']['shared_id']
+      end
+     @v1_share = @current_user.shares.create(:user_id=>@current_user._id,:shared_id=> value['item']['shared_id'], :community_id=> value['item']['community_id'], :shared_type=> value['item']['shared_type'], :attachment_id => attachment_id, :item_id => item_id, :folder_id => folder_id)
       @v1_share.save
     end
     params[:share].each do |key, value|
@@ -44,6 +51,13 @@ class V1::SharesController < ApplicationController
   # DELETE /v1/shares/1.xml
   def destroy
     @share.update_attributes(:status=>false)
+    respond_to do |format|
+      format.json {render :json=>success }
+    end
+  end
+  
+  def shares_multiple_delete
+    Share.any_in(_id: params[:share_list]).update_all(:status => false)
     respond_to do |format|
       format.json {render :json=>success }
     end

@@ -48,15 +48,8 @@ class V1::AttachmentsController < ApplicationController
     params[:attachment][:file] = File.new("#{Rails.root}/tmp/#{params[:attachment][:file_name]}")
     params[:attachment][:size] = params[:attachment][:file].size
     params[:attachment][:changed_by] = @current_user._id
-
-    if attachments_present.size > 0 
-      params[:attachment][:version] = attachments_present.size + 1 
-      params[:attachment][:event] = "Updated"
-      params[:attachment][:parent_id] = parent_file._id
-    else
-      params[:attachment][:version] = 1
-      params[:attachment][:event] = "Added"      
-    end
+    params[:attachment][:parent_id] = parent_file._id if attachments_present.size > 0
+    attachments_present.size > 0 ? event = "Updated" : event = "Added"
 
     folder = Folder.find(params[:attachment][:folder_id]) if params[:attachment][:folder_id]
     params[:attachment][:folder_id] = folder._id if folder
@@ -67,7 +60,8 @@ class V1::AttachmentsController < ApplicationController
 
     respond_to do |format|
       if @attachment.save
-         if params[:community]!='' && params.has_key?(:community)
+        parent_file ? parent_file.revisions.create(:version => attachments_present.size + 1, :event => event, :changed_by => @current_user._id, :size => @attachment.size, :versioned_attachment => @attachment._id) : @attachment.revisions.create(:version => attachments_present.size + 1, :event => event, :changed_by => @current_user._id, :size => @attachment.size, :versioned_attachment => @attachment._id)
+        if params[:community]!='' && params.has_key?(:community)
           @v1_share = @current_user.shares.create(:user_id => @current_user._id, :shared_id => @attachment._id, :community_id => params[:community], :shared_type=> "Attachment", :attachment_id => @attachment._id, :item_id => nil)
           @v1_share.save
           @v1_share.create_activity("SHARE_ATTACHMENT", params[:community], @attachment._id)
@@ -96,13 +90,14 @@ class V1::AttachmentsController < ApplicationController
         folder ? folder_id = folder._id : folder_id = @attachment.folder_id   
         file = File.new("#{Rails.root}/tmp/#{@attachment.file_name}")
 
-        @new_attachment = @current_user.attachments.new(:attachable_id => @current_user._id, :attachable_type => @attachment.attachable_type, :file_name => file_name, :file_type => file_type, :content_type => content_type, :version => version, :folder_id => folder_id, :file => file, :size => file.size, :changed_by => @current_user._id, :event => "Updated", :parent_id => parent._id)
+        @new_attachment = @current_user.attachments.new(:attachable_id => @current_user._id, :attachable_type => @attachment.attachable_type, :file_name => file_name, :file_type => file_type, :content_type => content_type, :folder_id => folder_id, :file => file, :size => file.size, :changed_by => @current_user._id, :parent_id => parent._id)
 
         respond_to do |format|
           if @new_attachment.save
             File.delete(file)
             @attachment.update_attributes(:is_current_version => false)
-            Share.update(@attachment._id, @new_attachment._id, @current_user._id)
+            Share.update(@attachment._id, @new_attachment._id, @current_user._id)      
+            parent.revisions.create(:version => version, :event => "Updated", :changed_by => @current_user._id, :size => @new_attachment.size, :versioned_attachment => @new_attachment._id)
             format.json  { render :json=> { :attachment => @new_attachment.to_json(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).parse}.to_success }
             format.xml  { render :xml => @new_attachment.to_xml(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).as_hash.to_success.to_xml(ROOT) }
           else
@@ -137,15 +132,31 @@ class V1::AttachmentsController < ApplicationController
 
   def get_revisions
     attachment = Attachment.where(:_id => params[:id]).first
-    parent_attachment = attachment.parent
-    parent_attachment ? attachment_revisions = parent_attachment.to_a + parent_attachment.children : attachment_revisions = attachment.to_a + attachment.children
+    attachment.parent ? parent_attachment = attachment.parent : parent_attachment = attachment
+    attachment_revisions = parent_attachment.revisions
 
     if !attachment_revisions.blank?
       respond_to do |format|
-        format.json  { render :json => { :file_name => attachment_revisions.first.file_name, :attachment_revisions => attachment_revisions.reverse.to_json(:only=>[:_id, :size, :file, :updated_at, :event]).parse}.to_success }
+        format.json  { render :json => { :file_name => attachment.file_name, :attachment_revisions => attachment_revisions.reverse.to_json(:only=>[:_id, :size, :version, :created_at, :event, :attachment_id]).parse}.to_success }
         format.xml  { render :xml => attachment_revisions.to_xml(:only=>[:_id, :file_type, :file_name, :size,  :content_type]).as_hash.to_success.to_xml(ROOT) }
       end      
     end
+  end
+
+  def restore_file
+    attachment = Attachment.where(:_id => params[:id]).first
+    attachment.parent ? parent = attachment.parent : parent = attachment
+    children = parent.children
+    parent.update_attributes(:is_current_version => false)
+    versioned = parent.revisions.where(:version => params[:version]).last
+    children.each{|a| a.update_attributes(:is_current_version => false)}
+    params[:version] == 1 ? parent.update_attributes(:is_current_version => true) : Attachment.where(:_id => versioned.versioned_attachment).last.update_attributes(:is_current_version => true)
+    parent.revisions.create(:version => params[:version], :event => "Restored", :changed_by => @current_user._id, :size => versioned.size, :versioned_attachment => versioned.versioned_attachment)    
+
+    respond_to do |format|
+      format.json { render :json=> success }
+      format.xml { render :xml=> success.to_xml(ROOT) }
+    end    
   end
 
  # DELETE  MULTIPLE/v1/attachments/1

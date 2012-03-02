@@ -11,6 +11,7 @@ class Attachment
   referenced_in :folder
   has_many :bookmarked_contents, as: :bookmarkable
   references_many :shares, :dependent => :destroy
+  references_many :revisions, :dependent => :destroy
   has_many :activities, as: :entity, :dependent => :destroy
   validates_presence_of :attachable_id, :message=>"attachable_id - Blank Parameter", :code=>3034
   validates_presence_of :attachable_type, :message=>"attachable_type - Blank Parameter", :code=>3022
@@ -30,9 +31,6 @@ class Attachment
   field :height, type: Integer
   field :is_deleted, :type => Boolean, :default => false
   field :is_current_version, :type => Boolean, :default => true  
-  field :event, type: String, :default => 'Added'
-  field :version, type: Integer, default: 1
-  field :changed_by, type: String  
 
   searchable do
     string :file_name do

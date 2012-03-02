@@ -13,7 +13,7 @@ class Contact
   validates_presence_of :first_name,:code=>3011,:message=>"first_name - Blank Parameter"
   validates_presence_of :email,:code=>3002,:message=>"email - Blank Parameter"
   validates_format_of     :email, :message=>"email - Invalid email format", :code=>4001, :with  => /\A([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})\z/i, :allow_blank => true
-  validates_uniqueness_of :email, :message=>"email - Already exist", :code=>3004, :allow_blank => true
+  # validates_uniqueness_of :email, :message=>"email - Already exist", :code=>3004, :allow_blank => true
   default_scope :without=>[:created_at,:updated_at]
   referenced_in :user
   belongs_to :contact_user, :class_name => "User", :foreign_key => "contact_id"

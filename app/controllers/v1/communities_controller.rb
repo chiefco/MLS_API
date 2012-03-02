@@ -36,8 +36,7 @@ class V1::CommunitiesController < ApplicationController
   end  
 
   def create
-    @community = @current_user.communities.new(params[:community])
-    
+    @community = @current_user.communities.new(params[:community])    
     respond_to do |format|
       if @community.save
         if !params[:invite_email].nil?
@@ -184,7 +183,8 @@ class V1::CommunitiesController < ApplicationController
       format.json {render :json => success }
     end
   end
- def member_delete
+
+  def member_delete
     community_user = CommunityUser.where(:user_id => params[:id], :community_id => params[:community_id]).first
     respond_to do |format|
       if community_user.delete
@@ -215,10 +215,12 @@ class V1::CommunitiesController < ApplicationController
     params[:invite_email]['users'].split(',').each do |invite_email|
       invite_email = invite_email.strip
       @user_id=User.where(:email=>invite_email).first
+      contact_present = @current_user.contacts.where(:email => invite_email).first
+
       if @user_id 
         @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)        
         if @invitation.save     
-          contacts = Contact.create(:email => invite_email, :first_name =>@user_id.first_name, :user_id =>@current_user._id)
+          contacts = Contact.create(:email => invite_email, :first_name =>@user_id.first_name, :user_id =>@current_user._id) unless contact_present
           @community_invites << [@current_user.first_name, @invitation.id, @community.name]
           #@community.save_Invitation_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
         else
@@ -228,7 +230,7 @@ class V1::CommunitiesController < ApplicationController
         invited = CommunityInvitee.where(:email => invite_email, :community_id => @community._id).first
         invited.nil? ? CommunityInvitee.create(:community_id => @community._id, :email => invite_email) : invited.update_attributes(:invited_count => invited.invited_count + 1)
         first_name = (invite_email.split('@'))[0] rescue 'No Name'
-        contacts = Contact.create(:email => invite_email, :first_name =>first_name, :user_id =>@current_user._id) if invited.nil?
+        contacts = Contact.create(:email => invite_email, :first_name =>first_name, :user_id =>@current_user._id) if invited.nil? && !contact_present
         @user_invites << [@current_user.id, invite_email, @community.id, @community.name]
       end
     end

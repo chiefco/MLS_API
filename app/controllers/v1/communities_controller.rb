@@ -10,7 +10,7 @@ class V1::CommunitiesController < ApplicationController
     communities = @current_user.communities.undeleted
     shared_communities = CommunityUser.where(:user_id => "#{@current_user._id}").map(&:community).select{|c| c.user_id != @current_user.id && c.status == true}
     #~ invited_members = (communities.map(&:community_invitees).flatten.map(&:email) + communities.map(&:invitations).flatten.map(&:email)).uniq
-    invited_members =  (@current_user.contacts.map(&:email)).uniq
+    invited_members =  (@current_user.contacts.map(&:email) - [@current_user.email]).uniq
     respond_to do |format|
       format.json {render :json =>  {:communities => communities.to_json(:methods => [:users_count, :shares_count]).parse, :invited_members => invited_members.to_json.parse, :shared_communities => shared_communities.to_json(:methods => [:users_count, :shares_count]).parse}} # index.html.erb
     end
@@ -215,7 +215,7 @@ class V1::CommunitiesController < ApplicationController
     params[:invite_email]['users'].split(',').each do |invite_email|
       invite_email = invite_email.strip
       @user_id=User.where(:email=>invite_email).first
-      if @user_id
+      if @user_id 
         @invitation=@community.invitations.new(:email=>invite_email, :user_id=>@user_id._id)        
         if @invitation.save     
           contacts = Contact.create(:email => invite_email, :first_name =>@user_id.first_name, :user_id =>@current_user._id)

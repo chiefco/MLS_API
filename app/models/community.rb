@@ -123,14 +123,17 @@ class Community
       if user_id
         invitation = self.invitations.new(:email => invite_email, :user_id => user_id._id)
         if invitation.save
+          contact = Contact.create(:email => invite_email, :first_name =>user_id.first_name, :user_id =>current_user._id)
           community_invites << [current_user.first_name, invitation.id, self.name]
           #@community.save_Invitation_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
         else
           format.json  { render :json => invitation.all_errors}
         end
-      else
+      else        
         invited = CommunityInvitee.where(:email => invite_email, :community_id => self._id).first
         invited.nil? ? CommunityInvitee.create(:community_id => self._id, :email => invite_email) : invited.update_attributes(:invited_count => invited.invited_count + 1)
+        first_name = (invite_email.split('@'))[0]
+        contact = Contact.create(:email => invite_email, :first_name =>first_name, :user_id =>current_user._id) if invited.nil? 
         user_invites << [current_user.id, invite_email, self.id, self.name]
       end
     end

@@ -39,6 +39,10 @@ class V1::SessionsController < Devise::SessionsController
     end
   end
   
+  def get_image
+    ActiveSupport::Base64.encode64(open("https://api-meetlinkshare.heroku.com/images/rails.png") { |io| io.read })
+  end
+  
   private
   #perform synchronisation for the user
   def perform_synchronisation(user)

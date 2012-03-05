@@ -40,7 +40,9 @@ class V1::SessionsController < Devise::SessionsController
   end
   
   def get_image
-    ActiveSupport::Base64.encode64(open("https://api-meetlinkshare.heroku.com/images/rails.png") { |io| io.read })
+    respond_to do |format|
+      format.json {:image=> ActiveSupport::Base64.encode64(open("https://api-meetlinkshare.heroku.com/images/rails.png") { |io| io.read })}
+    end
   end
   
   private

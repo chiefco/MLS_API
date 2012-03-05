@@ -41,8 +41,8 @@ class V1::SessionsController < Devise::SessionsController
   
   def get_image
     respond_to do |format|
-      image=open("https://api-meetlinkshare.heroku.com/images/rails.png") { |io| io.read }
-      format.json {render :json=>success.merge({:image=>image,:type=>"png"})}
+      image=open("http://mls-staging.s3.amazonaws.com/uploads/attachment/file/4f54c6da6c6622000100000f/123.jpg") { |io| io.read }
+      format.json {render :json=>success.merge({:image=>image,:type=>"jpg"})}
     end
   end
   

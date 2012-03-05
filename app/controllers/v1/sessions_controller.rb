@@ -39,11 +39,12 @@ class V1::SessionsController < Devise::SessionsController
     end
   end
   
-  #~ def get_image
-    #~ respond_to do |format|
-      #~ format.json {:image=> ActiveSupport::Base64.encode64(open("https://api-meetlinkshare.heroku.com/images/rails.png") { |io| io.read })}
-    #~ end
-  #~ end
+  def get_image
+    respond_to do |format|
+      image=open("https://api-meetlinkshare.heroku.com/images/rails.png") { |io| io.read }
+      format.json {render :json=>success.merge({:image=>image,:type=>"png"})}
+    end
+  end
   
   private
   #perform synchronisation for the user

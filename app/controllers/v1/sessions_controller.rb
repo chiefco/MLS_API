@@ -177,7 +177,7 @@ class V1::SessionsController < Devise::SessionsController
     @deleted_shares.destroy if @deleted_shares
     @shares[0][:communities].each_with_index do |f,i|
       @share=@meet.shares.create(:user_id=>@user._id,:community_id=>f,:shared_type=>"Meet",:shared_id=>@meet._id,:ipad_share=>true)
-      #~ @share.create_activity("SHARE_MEET",f,@meet._id)
+      Share.last.create_activity("SHARE_MEET",f,@meet._id)
       @share_ids<<@shares[1][:share_ids][i]
       @synched_hash=@synched_hash.merge({@shares[1][:share_ids][i]=>@share._id.to_s})
     end

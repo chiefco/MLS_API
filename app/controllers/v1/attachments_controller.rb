@@ -18,7 +18,7 @@ class V1::AttachmentsController < ApplicationController
       @count = @current_user.attachments.where(:folder_id => nil, :is_deleted => false).count
     end
     respond_to do |format|
-      format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :content_type,:file,:created_at], :methods => [:user_name]).parse ,:total=>@count}.to_success }
+      format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision?]).parse ,:total=>@count}.to_success }
       format.xml  { render :xml => @attachments.to_xml(:only=>[:_id, :file_type, :file_name, :size, :user_id,  :content_type],:methods => [:user_name]).as_hash.to_success.to_xml(ROOT) }
     end
   end
@@ -60,6 +60,7 @@ class V1::AttachmentsController < ApplicationController
 
     respond_to do |format|
       if @attachment.save
+        @attachment.update_activity if event == "Updated"
         parent_file ? parent_file.revisions.create(:version => attachments_present.size + 1, :event => event, :changed_by => @current_user._id, :size => @attachment.size, :versioned_attachment => @attachment._id) : @attachment.revisions.create(:version => attachments_present.size + 1, :event => event, :changed_by => @current_user._id, :size => @attachment.size, :versioned_attachment => @attachment._id)
         if params[:community]!='' && params.has_key?(:community)
           @v1_share = @current_user.shares.create(:user_id => @current_user._id, :shared_id => @attachment._id, :community_id => params[:community], :shared_type=> "Attachment", :attachment_id => @attachment._id, :item_id => nil)
@@ -150,7 +151,14 @@ class V1::AttachmentsController < ApplicationController
     parent.update_attributes(:is_current_version => false)
     versioned = parent.revisions.where(:version => params[:version]).last
     children.each{|a| a.update_attributes(:is_current_version => false)}
-    params[:version] == 1 ? parent.update_attributes(:is_current_version => true) : Attachment.where(:_id => versioned.versioned_attachment).last.update_attributes(:is_current_version => true)
+    if params[:version] == 1 
+      parent.update_attributes(:is_current_version => true)
+      parent.restore_activity 
+    else 
+      file = Attachment.where(:_id => versioned.versioned_attachment).last
+      file.update_attributes(:is_current_version => true)
+      file.restore_activity      
+    end
     parent.revisions.create(:version => params[:version], :event => "Restored", :changed_by => @current_user._id, :size => versioned.size, :versioned_attachment => versioned.versioned_attachment)    
 
     respond_to do |format|

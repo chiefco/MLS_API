@@ -20,7 +20,7 @@ class Attachment
   ORDER_BY_ALLOWED =  [:asc,:desc]
   after_destroy :delete_parent
   after_create :create_activity
-  after_update :update_activity
+  # after_update :update_activity, :if => :is_current_version
   after_save :sunspot_index
   
   field :file_name, type: String
@@ -38,6 +38,14 @@ class Attachment
     end
     string :user_id
   end
+
+  def update_activity
+    save_activity("USER_ATTACHMENT_UPDATE")    
+  end  
+
+  def restore_activity
+    save_activity("USER_ATTACHMENT_RESTORE")    
+  end    
 
   protected
 
@@ -67,15 +75,17 @@ class Attachment
     save_activity("USER_ATTACHMENT")
   end
 
-   def update_activity
-  end
-
   def save_activity(text)
     evaluate_item(a=text) unless self.attachable.nil?
   end
 
   def user_name
     User.find(self.user_id).first_name
+  end
+
+  def has_revision?
+    self.parent ? parent_attachment = self.parent : parent_attachment = self
+    return true if parent_attachment.revisions.count > 1
   end
 
   def  evaluate_item(text)

@@ -64,7 +64,7 @@ class Community
     @community_values={}
     user.communities.undeleted.each do |f|
       @community<<f._id.to_s
-      @community_values=@community_values.merge({"#{f.id}"=>{:name=>"#{f.name}",:id=>"#{f._id}",:users_count => "#{f.users_count}"}})
+      @community_values=@community_values.merge({"#{f.id}"=>{:name=>"#{f.name}",:id=>"#{f._id}",:users_count => "#{f.users_count}",:members=>f.members}})
     end
     return {:community_arrays=>@community,:community_hashes=>@community_values}
   end
@@ -120,10 +120,11 @@ class Community
     invites.split(',').each do |invite_email|
       invite_email = invite_email.strip
       user_id = User.where(:email=>invite_email).first
+      contact_present = current_user.contacts.where(:email => invite_email).first
       if user_id
         invitation = self.invitations.new(:email => invite_email, :user_id => user_id._id)
         if invitation.save
-          contact = Contact.create(:email => invite_email, :first_name =>user_id.first_name, :user_id =>current_user._id)
+          contact = Contact.create(:email => invite_email, :first_name =>user_id.first_name, :user_id =>current_user._id) unless contact_present
           community_invites << [current_user.first_name, invitation.id, self.name]
           #@community.save_Invitation_activity("COMMUNITY_INVITED", @community._id, @invitation._id, @current_user._id)
         else
@@ -133,7 +134,7 @@ class Community
         invited = CommunityInvitee.where(:email => invite_email, :community_id => self._id).first
         invited.nil? ? CommunityInvitee.create(:community_id => self._id, :email => invite_email) : invited.update_attributes(:invited_count => invited.invited_count + 1)
         first_name = (invite_email.split('@'))[0]
-        contact = Contact.create(:email => invite_email, :first_name =>first_name, :user_id =>current_user._id) if invited.nil? 
+        contact = Contact.create(:email => invite_email, :first_name =>first_name, :user_id =>current_user._id) if invited.nil? && !contact_present
         user_invites << [current_user.id, invite_email, self.id, self.name]
       end
     end

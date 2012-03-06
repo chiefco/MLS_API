@@ -33,9 +33,15 @@ class V1::SessionsController < Devise::SessionsController
   end
   
   def community_synchronisation
-    get_user;get_communities
+    get_user;
+    unless params[:communities].first[:new].nil?
+      params[:communities].first[:new].each do |community|
+        create_communities(community)
+      end
+    end
+    get_communities
     respond_to do |format|
-      format.json{render :json =>success.merge(:communities=>@communities)}
+      format.json{render :json =>success.merge(:new_community=>@result_hash,:communities=>@communities)}
     end
   end
   
@@ -211,4 +217,15 @@ class V1::SessionsController < Devise::SessionsController
     @user=User.where(:authentication_token=>params[:access_token]).first
   end
   
+  def create_communities(community)
+    members="";@result_hash={};
+    community[:members].each do |mem|
+      members="#{members}"+",#{mem}"
+    end
+    community.delete(:members)
+    communities=@user.communities.create(:name=>community[:name],:description=>community[:description])
+    @result_hash=@result_hash.merge(community[:id]=>communities._id)
+    members.slice!(0)
+    communities.invite(members.empty? ? "": members,@user)
+  end  
 end

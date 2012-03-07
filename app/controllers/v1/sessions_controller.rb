@@ -224,6 +224,7 @@ class V1::SessionsController < Devise::SessionsController
     end
     community.delete(:members)
     communities=@user.communities.create(:name=>community[:name],:description=>community[:description])
+    CommunityUser.create(:user_id=>@user._id,:community_id=>communities._id,:role_id=>1)
     @result_hash=@result_hash.merge(community[:id]=>communities._id)
     members.slice!(0)
     communities.invite(members.empty? ? "": members,@user)

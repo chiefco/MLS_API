@@ -53,6 +53,7 @@ MeetlinkshareApi::Application.routes.draw do
     match '/move_folders', :to=>'folders#move_folders'
     match '/get_file_revisions/:id', :to => 'attachments#get_revisions'
     match '/restore_file/:id', :to => 'attachments#restore_file'      
+    match '/validate_attachment', :to => 'attachments#validate_attachment'
     match '/shares_multiple_delete', :to => 'shares#shares_multiple_delete'
   end
 

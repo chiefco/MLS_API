@@ -55,6 +55,7 @@ MeetlinkshareApi::Application.routes.draw do
     match '/restore_file/:id', :to => 'attachments#restore_file'      
     match '/validate_attachment', :to => 'attachments#validate_attachment'
     match '/shares_multiple_delete', :to => 'shares#shares_multiple_delete'
+    match '/multiple_member_delete', :to => 'communities#multiple_member_delete'
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do

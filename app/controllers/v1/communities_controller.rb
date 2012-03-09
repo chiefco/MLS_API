@@ -22,8 +22,8 @@ class V1::CommunitiesController < ApplicationController
     share_attachments = shares.select{|i| i.shared_type == 'Attachment' && i.status == true}
     items = shares.select{|i| i.shared_type == 'Meet'}.map(&:item).uniq.reject{|v| v.status==false}
     folders = shares.select{|i| i.shared_type == 'Folder' && i.status == true}
-    community_owner = @community.community_users.select{|i| i.user_id == @community.user_id}.map(&:user)
-    users = (@community.community_users.map(&:user) - community_owner).uniq
+    community_owner = @community.community_users.select{|i| i.user_id == @community.user_id && i.status == true}.map(&:user)
+    users = (@community.community_users.select{|i| i.status == true}.map(&:user) - community_owner).uniq
     invitees = ((@community.invitations.map(&:email) + @community.community_invitees.map(&:email)) - @community.community_users.map(&:user).map(&:email)).uniq 
     
     respond_to do |format|
@@ -110,11 +110,24 @@ class V1::CommunitiesController < ApplicationController
     end
   end
 
+  #Remove single member
   def remove_member
     respond_to do |format|
       @community_user=CommunityUser.where(:community_id=>params[:remove_member][:community_id],:user_id=>params[:remove_member][:user_id]).first
       unless @community_user.nil?
         @community_user.update_attributes(:status=>false)
+        format.json {render :json=>success}
+      else
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
+    end
+  end
+  
+  #Remove multiple member
+  def multiple_member_delete
+    respond_to do |format|
+      @community_user = CommunityUser.any_in(:user_id => params[:user_id]).where(:community_id => params[:community_id]).delete_all
+      unless @community_user.nil?
         format.json {render :json=>success}
       else
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}

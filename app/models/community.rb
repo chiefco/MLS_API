@@ -11,6 +11,7 @@ class Community
   references_many :community_users
   references_many :community_invitees
   has_many :activities, as: :entity
+  has_many :attachments, :dependent => :destroy  
   validates_presence_of :name,:code=>3013,:message=>"name - Blank Parameter"
   scope :undeleted,self.excludes(:status=>false)
 

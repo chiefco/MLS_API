@@ -8,6 +8,7 @@ class Attachment
   mount_uploader :file, FileUploader
   belongs_to :attachable, polymorphic: true
   belongs_to :user
+  belongs_to :community
   referenced_in :folder
   has_many :bookmarked_contents, as: :bookmarkable
   references_many :shares, :dependent => :destroy
@@ -31,6 +32,9 @@ class Attachment
   field :height, type: Integer
   field :is_deleted, :type => Boolean, :default => false
   field :is_current_version, :type => Boolean, :default => true  
+  field :attachment_type, type: String, default: "PERSONAL_ATTACHMENT"  
+  scope :current_version,self.excludes(:is_current_version=>false)  
+  
 
   searchable do
     string :file_name do
@@ -56,6 +60,7 @@ class Attachment
     query +=  '.where(is_deleted: false, is_current_version: true)'
     query +=  '.where(file_type: params[:file_type])' if params[:file_type]
     query +=  '.and(:folder_id=> nil)' if params[:folder_id]
+    query +=  '.and(:community_id=> nil)' if params[:user_attachments]
     query += '.any_of(self.get_criteria(params[:q]))' if params[:q]
     #~ query += '.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)'
     query += '.order_by([params[:sort_by],params[:order_by]])'

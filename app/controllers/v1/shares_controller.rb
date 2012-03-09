@@ -58,6 +58,9 @@ class V1::SharesController < ApplicationController
   
   def shares_multiple_delete
     Share.any_in(_id: params[:share_list]).update_all(:status => false)
+    attachments = Attachment.any_in(_id: params[:share_list]).map(&:id)
+    Attachment.delay.delete(attachments) unless attachments.blank?
+    
     respond_to do |format|
       format.json {render :json=>success }
     end

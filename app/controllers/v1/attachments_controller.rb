@@ -12,14 +12,10 @@ class V1::AttachmentsController < ApplicationController
     paginate_options.store(:per_page,set_page_size)
     @attachments = Attachment.list(@current_user.attachments,params,paginate_options)
     size = @current_user.attachments.where(:is_deleted => false).sum(:size)
-    percentage = nil
-    percentage = (((size.to_i) * 100)/1073741824).round(1) unless size.nil?
-    if params[:user_attachments]
-      @attachments = @attachments.reject{|attachment| attachment.shares.count > 0}
-      @count = @current_user.attachments.where(:folder_id => nil, :is_deleted => false).reject{|attachment| attachment.shares.count > 0}.count
-    else
-      @count = @current_user.attachments.where(:folder_id => nil, :is_deleted => false).count
-    end
+    percentage = (((@current_user.attachments.where(:is_deleted => false).sum(:size).to_i) * 100)/1073741824).round(1) resuce nil
+    params[:user_attachments] ? @count = @current_user.attachments.where(:folder_id => nil, :is_deleted => false).reject{|attachment| attachment.shares.count > 0}.count : @count = @current_user.attachments.where(:folder_id => nil, :is_deleted => false).count
+
+
     respond_to do |format|
       format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision?]).parse ,:total=>@count, :size => size, :percentage => percentage}.to_success }
       format.xml  { render :xml => @attachments.to_xml(:only=>[:_id, :file_type, :file_name, :size, :user_id,  :content_type],:methods => [:user_name]).as_hash.to_success.to_xml(ROOT) }
@@ -38,8 +34,9 @@ class V1::AttachmentsController < ApplicationController
   # POST /v1/attachments
   # POST /v1/attachments.xml
 
-   def create
-    attachments_present = Attachment.where(:file_name => "#{params[:attachment][:file_name]}", :attachable_id => @current_user.id, :folder_id => params[:attachment][:folder_id])
+  def create
+    !params[:community].blank? ? community_id = params[:community] : community_id = nil
+    attachments_present = Attachment.where(:file_name => "#{params[:attachment][:file_name]}", :attachable_id => @current_user.id, :folder_id => params[:attachment][:folder_id], :community_id => community_id)
     attachment_present = attachments_present.where(:file_name => "#{params[:attachment][:file_name]}", :attachable_id => @current_user.id, :is_current_version => true, :is_deleted => false).first
     parent_file = attachments_present.where(:parent_id => nil).first
     attachment_present.update_attributes(:is_current_version => false) if attachment_present
@@ -65,11 +62,7 @@ class V1::AttachmentsController < ApplicationController
       if @attachment.save
         @attachment.update_activity if event == "Updated"
         parent_file ? parent_file.revisions.create(:version => attachments_present.size + 1, :event => event, :changed_by => @current_user._id, :size => @attachment.size, :versioned_attachment => @attachment._id) : @attachment.revisions.create(:version => attachments_present.size + 1, :event => event, :changed_by => @current_user._id, :size => @attachment.size, :versioned_attachment => @attachment._id)
-        if params[:community]!='' && params.has_key?(:community)
-          @v1_share = @current_user.shares.create(:user_id => @current_user._id, :shared_id => @attachment._id, :community_id => params[:community], :shared_type=> "Attachment", :attachment_id => @attachment._id, :item_id => nil)
-          @v1_share.save
-          @v1_share.create_activity("SHARE_ATTACHMENT", params[:community], @attachment._id)
-        end
+        @attachment.update_attributes(:attachment_type => "COMMUNITY_ATTACHMENT", :community_id => params[:community]) if params[:community]!='' && params.has_key?(:community)
         format.json  { render :json=> { :attachment=>@attachment.to_json(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).parse}.to_success }
         format.xml  { render :xml => @attachment.to_xml(:only=>[:_id,:attachable_type,:attachable_id, :file_type, :file_name, :height, :width, :size, :created_at]).as_hash.to_success.to_xml(ROOT) }
       else

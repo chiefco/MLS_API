@@ -93,7 +93,7 @@ class Community
   end
 
   def users_count
-    self.community_users.count
+    self.community_users.where(:status => true).count
   end
   
   def owner

@@ -11,6 +11,9 @@ class V1::AttachmentsController < ApplicationController
     paginate_options.store(:page,set_page)
     paginate_options.store(:per_page,set_page_size)
     @attachments = Attachment.list(@current_user.attachments,params,paginate_options)
+    size = @current_user.attachments.where(:is_deleted => false).sum(:size)
+    percentage = nil
+    percentage = (((size.to_i) * 100)/1073741824).round(1) unless size.nil?
     if params[:user_attachments]
       @attachments = @attachments.reject{|attachment| attachment.shares.count > 0}
       @count = @current_user.attachments.where(:folder_id => nil, :is_deleted => false).reject{|attachment| attachment.shares.count > 0}.count
@@ -18,7 +21,7 @@ class V1::AttachmentsController < ApplicationController
       @count = @current_user.attachments.where(:folder_id => nil, :is_deleted => false).count
     end
     respond_to do |format|
-      format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision?]).parse ,:total=>@count}.to_success }
+      format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision?]).parse ,:total=>@count, :size => size, :percentage => percentage}.to_success }
       format.xml  { render :xml => @attachments.to_xml(:only=>[:_id, :file_type, :file_name, :size, :user_id,  :content_type],:methods => [:user_name]).as_hash.to_success.to_xml(ROOT) }
     end
   end

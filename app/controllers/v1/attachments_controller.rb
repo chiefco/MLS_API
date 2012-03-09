@@ -12,7 +12,7 @@ class V1::AttachmentsController < ApplicationController
     paginate_options.store(:per_page,set_page_size)
     @attachments = Attachment.list(@current_user.attachments,params,paginate_options)
     size = @current_user.attachments.where(:is_deleted => false).sum(:size)
-    percentage = (((@current_user.attachments.where(:is_deleted => false).sum(:size).to_i) * 100)/1073741824).round(1) rescue nil
+    percentage = (((size.to_i) * 100)/1073741824).round(1) rescue nil
     params[:user_attachments] ? @count = @current_user.attachments.where(:folder_id => nil, :is_deleted => false).reject{|attachment| attachment.shares.count > 0}.count : @count = @current_user.attachments.where(:folder_id => nil, :is_deleted => false).count
 
 

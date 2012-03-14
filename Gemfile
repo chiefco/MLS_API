@@ -36,6 +36,7 @@ gem 'json'
 gem 'delayed_job'
 gem 'delayed_job_mongoid'
 gem 'geo_ip', '~> 0.3.0'
+gem "daemons"
 
 # Deploy with Capistrano
 # gem 'capistrano'

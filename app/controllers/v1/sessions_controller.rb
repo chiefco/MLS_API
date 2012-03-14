@@ -34,15 +34,30 @@ class V1::SessionsController < Devise::SessionsController
   
   def community_synchronisation
     get_user;
-    unless params[:communities].first[:new].nil?
-      params[:communities].first[:new].each do |community|
-        create_communities(community)
-      end
-    end
+    create_delete_communities
     get_communities
     respond_to do |format|
       format.json{render :json =>success.merge(:new_community=>@result_hash,:communities=>@communities)}
     end
+  end
+  
+  def create_delete_communities
+    #Create New Communities in Cloud from Ipad
+    unless params[:communities].first[:new].nil?
+      params[:communities].first[:new].each do |community|
+        delete_communities(community)
+      end
+    end
+    #Delete Communities from Cloud deleted in Ipad
+    unless params[:communities][1][:delete].nil?
+      params[:communities][1][:delete].each do |community|
+        delete_communties(community)
+      end
+    end
+  end
+  
+  def delete_communties(community)
+    Community.where(:_id=>community[:cloud_id]).first.update_attributes(:status=>false)
   end
   
   def get_image
@@ -108,8 +123,8 @@ class V1::SessionsController < Devise::SessionsController
         meet.delete(:share)
         begin
           unless location.nil?
-            @location=@user.locations.find_or_create_by(:name=>location.downcase)
-            meet[:location_id]=@location._id unless @location.nil?
+            location_meet=@user.locations.find_or_create_by(:name=>location.downcase)
+            meet[:location_id]=location_meet._id unless location_meet.nil?
           end
           @meet= @user.items.create(meet)
           puts @meet.errors.inspect
@@ -138,8 +153,8 @@ class V1::SessionsController < Devise::SessionsController
             meet.delete(:page)
             meet.delete(:share)
             unless location.nil?
-              @location=@user.locations.find_or_create_by(:name=>location.downcase)
-              meet[:location_id]=@location._id unless @location.nil?
+              location_meet=@user.locations.find_or_create_by(:name=>location.downcase)
+              meet[:location_id]=location_meet._id unless location_meet.nil?
             end
             @meet.update_attributes(meet)
             @id=meet[:cloud_id]

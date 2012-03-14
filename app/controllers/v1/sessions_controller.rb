@@ -45,7 +45,7 @@ class V1::SessionsController < Devise::SessionsController
     #Create New Communities in Cloud from Ipad
     unless params[:communities].first[:new].nil?
       params[:communities].first[:new].each do |community|
-        delete_communities(community)
+        create_communities(community)
       end
     end
     #Delete Communities from Cloud deleted in Ipad

@@ -266,8 +266,8 @@ class V1::CommunitiesController < ApplicationController
         @user_invites << [@current_user.id, invite_email, @community.id, @community.name]
       end
     end
-    Community.delay.community_invite(@community_invites) unless @community_invites.blank?
-    Community.delay.user_invite(@user_invites) unless @user_invites.blank?    
+    Community.community_invite(@community_invites) unless @community_invites.blank?
+    Community.user_invite(@user_invites) unless @user_invites.blank?    
   end  
   
   def check_authorised_mem

@@ -21,7 +21,6 @@ class V1::CommunitiesController < ApplicationController
     if @authoriesd_mem
       @attachments, @items = [], []
       shares = @community.shares.order_by(:created_at.desc)
-      share_attachments = shares.select{|i| i.shared_type == 'Attachment' && i.status == true}
       items = shares.select{|i| i.shared_type == 'Meet'}.map(&:item).uniq.reject{|v| v.status==false}
       folders = shares.select{|i| i.shared_type == 'Folder' && i.status == true}
       community_owner = @community.community_users.select{|i| i.user_id == @community.user_id && i.status == true}.map(&:user)
@@ -30,7 +29,7 @@ class V1::CommunitiesController < ApplicationController
       
       respond_to do |format|
         if @community.status!=false
-          format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :invitees => invitees.to_json.parse, :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :community_attachments => @community.attachments.current_version.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision?]).parse, :shared_attachments => share_attachments.to_json(:only=>[:_id, :user_id, :created_at], :methods => [:user_name, :has_revision?, :share_attachments]).parse,  :folder_share => folders.to_json(:only=>[:_id, :user_id, :created_at], :methods => [:user_name, :share_folders]).parse,  :users => users.to_json(:only=>[:_id, :first_name, :email]).parse, :community_owner => community_owner.to_json(:only=>[:_id, :first_name, :email]).parse}.to_success}
+          format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :invitees => invitees.to_json.parse, :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :community_attachments => @community.attachments.current_version.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision?]).parse, :folder_share => folders.to_json(:only=>[:_id, :user_id, :created_at], :methods => [:user_name, :share_folders]).parse,  :users => users.to_json(:only=>[:_id, :first_name, :email]).parse, :community_owner => community_owner.to_json(:only=>[:_id, :first_name, :email]).parse}.to_success}
         else
           format.json  {render :json=> failure.merge(INVALID_PARAMETER_ID)}
         end

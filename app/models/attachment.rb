@@ -33,8 +33,9 @@ class Attachment
   field :is_deleted, :type => Boolean, :default => false
   field :is_current_version, :type => Boolean, :default => true  
   field :attachment_type, type: String, default: "PERSONAL_ATTACHMENT"  
-  scope :current_version,self.excludes(:is_current_version=>false)  
-  
+
+  scope :current_version,self.excludes(:is_current_version => false)  
+  scope :undeleted, self.excludes(:is_deleted => true)
 
   searchable do
     string :file_name do

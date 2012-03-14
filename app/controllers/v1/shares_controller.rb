@@ -22,17 +22,26 @@ class V1::SharesController < ApplicationController
       folder_id = nil
       if value['item']['shared_type'] == "Attachment" 
         attachment_id = value['item']['shared_id'] 
+        attachment = Attachment.find(attachment_id)
+
+        File.open("#{Rails.root}/tmp/#{attachment.file_name}", 'wb') do |fo|
+          fo.print open("#{attachment.file.to_s}").read
+        end     
+        attached_file = File.new("#{Rails.root}/tmp/#{attachment.file_name}")
+        new_attachment = Attachment.new(:attachable_id => @current_user._id, :file => attached_file, :size => attached_file.size, :community_id => value['item']['community_id'], :attachable_type => 'User', :attachment_type => 'COMMUNITY_ATTACHMENT', :user_id => attachment.user_id, :content_type => attachment.content_type, :file_name => attachment.file_name, :file_type => attachment.file_type)
+        new_attachment.save!
+        File.delete(attached_file)
       elsif value['item']['shared_type'] == "Folder" 
         folder_id = value['item']['shared_id']
       else
         item_id = value['item']['shared_id']
       end
-     @v1_share = @current_user.shares.create(:user_id=>@current_user._id,:shared_id=> value['item']['shared_id'], :community_id=> value['item']['community_id'], :shared_type=> value['item']['shared_type'], :attachment_id => attachment_id, :item_id => item_id, :folder_id => folder_id)
+      @v1_share = @current_user.shares.create(:user_id=>@current_user._id,:shared_id=> value['item']['shared_id'], :community_id=> value['item']['community_id'], :shared_type=> value['item']['shared_type'], :attachment_id => attachment_id, :item_id => item_id, :folder_id => folder_id)
       @v1_share.save
     end
     params[:share].each do |key, value|
         @v1_share.create_activity("SHARE_"+value['item']['shared_type'].upcase,value['item']['community_id'],value['item']['shared_id'])
-      end
+    end
 
     respond_to do |format|
       format.xml  { render :xml => success.merge(:share=>@v1_share).to_xml(ROOT,:only=>[:name,:_id])}

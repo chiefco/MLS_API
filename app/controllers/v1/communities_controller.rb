@@ -1,6 +1,6 @@
 class V1::CommunitiesController < ApplicationController
   before_filter :authenticate_request!
-  before_filter :find_community,:only=>[:update,:show,:destroy,:members,:invite_member]
+  before_filter :find_community,:only=>[:update,:show,:destroy,:members,:invite_member,:validate_folder,:validate_file]
   before_filter :find_community_members,:only=>[:members]
   before_filter :add_pagination,:only=>[:index]
   before_filter :detect_missing_params, :only=>[:create]
@@ -224,6 +224,46 @@ class V1::CommunitiesController < ApplicationController
         format.json  { render :json => failure}
       end
     end
+  end
+
+  def validate_folder
+    if @community
+      folder = Folder.find(params[:folder_id])
+      respond_to do |format|
+        if @community.folders.include?(folder)
+          format.json  { render :json => { :message=>"The folder already exist", :folder => folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at],:methods => [:user_name]).parse}.to_failure }
+          format.xml { render :xml=> failure.to_xml(ROOT) }
+        else
+          format.json { render :json=> {:success => {:message=>"The folder doesn't exist"}}.to_success }
+          format.xml { render :xml=> {:message => "The folder doesn't exist"}.to_success.to_xml(ROOT) }
+        end
+      end
+    else
+      respond_to do |format|
+        format.json  { render :json => { :message=>"Community doesn't exist"}.to_failure }
+        format.xml { render :xml=> failure.to_xml(ROOT) }
+      end      
+    end
+  end
+
+  def validate_file
+    if @community
+      attachment = Attachment.where(:file_name => "#{params[:file_name]}", :folder_id => params[:folder_id], :is_current_version => true).first
+      respond_to do |format|
+        if @community.attachments.include?(attachment)
+          format.json  { render :json => { :message=>"The file already exist", :attachment => attachment.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision?]).parse}.to_failure }
+          format.xml { render :xml=> failure.to_xml(ROOT) }
+        else
+          format.json { render :json=> {:success => {:message=>"The folder doesn't exist"}}.to_success }
+          format.xml { render :xml=> {:message => "The folder doesn't exist"}.to_success.to_xml(ROOT) }
+        end
+      end
+    else
+      respond_to do |format|
+        format.json  { render :json => { :message=>"Community doesn't exist"}.to_failure }
+        format.xml { render :xml=> failure.to_xml(ROOT) }
+      end      
+    end    
   end
 
   private

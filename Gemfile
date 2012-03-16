@@ -28,7 +28,7 @@ gem 'sunspot_mongoid'
 #gem 'sunspot'
 #gem 'sunspot_rails'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
-gem 'rails_best_practices'
+#gem 'rails_best_practices'
 gem 'fog'
 gem 'yamler'
 gem 'httparty'
@@ -36,7 +36,9 @@ gem 'json'
 gem 'delayed_job'
 gem 'delayed_job_mongoid'
 gem 'geo_ip', '~> 0.3.0'
-gem "daemons"
+group :development do
+  gem 'sunspot_solr'
+end
 
 # Deploy with Capistrano
 # gem 'capistrano'

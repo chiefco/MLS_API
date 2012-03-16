@@ -3,9 +3,20 @@ class V1::FoldersController < ApplicationController
   before_filter :find_folder,:only=>[:update,:show,:destroy, :move_folders]
   #~ before_filter :add_pagination,:only=>[:index]
   def index
-    @folder = @current_user.folders.undeleted
-    respond_to do |format|
-      format.json {render :json =>  {:folders => @folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at],:methods => [:user_name]).parse}}
+    if params[:community_id]
+      community = Community.where(:_id => params[:community_id]).first
+      respond_to do |format|
+        if community
+          format.json {render :json =>  {:folders => community.folders.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at],:methods => [:user_name]).parse}}
+        else
+          format.json {render :json => failure.merge({:message => "Community doesn't exist"})}        
+        end        
+      end      
+    else
+      folder = @current_user.folders.undeleted
+      respond_to do |format|
+        format.json {render :json =>  {:folders => folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at],:methods => [:user_name]).parse}}
+      end
     end
   end
 
@@ -76,12 +87,12 @@ class V1::FoldersController < ApplicationController
     end
   end
 
-   def folder_tree
-     @folder = @current_user.folders.select{|f| f['parent_id']==nil && f[:is_deleted]== false && f[:status] == true}
-      respond_to do |format|
-        format.json {render :json =>  {:folders => @folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at], :methods => [:children_count]).parse}}
-      end
-    end
+  def folder_tree
+   @folder = @current_user.folders.select{|f| f['parent_id']==nil && f[:is_deleted]== false && f[:status] == true}
+    respond_to do |format|
+      format.json {render :json =>  {:folders => @folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at], :methods => [:children_count]).parse}}
+   end
+  end
 
   def move_attachments
    params[:id] = nil if params[:id] == ''

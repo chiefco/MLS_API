@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   include SslRequirement
   after_filter :clear_session
-  before_filter :get_user_location
+  #~ before_filter :get_user_location
 
   RESET_TOKEN_SENT={:reset_token_sent=>true}
   RESET_TOKEN_ERROR={:code=>5003,:message=>"Email not found"}

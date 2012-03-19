@@ -37,8 +37,13 @@ class V1::AttachmentsController < ApplicationController
 
   def create
     !params[:community].blank? ? community_id = params[:community] : community_id = nil
-    attachments_present = Attachment.where(:file_name => "#{params[:attachment][:file_name]}", :attachable_id => @current_user.id, :folder_id => params[:attachment][:folder_id], :community_id => community_id)
-    attachment_present = attachments_present.where(:file_name => "#{params[:attachment][:file_name]}", :attachable_id => @current_user.id, :is_current_version => true, :is_deleted => false).first
+    if community_id 
+      attachments_present = Attachment.where(:file_name => "#{params[:attachment][:file_name]}", :folder_id => params[:attachment][:folder_id], :community_id => community_id) 
+      attachment_present = attachments_present.where(:file_name => "#{params[:attachment][:file_name]}", :is_current_version => true, :is_deleted => false).first
+    else
+     attachments_present = Attachment.where(:file_name => "#{params[:attachment][:file_name]}", :attachable_id => @current_user.id, :folder_id => params[:attachment][:folder_id], :community_id => community_id)
+     attachment_present = attachments_present.where(:file_name => "#{params[:attachment][:file_name]}", :attachable_id => @current_user.id, :is_current_version => true, :is_deleted => false).first
+    end
     parent_file = attachments_present.where(:parent_id => nil).first
     attachment_present.update_attributes(:is_current_version => false) if attachment_present
     File.open("#{Rails.root}/tmp/#{params[:attachment][:file_name]}", 'wb') do|f|

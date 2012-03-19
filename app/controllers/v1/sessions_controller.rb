@@ -83,13 +83,13 @@ class V1::SessionsController < Devise::SessionsController
     #~ end
     get_communities
    respond_to do |format|
-      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:ipad_ids=>@ipad_ids.uniq,:communities=>@communities,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks,:meets=>params[:user][1][:status]=="true" ? get_meets(true) : get_meets(nil),:other_users=>CommunityUser.other_users(@user._id),:locations=>@user.locations.serializable_hash(:only=>[:_id,:name],:methods=>[:latitude_val,:longitude_val] ))}
+      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:comments=>@comments.flatten,:ipad_ids=>@ipad_ids.uniq,:communities=>@communities,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks,:meets=>params[:user][1][:status]=="true" ? get_meets(true) : get_meets(nil),:other_users=>CommunityUser.other_users(@user._id),:locations=>@user.locations.serializable_hash(:only=>[:_id,:name],:methods=>[:latitude_val,:longitude_val] ))}
     end
   end
 
   def initialize_values
     @ipad_ids=[];@ipad_page_ids=[]; @share_ids=[];@task_ids=[];@synched_meets={};@synched_pages={};
-    @synched_hash={};@synched_tasks={};
+    @synched_hash={};@synched_tasks={};@comments=[];
   end
 
   #Invalid user- do not perform synchronisation
@@ -186,15 +186,18 @@ class V1::SessionsController < Devise::SessionsController
               Page.create_page_texts(page[:page_text],@page._id)
               @ipad_page_ids<<page[:page_id]
               @attachment=@page.create_attachment(:attachable_type=>"Page",:attachable_id=>@page._id,:file=>decode_image(@page._id,page[:page_image]))
+              comments=Comment.create_comments(@user,page[:comments],@attachment._id)
               File.delete(@file)
             else
               @attachment=Attachment.where(:_id=>page[:cloud_id]).first
+              comments=Comment.create_comments(@user,page[:comments],@attachment._id)
               Page.create_page_texts(page[:page_text],@attachment.attachable._id)
               @ipad_page_ids<<page[:page_id]
               @attachment.update_attributes(:file=>decode_image(ActiveSupport::SecureRandom.hex(16),page[:page_image]))
                File.delete(@file)
              end
-          @synched_pages=@synched_pages.merge({page[:page_id]=>@attachment._id,:page_texts=>@page_texts})
+             @comments<<comments unless comments.empty? 
+             @synched_pages=@synched_pages.merge({page[:page_id]=>@attachment._id,:page_texts=>@page_texts})
         end
       end
     end

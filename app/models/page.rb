@@ -58,8 +58,8 @@ class Page
     page.page_texts.delete_all
     unless pagetexts.nil?
       pagetexts.each do |text|
-        @text=page.page_texts.create(:position=>text[:page_text_position],:content=>text[:page_text_content])
-        @page_texts<<{text[:pagetext_id]=>@text._id}
+        text_id=page.page_texts.create(:position=>text[:page_text_position],:content=>text[:page_text_content])
+        @page_texts<<{text[:pagetext_id]=>text_id._id}
       end
     end
   end

@@ -54,6 +54,11 @@ class V1::SessionsController < Devise::SessionsController
         delete_communties(community)
       end
     end
+    unless params[:communities][1][:delete].nil?
+      params[:communities][2][:update].each do |community|
+        update_communities(community)
+      end
+    end
   end
   
   def delete_communties(community)
@@ -246,5 +251,15 @@ class V1::SessionsController < Devise::SessionsController
     @result_hash=@result_hash.merge(community[:id]=>communities._id)
     members.slice!(0)
     communities.invite(members.empty? ? "": members,@user)
+  end  
+  
+  def update_communities(community)
+    members="";
+    community[:members].each do |mem|
+      members="#{members}"+",#{mem}"
+    end
+    members.slice!(0)
+    communities=Community.where(:_id=>community[:cloud_id]).first
+    communities.invite(members.empty? ? "": members,@user) unless communities.nil?
   end  
 end

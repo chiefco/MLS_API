@@ -24,7 +24,7 @@ class V1::FoldersController < ApplicationController
    sub_folders
    @folder_attachments = @folder.attachments.where(:is_deleted => false, :is_current_version => true).order_by(:created_at.desc).entries
     respond_to do |format|
-      format.json  { render :json => { :sub_folders=>@sub_folders.to_json(:only=>[:_id, :name, :parent_id, :created_at, :updated_at], :methods => [:children_count, :user_name]).parse,:parent_folder => @folder.to_json(:only=>[:name,:_id, :parent_id]).parse, :folder_attachments => @folder_attachments.to_json(:only =>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at,:user_id], :methods =>[:user_name,  :has_revision?]).parse}.to_success }
+      format.json  { render :json => { :sub_folders=>@sub_folders.to_json(:only=>[:_id, :name, :parent_id, :created_at, :updated_at], :methods => [:children_count, :user_name]).parse,:parent_folder => @folder.to_json(:only=>[:name,:_id, :parent_id]).parse, :folder_attachments => @folder_attachments.to_json(:only =>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at,:user_id], :methods =>[:user_name,  :has_revision]).parse}.to_success }
       format.xml  { render :xml =>  @sub_folders.to_xml(:only=>[:_id, :name, :parent_id]).as_hash.merge( :count=> @sub_folders.count).to_success.to_xml(ROOT) }
     end
   end

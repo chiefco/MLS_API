@@ -8,4 +8,8 @@ class Revision
   field :size, type: Integer
   field :changed_by, type: String  
   field :versioned_attachment, type: String    
+
+  def revised_by 
+  	(User.find "#{self.changed_by}").first_name
+  end
 end

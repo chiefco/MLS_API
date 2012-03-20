@@ -54,9 +54,14 @@ class V1::SessionsController < Devise::SessionsController
         delete_communties(community)
       end
     end
-    unless params[:communities][1][:delete].nil?
+    unless params[:communities][2][:update].nil?
       params[:communities][2][:update].each do |community|
         update_communities(community)
+      end
+    end
+    unless params[:communities][3][:remove].nil?
+      params[:communities][3][:remove].each do |community|
+        remove_member(community)
       end
     end
   end
@@ -259,7 +264,29 @@ class V1::SessionsController < Devise::SessionsController
       members="#{members}"+",#{mem}"
     end
     members.slice!(0)
-    communities=Community.where(:_id=>community[:cloud_id]).first
+    communities=get_community(community)
     communities.invite(members.empty? ? "": members,@user) unless communities.nil?
   end  
+  
+  def remove_member(community)
+    community[:members].each do |mem|
+      p "fffffffffffffffffffffffffffffff"
+      p mem
+      p "fffffffffffffffffffffffffffffff"
+      user=User.where(:email=>mem).first
+      community=get_community(community)
+      unless user.nil? && community.nil?
+        community_user=CommunityUser.where(:community_id=>community._id,:user_id=>user._id).first
+        p "kkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
+        p community_user
+        community_user.update_attributes(:status=>false)
+      end     
+    end     
+  end
+      
+  def get_community(community)
+    p community
+    p "gggggggggggggggggggggggg"
+    p community=Community.where(:_id=>community[:cloud_id]).first
+  end
 end

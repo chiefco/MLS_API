@@ -270,23 +270,18 @@ class V1::SessionsController < Devise::SessionsController
   
   def remove_member(community)
     community[:members].each do |mem|
-      p "fffffffffffffffffffffffffffffff"
-      p mem
-      p "fffffffffffffffffffffffffffffff"
       user=User.where(:email=>mem).first
       community=get_community(community)
-      unless user.nil? && community.nil?
+      unless user.nil? || community.nil?
         community_user=CommunityUser.where(:community_id=>community._id,:user_id=>user._id).first
-        p "kkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
-        p community_user
-        community_user.update_attributes(:status=>false)
+        community_user.update_attributes(:status=>false) unless community_user.nil?
       end     
     end     
   end
       
   def get_community(community)
-    p community
-    p "gggggggggggggggggggggggg"
-    p community=Community.where(:_id=>community[:cloud_id]).first
+    unless community.nil?
+      Community.where(:_id=>community[:cloud_id]).first
+    end
   end
 end

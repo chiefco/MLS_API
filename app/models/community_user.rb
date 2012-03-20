@@ -6,6 +6,8 @@ class CommunityUser
   field :user_id,:type=>String
   referenced_in :community
   belongs_to :user
+  scope :undeleted,self.excludes(:status=>false)
+
 
   def self.other_users(user_id)
     users=where(:user_id =>user_id).map(&:community).select{|c|  c.status == true}.to_json(:only=>[:_id,:name,:description],:methods=>[:get_meets, :users_count,:members,:owner,:get_community_attachments]).parse

@@ -14,6 +14,7 @@ class Attachment
   references_many :shares, :dependent => :destroy
   references_many :revisions, :dependent => :destroy
   has_many :activities, as: :entity, :dependent => :destroy
+  has_many :comments, as: :commentable, :dependent => :destroy
   validates_presence_of :attachable_id, :message=>"attachable_id - Blank Parameter", :code=>3034
   validates_presence_of :attachable_type, :message=>"attachable_type - Blank Parameter", :code=>3022
   validates_inclusion_of :attachable_type, :in=>["User","Item","Page"], :message=>"attachable_type - Invalid Parameter", :code=>3050
@@ -106,5 +107,8 @@ class Attachment
 
   def delete_parent
     self.parent.destroy if self.parent
+  end
+  def messages
+    comments.to_a.to_json(:only=>[:_id,:message],:include=>{:user=>{:only=>[:email]}}).parse
   end
 end

@@ -23,13 +23,14 @@ class V1::CommunitiesController < ApplicationController
       shares = @community.shares.order_by(:created_at.desc)
       items = shares.select{|i| i.shared_type == 'Meet'}.map(&:item).uniq.reject{|v| v.status==false}
       folders = shares.select{|i| i.shared_type == 'Folder' && i.status == true}
+      attachments_count = @community.attachments.undeleted.count
       community_owner = @community.community_users.select{|i| i.user_id == @community.user_id && i.status == true}.map(&:user)
       users = (@community.community_users.select{|i| i.status == true}.map(&:user) - community_owner).uniq
       invitees = ((@community.invitations.map(&:email) + @community.community_invitees.map(&:email)) - @community.community_users.map(&:user).map(&:email)).uniq 
 
       respond_to do |format|
         if @community.status!=false
-          format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :invitees => invitees.to_json.parse, :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :community_attachments => @community.attachments.current_version.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :folder_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision]).parse, :folder_share => folders.to_json(:only=>[:_id, :user_id, :created_at], :methods => [:user_name, :share_folders]).parse,  :users => users.to_json(:only=>[:_id, :first_name, :email]).parse, :community_owner => community_owner.to_json(:only=>[:_id, :first_name, :email]).parse}.to_success}
+          format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :invitees => invitees.to_json.parse, :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :community_attachments => @community.attachments.current_version.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :folder_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision]).parse, :attachments_count => attachments_count, :folder_share => folders.to_json(:only=>[:_id, :user_id, :created_at], :methods => [:user_name, :share_folders]).parse,  :users => users.to_json(:only=>[:_id, :first_name, :email]).parse, :community_owner => community_owner.to_json(:only=>[:_id, :first_name, :email]).parse}.to_success}
         else
           format.json  {render :json=> failure.merge(INVALID_PARAMETER_ID)}
         end
@@ -207,7 +208,7 @@ class V1::CommunitiesController < ApplicationController
     render_missing_params(missing_params) unless missing_params.blank?
   end
 
-  def  invite_from_community
+  def invite_from_community
     @community = Community.find(params[:invite_email]['community'])
     @community.invite(params[:invite_email]['users'], @current_user) if params[:invite_email]['users'] != 'use comma separated emails'
     respond_to do |format|

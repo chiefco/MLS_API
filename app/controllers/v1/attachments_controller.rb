@@ -18,7 +18,7 @@ class V1::AttachmentsController < ApplicationController
 
 
     respond_to do |format|
-      format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :folder_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision?]).parse ,:total=>@count, :size => size, :percentage => percentage}.to_success }
+      format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :folder_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision]).parse ,:total=>@count, :size => size, :percentage => percentage}.to_success }
       format.xml  { render :xml => @attachments.to_xml(:only=>[:_id, :file_type, :file_name, :size, :user_id,  :folder_id, :content_type],:methods => [:user_name]).as_hash.to_success.to_xml(ROOT) }
     end
   end
@@ -141,8 +141,8 @@ class V1::AttachmentsController < ApplicationController
 
     if !attachment_revisions.blank?
       respond_to do |format|
-        format.json  { render :json => { :file_name => attachment.file_name, :attachment_revisions => attachment_revisions.reverse.to_json(:only=>[:_id, :size, :version, :created_at, :event, :attachment_id]).parse}.to_success }
-        format.xml  { render :xml => attachment_revisions.to_xml(:only=>[:_id, :file_type, :file_name, :size,  :content_type]).as_hash.to_success.to_xml(ROOT) }
+        format.json  { render :json => { :file_name => attachment.file_name, :attachment_revisions => attachment_revisions.reverse.to_json(:only=>[:_id, :size, :version, :created_at, :event, :attachment_id], :methods => [:revised_by]).parse}.to_success }
+        format.xml  { render :xml => attachment_revisions.to_xml(:only=>[:_id, :file_type, :file_name, :size,  :content_type], :methods => [:revised_by]).as_hash.to_success.to_xml(ROOT) }
       end      
     end
   end
@@ -152,7 +152,7 @@ class V1::AttachmentsController < ApplicationController
 
     respond_to do |format|
       if attachment
-        format.json  { render :json => { :message=>"The file already exist", :attachment => attachment.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision?]).parse}.to_failure }
+        format.json  { render :json => { :message=>"The file already exist", :attachment => attachment.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision]).parse}.to_failure }
         format.xml { render :xml=> failure.to_xml(ROOT) }
       else
         format.json { render :json=> {:success => {:message=>"The file doesn't exist"}}.to_success }
@@ -196,7 +196,7 @@ class V1::AttachmentsController < ApplicationController
     Folder.delay.delete(params[:folder]) if params[:folder] 
 
     respond_to do |format|
-      format.json  { render :json => { :attachments => attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at, :user_id], :methods => [:user_name, :has_revision?]).parse ,:total => count}.to_success }
+      format.json  { render :json => { :attachments => attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at, :user_id], :methods => [:user_name, :has_revision]).parse ,:total => count}.to_success }
       format.xml  { render :xml => @attachments.to_xml(:only=>[:_id, :file_type, :file_name, :size,  :content_type]).as_hash.to_success.to_xml(ROOT) }
     end
   end

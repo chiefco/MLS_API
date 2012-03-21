@@ -89,9 +89,9 @@ class Attachment
     User.find(self.user_id).first_name
   end
 
-  def has_revision?
+  def has_revision
     self.parent ? parent_attachment = self.parent : parent_attachment = self
-    return true if parent_attachment.revisions.count > 1
+    parent_attachment.revisions.count > 1 ? true : false
   end
 
   def  evaluate_item(text)

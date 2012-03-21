@@ -33,16 +33,17 @@ class V1::SessionsController < Devise::SessionsController
   end
   
   def community_synchronisation
-    get_user;
+    get_user;initialize_values;
     create_delete_communities
     get_communities
     respond_to do |format|
-      format.json{render :json =>success.merge(:new_community=>@result_hash,:communities=>@communities)}
+      format.json{render :json =>success.merge(:new_community=>@result_hash,:communities=>@communities,:comments=>@community_comments)}
     end
   end
   
   def create_delete_communities
     #Create New Communities in Cloud from Ipad
+    #~ a=[:new,:delete,:update,:remove]
     unless params[:communities].first[:new].nil?
       params[:communities].first[:new].each do |community|
         create_communities(community)
@@ -62,6 +63,11 @@ class V1::SessionsController < Devise::SessionsController
     unless params[:communities][3][:remove].nil?
       params[:communities][3][:remove].each do |community|
         remove_member(community)
+      end
+    end
+    unless params[:communities][4][:comment].nil?
+      params[:communities][4][:comment].each do |member|
+        create_comment(member)
       end
     end
   end
@@ -99,7 +105,7 @@ class V1::SessionsController < Devise::SessionsController
 
   def initialize_values
     @ipad_ids=[];@ipad_page_ids=[]; @share_ids=[];@task_ids=[];@synched_meets={};@synched_pages={};
-    @synched_hash={};@synched_tasks={};@comments=[];
+    @synched_hash={};@synched_tasks={};@comments=[];@community_comments=[];
   end
 
   #Invalid user- do not perform synchronisation
@@ -283,5 +289,11 @@ class V1::SessionsController < Devise::SessionsController
     unless community.nil?
       Community.where(:_id=>community[:cloud_id]).first
     end
+  end
+  
+  def create_comment(member)
+    attachment=Attachment.where(:_id=>member[:cloud_id]).first
+    comment=@user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment._id,:message=>member[:message]) unless attachment.nil?
+    @community_comments << {member[:id] => comment._id} unless comment.nil?
   end
 end

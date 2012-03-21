@@ -70,14 +70,14 @@ class Community
     return {:community_arrays=>@community,:community_hashes=>@community_values}
   end
 
-  def self.community_invite(invites)
+  def community_invite(invites)
     invites.each do |invite|
       invitation = Invitation.find(invite[1])
       Invite.community_invite(invite[0], invitation, invite[2]).deliver
     end
   end
 
-  def self.user_invite(invites)
+  def user_invite(invites)
     invites.each do |invite|
       user = User.find(invite[0])
       Invite.send_invitations(user, invite[1], invite[2], invite[3]).deliver
@@ -147,7 +147,7 @@ class Community
         user_invites << [current_user.id, invite_email, self.id, self.name]
       end
     end
-      Community.delay.community_invite(community_invites) unless community_invites.blank?
-      Community.delay.user_invite(user_invites) unless user_invites.blank?      
+      self.delay.community_invite(community_invites) unless community_invites.blank?
+      self.delay.user_invite(user_invites) unless user_invites.blank?      
   end
 end

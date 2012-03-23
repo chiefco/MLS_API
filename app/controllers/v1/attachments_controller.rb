@@ -40,6 +40,11 @@ class V1::AttachmentsController < ApplicationController
     if community_id 
       attachments_present = Attachment.where(:file_name => "#{params[:attachment][:file_name]}", :folder_id => params[:attachment][:folder_id], :community_id => community_id) 
       attachment_present = attachments_present.where(:file_name => "#{params[:attachment][:file_name]}", :is_current_version => true, :is_deleted => false).first
+      
+      community_name = Community.find(community_id).name
+      emails = CommunityUser.where(:community_id => community_id ).map(&:user).map(&:email) - [@current_user.email]
+      Attachment.upload_share(@current_user.email, @current_user.first_name, community_id, community_name, emails, params[:attachment][:file_name]) unless emails.blank?
+      
     else
      attachments_present = Attachment.where(:file_name => "#{params[:attachment][:file_name]}", :attachable_id => @current_user.id, :folder_id => params[:attachment][:folder_id], :community_id => community_id)
      attachment_present = attachments_present.where(:file_name => "#{params[:attachment][:file_name]}", :attachable_id => @current_user.id, :is_current_version => true, :is_deleted => false).first
@@ -124,6 +129,7 @@ class V1::AttachmentsController < ApplicationController
   # DELETE /v1/attachments/1
   # DELETE /v1/attachments/1.xml
   def destroy
+    Attachment.share_delete(@attachment.community.id,@attachment.file_name, @current_user) if @attachment.community
     @activity = Activity.where(:shared_id => params[:id])
     @activity.destroy_all if @activity
     @attachment.destroy
@@ -191,7 +197,7 @@ class V1::AttachmentsController < ApplicationController
     attachments = Attachment.list(@current_user.attachments, params, {:page =>1, :per_page => 10})
     count = @current_user.attachments.where(:folder_id => nil, :is_deleted => false).count
     Folder.any_in(_id: params[:folder]).update_all(:is_deleted => true) if params[:folder] 
-    folders = @current_user.folders.where(:parent_id => nil, :is_deleted => false)
+    folders = @current_user.folders.where(:parent_id => nil, :is_deleted => false, :community_id => nil)
     Attachment.delay.delete(params[:attachment])
     Folder.delay.delete(params[:folder]) if params[:folder] 
 

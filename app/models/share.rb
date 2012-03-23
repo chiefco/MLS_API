@@ -70,4 +70,38 @@ class Share
   def self.update(attachment_id, new_attachment_id, user_id)
     Share.where(:shared_id => attachment_id, :user_id => user_id, :attachment_id => attachment_id).each{|a| a.update_attributes(:shared_id => new_attachment_id, :attachment_id => new_attachment_id, :user_id => user_id)}
   end
+  
+  def share_files(communities, files, folders, current_user)
+    user = current_user.email
+    user_name = current_user.first_name
+     community_users = []
+     communities.each do |value|
+          community_name = Community.find(value).name
+          emails = CommunityUser.where(:community_id => value ).map(&:user).map(&:email) - [user]
+          share_mail(user, user_name, value, community_name, emails, files, folders) unless emails.blank?
+     end
+   end
+   
+   def share_mail(user, user_name, community_id, community_name, emails, files, folders)
+     file_names = files*"," 
+     folder_names = folders*"," 
+     emails.each do |email|
+       Invite.share_send_email(user, user_name, community_id, community_name, email, files.length, folders.length, file_names, folder_names).deliver
+     end
+   end
+   
+   def self.shared_delete(community_id, count, item_name, current_user)
+      current_user_email = current_user.email
+      current_user_name = current_user.first_name
+      community_name = Community.find(community_id).name
+      emails = CommunityUser.where(:community_id => community_id).map(&:user).map(&:email) - [current_user_email]
+      share_delete_notifications(current_user_email,current_user_name, community_id, community_name, emails, count, item_name)
+    end
+    
+  def self.share_delete_notifications(current_user_email,current_user_name, community_id, community_name, emails, count, item_name)
+    emails.each do |email|
+       Invite.share_delete_email(current_user_email, current_user_name, community_id, community_name, email, count, item_name).deliver
+     end
+   end
+
  end

@@ -22,15 +22,15 @@ class V1::CommunitiesController < ApplicationController
       @attachments, @items = [], []
       shares = @community.shares.order_by(:created_at.desc)
       items = shares.select{|i| i.shared_type == 'Meet'}.map(&:item).uniq.reject{|v| v.status==false}
-      folders = shares.select{|i| i.shared_type == 'Folder' && i.status == true}
-      attachments_count = @community.attachments.undeleted.count
+      folders = @community.folders.comm_folders
+      attachments_count = @community.attachments.total_attachments.count
       community_owner = @community.community_users.select{|i| i.user_id == @community.user_id && i.status == true}.map(&:user)
       users = (@community.community_users.select{|i| i.status == true}.map(&:user) - community_owner).uniq
       invitees = ((@community.invitations.map(&:email) + @community.community_invitees.map(&:email)) - @community.community_users.map(&:user).map(&:email)).uniq 
 
       respond_to do |format|
         if @community.status!=false
-          format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :invitees => invitees.to_json.parse, :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :community_attachments => @community.attachments.current_version.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :folder_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision]).parse, :attachments_count => attachments_count, :folder_share => folders.to_json(:only=>[:_id, :user_id, :created_at], :methods => [:user_name, :share_folders]).parse,  :users => users.to_json(:only=>[:_id, :first_name, :email]).parse, :community_owner => community_owner.to_json(:only=>[:_id, :first_name, :email]).parse}.to_success}
+          format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :invitees => invitees.to_json.parse, :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :community_attachments => @community.attachments.current_version.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :folder_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision]).parse, :attachments_count => attachments_count, :folder_share => folders.to_json(:methods => [:user_name]).parse,  :users => users.to_json(:only=>[:_id, :first_name, :email]).parse, :community_owner => community_owner.to_json(:only=>[:_id, :first_name, :email]).parse}.to_success}
         else
           format.json  {render :json=> failure.merge(INVALID_PARAMETER_ID)}
         end
@@ -134,6 +134,7 @@ class V1::CommunitiesController < ApplicationController
   def multiple_member_delete
     respond_to do |format|
       @community_user = CommunityUser.any_in(:user_id => params[:user_id]).where(:community_id => params[:community_id]).delete_all
+      Community.send_notifications(params[:user_id], params[:community_id], @current_user)
       unless @community_user.nil?
         format.json {render :json=>success}
       else
@@ -146,6 +147,7 @@ class V1::CommunitiesController < ApplicationController
   def remove_shared_team
     respond_to do |format|
       @community_user = CommunityUser.any_in(:community_id => params[:community_id]).where(:user_id => @current_user._id).delete_all
+      Community.shared_unsubscribe(params[:community_id], @current_user)
       unless @community_user.nil?
         format.json {render :json=>success}
       else
@@ -285,4 +287,5 @@ class V1::CommunitiesController < ApplicationController
   def check_authorised_mem
       @authoriesd_mem = CommunityUser.where(:user_id => @current_user._id, :community_id => params[:id]).first
   end
+    
 end

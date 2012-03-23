@@ -1,0 +1,6 @@
+<% unless @count <=0 %>
+<b><%= @user_name %></b> has deleted <%= @count %> files in MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
+<% else%>
+<b><%= @user_name %></b> has deleted <%= @item_name %> in MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
+<% end %>
+<a href='<%=Rails.env=="development" ? "http://localhost:3000" : "www.meetlinkshare.com" %>/communities/<%= @community_id	%>'>Click here to view team</a>

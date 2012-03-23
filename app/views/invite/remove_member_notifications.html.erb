@@ -1,0 +1,5 @@
+<% if @names == false %>
+<b>You</b> are unsubscribed from the MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
+<% else %>
+<b><%= @user_name %></b> has removed<b> <%= @names%></b> from the MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
+<% end %>

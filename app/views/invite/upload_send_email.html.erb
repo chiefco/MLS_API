@@ -1,0 +1,2 @@
+<b><%= @user_name %></b> has uploaded <%= @file_name %> file in MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
+<a href='<%=Rails.env=="development" ? "http://localhost:3000" : "www.meetlinkshare.com" %>/communities/<%= @community_id	%>'>Click here to view uploaded files</a>

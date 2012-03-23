@@ -1,0 +1,13 @@
+<b><%= @user_name %></b> has shared 
+<% unless @files_length<=0%> <%= @files_length%> files <% end%><%= (@files_length >0) && (@files_length >0) ? " and " : ''%>
+<% unless @folders_length<0%><%= @folders_length%> folders <% end%>
+in MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
+<% unless @files_name.blank?%>
+<b>Files</b><br/>
+<%= @files_name%><br/><br/>
+<% end %>
+<% unless @folders_name.blank?%>
+<b>Folders</b><br/>
+<%= @folders_name%><br/><br/>
+<% end %>
+<a href='<%=Rails.env=="development" ? "http://localhost:3000" : "www.meetlinkshare.com" %>/communities/<%= @community_id	%>'>Click here to view shared files</a>

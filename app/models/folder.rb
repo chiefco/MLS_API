@@ -63,15 +63,4 @@ class Folder
     self.attachments.each {|attachment| attachment.create(community_id, shared_folder._id, user)}
     self.children.each{|folder| folder.make_clone(community_id, user, shared_folder._id)} unless self.children.empty?
   end
-
-  def all_children
-    all = []
-    self.children.each do |category|
-      all << category
-      root_children = category.all_children.flatten
-      all << root_children unless root_children.empty?
-    end
-    return all.flatten
-  end
-
 end

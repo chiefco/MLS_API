@@ -19,11 +19,11 @@ class V1::SharesController < ApplicationController
     shr_files, shr_folders, shr_comm = [], [], []
     params[:share].each do |key, value|
       attachment_id, item_id, folder_id = nil
-      shr_comm<<value['item']['community_id']
+      shr_comm << value['item']['community_id']
       if value['item']['shared_type'] == "Attachment" 
         attachment = Attachment.find(value['item']['shared_id'])
-        shr_files<< (attachment).file_name
-        attachment.create(community_id, nil, @current_user)
+        shr_files << (attachment).file_name
+        attachment.create(value['item']['community_id'], nil, @current_user)
       elsif value['item']['shared_type'] == "Folder" 
         folder_id = value['item']['shared_id']
         folder = Folder.find(folder_id)

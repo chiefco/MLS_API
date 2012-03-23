@@ -106,9 +106,9 @@ class V1::SessionsController < Devise::SessionsController
         #~ create_or_update_tasks(task)
       #~ end
     #~ end
-    #~ get_communities
+    get_communities
    respond_to do |format|
-      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:comments=>@comments.flatten,:ipad_ids=>@ipad_ids.uniq,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks,:meets=>params[:user][1][:status]=="true" ? get_meets(true) : get_meets(nil),:other_users=>CommunityUser.other_users(@user._id),:locations=>@user.locations.serializable_hash(:only=>[:_id,:name],:methods=>[:latitude_val,:longitude_val] ))}
+      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:comments=>@comments.flatten,:communities=>@communities,:ipad_ids=>@ipad_ids.uniq,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks,:meets=>params[:user][1][:status]=="true" ? get_meets(true) : get_meets(nil),:other_users=>CommunityUser.other_users(@user._id),:locations=>@user.locations.serializable_hash(:only=>[:_id,:name],:methods=>[:latitude_val,:longitude_val] ))}
     end
   end
 

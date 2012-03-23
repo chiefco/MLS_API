@@ -43,37 +43,46 @@ class V1::SessionsController < Devise::SessionsController
   
   def create_delete_communities
     #Create New Communities in Cloud from Ipad
-    #~ a=[:new,:delete,:update,:remove]
-    unless params[:communities].first[:new].nil?
-      params[:communities].first[:new].each do |community|
-        create_communities(community)
+    param=[:new,:delete,:update,:remove,:comment,:removeother]
+    values=[:create_communities,:delete_communties,:update_communities,:remove_member,:create_comment,:remove_from_community]
+    param.each_with_index do |f,i|
+      unless params[:communities][i][f].nil? 
+          params[:communities][i][f].each do |value|
+          eval("#{values[i]}(#{value})")
+        end
       end
     end
-    #Delete Communities from Cloud deleted in Ipad
-    unless params[:communities][1][:delete].nil?
-      params[:communities][1][:delete].each do |community|
-        delete_communties(community)
-      end
-    end
-    unless params[:communities][2][:update].nil?
-      params[:communities][2][:update].each do |community|
-        update_communities(community)
-      end
-    end
-    unless params[:communities][3][:remove].nil?
-      params[:communities][3][:remove].each do |community|
-        remove_member(community)
-      end
-    end
-    unless params[:communities][4][:comment].nil?
-      params[:communities][4][:comment].each do |member|
-        create_comment(member)
-      end
-    end
+    
+    #~ unless params[:communities].first[:new].nil?
+      #~ params[:communities].first[:new].each do |community|
+        #~ create_communities(community)
+      #~ end
+    #~ end
+    #~ #Delete Communities from Cloud deleted in Ipad
+    #~ unless params[:communities][1][:delete].nil?
+      #~ params[:communities][1][:delete].each do |community|
+        #~ delete_communties(community)
+      #~ end
+    #~ end
+    #~ unless params[:communities][2][:update].nil?
+      #~ params[:communities][2][:update].each do |community|
+        #~ update_communities(community)
+      #~ end
+    #~ end
+    #~ unless params[:communities][3][:remove].nil?
+      #~ params[:communities][3][:remove].each do |community|
+        #~ remove_member(community)
+      #~ end
+    #~ end
+    #~ unless params[:communities][4][:comment].nil?
+      #~ params[:communities][4][:comment].each do |member|
+        #~ create_comment(member)
+      #~ end
+    #~ end
   end
   
   def delete_communties(community)
-    Community.where(:_id=>community[:cloud_id]).first.update_attributes(:status=>false)
+    Community.where(:_id=>community["cloud_id"]).first.update_attributes(:status=>false)
   end
   
   def get_image
@@ -97,9 +106,9 @@ class V1::SessionsController < Devise::SessionsController
         #~ create_or_update_tasks(task)
       #~ end
     #~ end
-    get_communities
+    #~ get_communities
    respond_to do |format|
-      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:comments=>@comments.flatten,:ipad_ids=>@ipad_ids.uniq,:communities=>@communities,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks,:meets=>params[:user][1][:status]=="true" ? get_meets(true) : get_meets(nil),:other_users=>CommunityUser.other_users(@user._id),:locations=>@user.locations.serializable_hash(:only=>[:_id,:name],:methods=>[:latitude_val,:longitude_val] ))}
+      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:comments=>@comments.flatten,:ipad_ids=>@ipad_ids.uniq,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks,:meets=>params[:user][1][:status]=="true" ? get_meets(true) : get_meets(nil),:other_users=>CommunityUser.other_users(@user._id),:locations=>@user.locations.serializable_hash(:only=>[:_id,:name],:methods=>[:latitude_val,:longitude_val] ))}
     end
   end
 
@@ -253,20 +262,20 @@ class V1::SessionsController < Devise::SessionsController
   
   def create_communities(community)
     members="";@result_hash={};
-    community[:members].each do |mem|
+    community["members"].each do |mem|
       members="#{members}"+",#{mem}"
     end
-    community.delete(:members)
-    communities=@user.communities.create(:name=>community[:name],:description=>community[:description])
+    community.delete("members")
+    communities=@user.communities.create(:name=>community["name"],:description=>community["description"])
     CommunityUser.create(:user_id=>@user._id,:community_id=>communities._id,:role_id=>1)
-    @result_hash=@result_hash.merge(community[:id]=>communities._id)
+    @result_hash=@result_hash.merge(community["id"]=>communities._id)
     members.slice!(0)
     communities.invite(members.empty? ? "": members,@user)
   end  
   
   def update_communities(community)
     members="";
-    community[:members].each do |mem|
+    community["members"].each do |mem|
       members="#{members}"+",#{mem}"
     end
     members.slice!(0)
@@ -275,25 +284,31 @@ class V1::SessionsController < Devise::SessionsController
   end  
   
   def remove_member(community)
-    community[:members].each do |mem|
+    community["members"].each do |mem|
       user=User.where(:email=>mem).first
       community=get_community(community)
       unless user.nil? || community.nil?
         community_user=CommunityUser.where(:community_id=>community._id,:user_id=>user._id).first
         community_user.update_attributes(:status=>false) unless community_user.nil?
-      end     
+      end   
+      community.remove_invites(mem) if community
     end     
   end
       
   def get_community(community)
     unless community.nil?
-      Community.where(:_id=>community[:cloud_id]).first
+      Community.where(:_id=>community["cloud_id"]).first
     end
   end
   
+  def remove_from_community(community)
+    invitations=@user.community_users.select{|a| a.user_id==@user._id && a.community_id.to_s==community["cloud_id"]}
+    invitations.update_attributes(:status=>false) unless invitations.nil?
+  end
+  
   def create_comment(member)
-    attachment=Attachment.where(:_id=>member[:cloud_id]).first
-    comment=@user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment._id,:message=>member[:message]) unless attachment.nil?
-    @community_comments << {member[:id] => comment._id} unless comment.nil?
+    attachment=Attachment.where(:_id=>member["cloud_id"]).first
+    comment=@user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment._id,:message=>member["message"]) unless attachment.nil?
+    @community_comments << {member["id"] => comment._id} unless comment.nil?
   end
 end

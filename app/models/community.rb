@@ -149,5 +149,12 @@ class Community
     end
       self.delay.community_invite(community_invites) unless community_invites.blank?
       self.delay.user_invite(user_invites) unless user_invites.blank?      
+    end
+    
+  def remove_invites(email)
+    invited_users=invitations.where(:email=>email) if invitations
+    invitees=community_invitees.where(:email=>email) if community_invitees
+    invited_users.destroy_all if invited_users
+    invitees.destroy_all   if invitees
   end
 end

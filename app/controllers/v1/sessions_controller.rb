@@ -303,7 +303,7 @@ class V1::SessionsController < Devise::SessionsController
   
   def remove_from_community(community)
     invitations=@user.community_users.where(:user_id=>@user._id,:community_id=>community["cloud_id"]).first
-    invitations.update_attributes(:status=>false) unless invitations.nil?
+    invitations.update_attributes(:status=>false) unless invitations.nil? 
   end
   
   def create_comment(member)

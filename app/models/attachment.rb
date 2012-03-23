@@ -35,8 +35,9 @@ class Attachment
   field :is_current_version, :type => Boolean, :default => true  
   field :attachment_type, type: String, default: "PERSONAL_ATTACHMENT"  
 
-  scope :current_version,self.excludes(:is_current_version => false)  
+  scope :current_version, self.where(:is_current_version => true, :folder_id => nil)  
   scope :undeleted, self.excludes(:is_deleted => true)
+  scope :total_attachments, self.where(:is_current_version => true, :is_deleted => false)
 
   searchable do
     string :file_name do
@@ -52,6 +53,17 @@ class Attachment
   def restore_activity
     save_activity("USER_ATTACHMENT_RESTORE")    
   end    
+
+  def create(community_id, folder_id=nil, user)
+    File.open("#{Rails.root}/tmp/#{self.file_name}", 'wb') do |fo|
+      fo.print open("#{self.file.to_s}").read
+    end 
+        
+    attached_file = File.new("#{Rails.root}/tmp/#{self.file_name}")
+    new_attachment = Attachment.new(:attachable_id => user._id, :file => attached_file, :size => attached_file.size, :community_id => community_id, :attachable_type => 'User', :attachment_type => 'COMMUNITY_ATTACHMENT', :user_id => self.user_id, :content_type => self.content_type, :file_name => self.file_name, :file_type => self.file_type, :folder_id => folder_id)
+    new_attachment.save
+    File.delete(attached_file)
+  end  
 
   protected
 
@@ -108,7 +120,28 @@ class Attachment
   def delete_parent
     self.parent.destroy if self.parent
   end
+
   def messages
     comments.to_a.to_json(:only=>[:_id,:message],:include=>{:user=>{:only=>[:email]}}).parse
   end
+
+  def self.upload_share(upload_user, user_name, community_id, community_name, emails, file_name)
+    emails.each do |email|
+      Invite.upload_send_email(upload_user, user_name, community_id, community_name, email, file_name).deliver
+    end      
+  end
+   
+  def self.share_delete(community_id, file_name, current_user)
+    current_user_email = current_user.email
+    current_user_name = current_user.first_name
+    community_name = Community.find(community_id).name
+    emails = CommunityUser.where(:community_id => community_id).map(&:user).map(&:email) - [current_user_email]
+    share_delete_notifications(current_user_email,current_user_name, community_id, community_name, emails, 0, file_name)
+  end
+  
+  def self.share_delete_notifications(current_user_email,current_user_name, community_id, community_name, emails, count, file_name)
+    emails.each do |email|
+       Invite.share_delete_email(current_user_email, current_user_name, community_id, community_name, email, count, file_name).deliver
+    end
+  end  
 end

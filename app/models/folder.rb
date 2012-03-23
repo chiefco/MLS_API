@@ -6,6 +6,7 @@ class Folder
   
   referenced_in :user
   has_many :activities, as: :entity, :dependent => :destroy
+  belongs_to :community
   references_many :attachments, :dependent => :destroy
   references_many :shares, :dependent => :destroy
   
@@ -15,7 +16,9 @@ class Folder
   field :is_deleted, :type => Boolean, :default => false
   
   validates_presence_of :name,:code=>3013,:message=>"name - Blank Parameter"
-  scope :undeleted,self.excludes(:status => false, :is_deleted => true)
+  scope :undeleted, self.excludes(:status => false, :is_deleted => false)
+  scope :personal, self.where(:status => true, :is_deleted => false, :community_id => nil)
+  scope :comm_folders, self.where(:status => true, :is_deleted => false, :parent_id => nil)
 
   after_create :create_activity
   after_update :update_activity
@@ -51,6 +54,24 @@ class Folder
   def self.delete(folders)
     Folder.any_in(:_id => folders).destroy_all
     Activity.any_in(:shared_id => folders).delete_all
+  end
+
+  def make_clone(community_id, user, parent_id=nil)
+    shared_folder = self.clone
+    shared_folder.save
+    shared_folder.update_attributes(:community_id => community_id, :parent_id => parent_id)
+    self.attachments.each {|attachment| attachment.create(community_id, shared_folder._id, user)}
+    self.children.each{|folder| folder.make_clone(community_id, user, shared_folder._id)} unless self.children.empty?
+  end
+
+  def all_children
+    all = []
+    self.children.each do |category|
+      all << category
+      root_children = category.all_children.flatten
+      all << root_children unless root_children.empty?
+    end
+    return all.flatten
   end
 
 end

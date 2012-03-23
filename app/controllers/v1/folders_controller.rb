@@ -13,7 +13,7 @@ class V1::FoldersController < ApplicationController
         end        
       end      
     else
-      folder = @current_user.folders.undeleted
+      folder = @current_user.folders.personal
       respond_to do |format|
         format.json {render :json =>  {:folders => folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at],:methods => [:user_name]).parse}}
       end
@@ -33,6 +33,7 @@ class V1::FoldersController < ApplicationController
     check_folder_uniqueness
     if @folder.nil?
        @folder = @current_user.folders.new(params[:folder])
+       @folder.community_id = params[:community]
       respond_to do |format|
         if @folder.save          
           create_share if params[:community] !='' && params.has_key?(:community) && params[:folder][:parent_id] == ''

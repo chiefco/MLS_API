@@ -12,6 +12,7 @@ class Community
   references_many :community_invitees
   has_many :activities, as: :entity
   has_many :attachments, :dependent => :destroy  
+  has_many :folders, :dependent => :destroy   
   validates_presence_of :name,:code=>3013,:message=>"name - Blank Parameter"
   scope :undeleted,self.excludes(:status=>false)
 
@@ -102,12 +103,12 @@ class Community
   end
 
   def shares_count
-    self.attachments.count
+    self.attachments.total_attachments.count
   end
 
-  def folders
-    self.shares.select{|i| i.shared_type == 'Folder' && i.status == true}.map(&:folder)
-  end
+  # def folders
+  #   self.shares.select{|i| i.shared_type == 'Folder' && i.status == true}.map(&:folder)
+  # end
 
   def get_meets
     shares.to_a.select{|c| c.shared_type=="Meet"}.map(&:item).uniq.reject{|v| v.status==false}.to_json(:only=>[:_id,:description,:name],:methods=>[:item_date,:created_time,:updated_time,:shared_id,:location_details],:include=>{:pages=>{:only=>[:_id,:page_order],:include=>{:attachment=>{:only=>[:file,:_id],:methods=>:messages}},:methods=>[:page_texts]}}).parse
@@ -149,12 +150,55 @@ class Community
     end
       self.delay.community_invite(community_invites) unless community_invites.blank?
       self.delay.user_invite(user_invites) unless user_invites.blank?      
-    end
-    
+  end
+
   def remove_invites(email)
     invited_users=invitations.where(:email=>email) if invitations
     invitees=community_invitees.where(:email=>email) if community_invitees
     invited_users.destroy_all if invited_users
     invitees.destroy_all   if invitees
   end
+  
+  def self.send_notifications(user_ids, community_id, current_user)
+    current_user_email = current_user.email
+    current_user_name = current_user.first_name
+    community_name = Community.find(community_id).name
+    emails = CommunityUser.where(:community_id => community_id ).map(&:user).map(&:email) - [current_user_email]
+    unsubscriber_names, unsubscriber_emails = [], []
+     user_ids.each do |id|
+       unsubscriber_names<<User.find(id).first_name
+       unsubscriber_emails<<User.find(id).email
+     end
+    remove_notifications(current_user_email, current_user_name, community_name, emails, unsubscriber_names)
+    unsubscribe_notifications(current_user_email, current_user_name, community_name, unsubscriber_emails)
+  end
+   
+  def self.remove_notifications(current_user_email, current_user_name, community_name, emails, unsubscriber_names)
+   unsubscriber_names = unsubscriber_names*","
+    emails.each do |email|
+       Invite.remove_member_notifications(current_user_email, current_user_name, community_name, email, unsubscriber_names).deliver
+    end
+  end
+  
+  def self.unsubscribe_notifications(current_user_email, current_user_name, community_name, unsubscriber_emails)
+    unsubscriber_emails.each do |email|
+       Invite.remove_member_notifications(current_user_email, current_user_name, community_name, email, false).deliver
+    end
+  end
+    
+  def self.shared_unsubscribe(communities, current_user)
+    current_user_email = current_user.email
+    current_user_name = current_user.first_name    
+    communities.each do |id|
+      community_name = Community.find(id).name
+      emails = CommunityUser.where(:community_id => id ).map(&:user).map(&:email) - [current_user_email]
+      shared_unsubscribe_mail(current_user_name, community_name, emails) unless emails.blank?
+     end
+  end
+   
+  def self.shared_unsubscribe_mail(current_user_name, community_name, emails) 
+   emails.each do |email|
+     Invite.shared_unsubscribe_notifications(current_user_name, community_name, email).deliver
+   end
+  end  
 end

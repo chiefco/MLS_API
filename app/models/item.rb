@@ -53,6 +53,13 @@ class Item
       [{:name => val.name, :latitude_val => val.latitude_val, :longitude_val => val.longitude_val,:id=>val._id.to_s}]
     end
   end
+  
+  def user_details
+    val=self.user
+    unless val.nil?
+      {:first_name => val.first_name, :last_name => val.last_name, :email => val.email}
+    end
+  end
 
   def create_activity
     save_activity("ITEM_CREATED")

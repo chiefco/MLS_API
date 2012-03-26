@@ -111,7 +111,7 @@ class Community
   # end
 
   def get_meets
-    shares.to_a.select{|c| c.shared_type=="Meet"}.map(&:item).uniq.reject{|v| v.status==false}.to_json(:only=>[:_id,:description,:name],:methods=>[:item_date,:created_time,:updated_time,:shared_id,:location_details],:include=>{:pages=>{:only=>[:_id,:page_order],:include=>{:attachment=>{:only=>[:file,:_id],:methods=>:messages}},:methods=>[:page_texts]}}).parse
+    shares.to_a.select{|c| c.shared_type=="Meet"}.map(&:item).uniq.reject{|v| v.status==false}.to_json(:only=>[:_id,:description,:name],:methods=>[:item_date,:created_time,:updated_time,:shared_id,:location_details, :user_details],:include=>{:pages=>{:only=>[:_id,:page_order],:include=>{:attachment=>{:only=>[:file,:_id],:methods=>:messages}},:methods=>[:page_texts]}}).parse
   end
   
   def get_community_attachments

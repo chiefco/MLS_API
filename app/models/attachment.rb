@@ -107,6 +107,10 @@ class Attachment
     parent_attachment.revisions.count > 1 ? true : false
   end
 
+  def is_shared
+    self.shares.count > 0
+  end   
+
   def  evaluate_item(text)
     if self.attachable_type =="User"
       user_id = self.attachable._id.nil?  ? 'nil' : self.attachable._id

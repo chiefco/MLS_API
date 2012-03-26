@@ -18,7 +18,7 @@ class V1::AttachmentsController < ApplicationController
 
 
     respond_to do |format|
-      format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :folder_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision]).parse ,:total=>@count, :size => size, :percentage => percentage}.to_success }
+      format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :folder_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision, :is_shared]).parse ,:total=>@count, :size => size, :percentage => percentage}.to_success }
       format.xml  { render :xml => @attachments.to_xml(:only=>[:_id, :file_type, :file_name, :size, :user_id,  :folder_id, :content_type],:methods => [:user_name]).as_hash.to_success.to_xml(ROOT) }
     end
   end

@@ -132,10 +132,20 @@ class V1::CommunitiesController < ApplicationController
   
   #Remove multiple member
   def multiple_member_delete
+    #To remove community members
+    if params[:user_id]
+      @community_users = CommunityUser.any_in(:user_id => params[:user_id]).where(:community_id => params[:community_id]).destroy_all
+      Community.send_notifications(params[:user_id], params[:community_id], @current_user)    
+    end
+
+    #To remove invited members
+    if params[:invited_ids]
+      p @community_users = CommunityInvitee.any_in(:email => params[:invited_ids]).where(:community_id => params[:community_id]).destroy_all
+      p @invitations = Invitation.any_in(:email => params[:invited_ids]).where(:community_id => params[:community_id]).destroy_all
+    end
+
     respond_to do |format|
-      @community_user = CommunityUser.any_in(:user_id => params[:user_id]).where(:community_id => params[:community_id]).delete_all
-      Community.send_notifications(params[:user_id], params[:community_id], @current_user)
-      unless @community_user.nil?
+      if @community_users
         format.json {render :json=>success}
       else
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}

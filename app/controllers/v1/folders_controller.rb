@@ -7,7 +7,7 @@ class V1::FoldersController < ApplicationController
       community = Community.where(:_id => params[:community_id]).first
       respond_to do |format|
         if community
-          format.json {render :json =>  {:folders => community.folders.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at],:methods => [:user_name]).parse}}
+          format.json {render :json =>  {:folders => community.folders.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at],:methods => [:user_name, :is_shared]).parse}}
         else
           format.json {render :json => failure.merge({:message => "Community doesn't exist"})}        
         end        
@@ -15,7 +15,7 @@ class V1::FoldersController < ApplicationController
     else
       folder = @current_user.folders.personal
       respond_to do |format|
-        format.json {render :json =>  {:folders => folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at],:methods => [:user_name]).parse}}
+        format.json {render :json =>  {:folders => folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at],:methods => [:user_name, :is_shared]).parse}}
       end
     end
   end

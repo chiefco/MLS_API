@@ -89,7 +89,7 @@ class V1::FoldersController < ApplicationController
   end
 
   def folder_tree
-   @folder = @current_user.folders.select{|f| f['parent_id']==nil && f[:is_deleted]== false && f[:status] == true}
+   @folder = @current_user.folders.select{|f| f['parent_id']==nil && f[:is_deleted]== false && f[:status] == true && f[:community_id] == nil}
     respond_to do |format|
       format.json {render :json =>  {:folders => @folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at], :methods => [:children_count]).parse}}
    end

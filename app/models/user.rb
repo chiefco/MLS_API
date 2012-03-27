@@ -36,7 +36,7 @@ class User
   validates_format_of     :email, :message=>"email - Invalid email format", :code=>4001, :with  => /\A([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})\z/i, :allow_blank => true
   validates_presence_of     :password, :message=>"password - Blank Parameter",:code=>3066, :if=>:pass_create_or_update?
   validates_presence_of     :password_confirmation, :message=>"password_confirmation - Blank Parameter",:code=>3079, :if=>:pass_create_or_update?
-  validates_length_of       :password, :message=>"password - Parameter length less than 6", :minimum => 6, :code=>3005, :allow_blank => true, :if=>:pass_create_or_update?
+  validates_length_of       :password, :message=>"password - Parameter length less than 6", :minimum => 6, :code=>3005,  :allow_blank => true, :if=>:pass_create_or_update?
   validates_length_of       :password, :message=>"password - Parameter length greater than 32", :maximum =>32, :code=>3006, :allow_blank => true, :if=>:pass_create_or_update?
   validates_length_of       :password_confirmation, :message=>"password_confirmation - Parameter length less than 6", :minimum => 6, :code=>3007, :allow_blank => true, :if=>:pass_create_or_update?
   validates_length_of       :password_confirmation, :message=>"password_confirmation - Parameter length greater than 32", :maximum =>32, :code=>3008, :allow_blank => true, :if=>:pass_create_or_update?
@@ -46,7 +46,7 @@ class User
   validates :company ,:length => { :minimum => 1 ,:maximum =>80,:message=>"company - Invalid length",:code=>3077},:allow_blank=>true
   validates :job_title ,:length => {:maximum =>80,:message=>"job_title - Invalid length",:code=>3078}
   validates_format_of       :password, :with =>  /^\S*$/,:message=>"password- Invalid should not contain space", :code=>2040, :if=>:pass_create_or_update?
-
+  validates_format_of       :password, :with =>  /((?=.*\d)(?=.*[a-zA-Z]).{6,32})/, :message=>"password- Invalid should contain atleast one letter and one number", :code=>2041, :if=>:pass_create_or_update?
   field :first_name, :type=> String
   field :last_name, :type=>String
   field :job_title, :type=>String

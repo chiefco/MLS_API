@@ -26,7 +26,7 @@ class V1::CommunitiesController < ApplicationController
       attachments_count = @community.attachments.total_attachments.count
       community_owner = @community.community_users.select{|i| i.user_id == @community.user_id && i.status == true}.map(&:user)
       users = (@community.community_users.select{|i| i.status == true}.map(&:user) - community_owner).uniq
-      invitees = @community.community_invitees.map(&:email) - @community.community_users.map(&:user).map(&:email).uniq 
+      invitees = ((@community.invitations.unused.map(&:email) + @community.community_invitees.map(&:email)) - @community.community_users.map(&:user).map(&:email)).uniq 
 
       respond_to do |format|
         if @community.status!=false

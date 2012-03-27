@@ -121,7 +121,7 @@ class Community
   def members
     owner = user
     members = (community_users.undeleted.map(&:user) - owner.to_a).uniq
-    invitees = community_invitees.map(&:email) - community_users.map(&:user).map(&:email).uniq 
+    invitees = ((invitations.unused.map(&:email) + community_invitees.map(&:email))-community_users.map(&:user).map(&:email)).uniq 
    {:members => members.map(&:email), :invitees =>invitees - (members.map(&:email) + owner.email.to_a),:id => _id.to_s }
   end
 
@@ -148,6 +148,7 @@ class Community
         user_invites << [current_user.id, invite_email, self.id, self.name]
       end
     end
+      
       self.delay.community_invite(community_invites) unless community_invites.blank?
       self.delay.user_invite(user_invites) unless user_invites.blank?      
   end

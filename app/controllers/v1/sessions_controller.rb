@@ -289,6 +289,8 @@ class V1::SessionsController < Devise::SessionsController
       community=get_community(community)
       unless user.nil? || community.nil?
         community_user=CommunityUser.where(:community_id=>community._id,:user_id=>user._id).first
+        value=community.shares.where(:user_id=>user._id)
+        value.each {|a| a.destroy} unless value.empty?
         community_user.destroy unless community_user.nil?
       end     
       community.remove_invites(mem) if community

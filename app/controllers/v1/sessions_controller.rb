@@ -307,6 +307,8 @@ class V1::SessionsController < Devise::SessionsController
      community=get_community(community)
       unless invitations.nil?
         community.activities.create(:action=>"COMMUNITY_REMOVED",:user_id=>@user._id) 
+        value=community.shares.where(:user_id=>@user._id)
+        value.each {|a| a.destroy} unless value.empty?
         invitations.destroy 
       end
     community.remove_invites(@user.email) if community

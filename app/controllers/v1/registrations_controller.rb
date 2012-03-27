@@ -50,7 +50,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
               format.xml{render :xml=>success.to_xml(ROOT) }
           else
             format.xml  { render :xml => failure.to_xml(ROOT)}
-            format.json {render :json =>failure}
+            format.json {render :json => resource.all_errors}
           end
         end
       else

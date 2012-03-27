@@ -50,6 +50,10 @@ class Folder
   def user_name
     User.find(self.user_id).first_name
   end
+
+  def is_shared
+    self.shares.count > 0
+  end    
   
   def self.delete(folders)
     Folder.any_in(:_id => folders).destroy_all

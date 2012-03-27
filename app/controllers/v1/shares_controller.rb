@@ -1,6 +1,6 @@
 class V1::SharesController < ApplicationController
   before_filter :authenticate_request!
-  before_filter :find_share,:only=>([:show])
+  # before_filter :find_share,:only=>([:show])
   # GET /v1/shares
   # GET /v1/shares.xml
   def index
@@ -10,7 +10,20 @@ class V1::SharesController < ApplicationController
   # GET /v1/shares/1
   # GET /v1/shares/1.xml
   def show
+    entity = Folder.where(:_id => params[:id]).first
+    if entity
+      entity_name = entity.name
+      entity_type = "Folder"
+    else
+      entity = Attachment.where(:_id => params[:id]).first
+      entity_name = entity.file_name
+      entity_type = "File"
+    end
 
+    communities = entity.shares.map(&:community).uniq
+    respond_to do |format|
+      format.json {render :json =>  {:communities => communities.to_json(:methods => [:users_count, :shares_count]).parse, :shared_name => entity_name, :shared_type => entity_type}} # index.html.erb
+    end    
   end
 
   # POST /v1/shares
@@ -22,6 +35,7 @@ class V1::SharesController < ApplicationController
       shr_comm << value['item']['community_id']
       if value['item']['shared_type'] == "Attachment" 
         attachment = Attachment.find(value['item']['shared_id'])
+        attachment_id = value['item']['shared_id']
         shr_files << (attachment).file_name
         attachment.create(value['item']['community_id'], nil, @current_user)
       elsif value['item']['shared_type'] == "Folder" 

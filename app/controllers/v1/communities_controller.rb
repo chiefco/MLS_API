@@ -26,7 +26,7 @@ class V1::CommunitiesController < ApplicationController
       attachments_count = @community.attachments.total_attachments.count
       community_owner = @community.community_users.select{|i| i.user_id == @community.user_id && i.status == true}.map(&:user)
       users = (@community.community_users.select{|i| i.status == true}.map(&:user) - community_owner).uniq
-      invitees = ((@community.invitations.map(&:email) + @community.community_invitees.map(&:email)) - @community.community_users.map(&:user).map(&:email)).uniq 
+      invitees = @community.community_invitees.map(&:email) - @community.community_users.map(&:user).map(&:email).uniq 
 
       respond_to do |format|
         if @community.status!=false
@@ -132,20 +132,22 @@ class V1::CommunitiesController < ApplicationController
   
   #Remove multiple member
   def multiple_member_delete
+    community = Community.where(:_id => params[:community_id]).first
+
     #To remove community members
     if params[:user_id]
-      @community_users = CommunityUser.any_in(:user_id => params[:user_id]).where(:community_id => params[:community_id]).destroy_all
+      community_users = community.community_users.any_in(:user_id => params[:user_id]).destroy_all
       Community.send_notifications(params[:user_id], params[:community_id], @current_user)    
     end
 
     #To remove invited members
     if params[:invited_ids]
-      p @community_users = CommunityInvitee.any_in(:email => params[:invited_ids]).where(:community_id => params[:community_id]).destroy_all
-      p @invitations = Invitation.any_in(:email => params[:invited_ids]).where(:community_id => params[:community_id]).destroy_all
+      community_users = community.community_invitees.any_in(:email => params[:invited_ids]).destroy_all
+      invitations = community.invitations.any_in(:email => params[:invited_ids]).update_all(:invitation_token => nil)
     end
 
     respond_to do |format|
-      if @community_users
+      if community_users
         format.json {render :json=>success}
       else
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}

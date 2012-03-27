@@ -147,6 +147,14 @@ class V1::RegistrationsController < Devise::RegistrationsController
         @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@category_name,:item_name=>'nil'}})
         @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:type_id=>activity.entity_id,:message=>"#{@activities[activity.action]}", :date=>activity_date }
       end
+       if activity.entity_type =="Comment"
+          comment=Comment.where(:_id=>activity.entity_id).first
+          username = comment.user.first_name rescue '' 
+          values=comment.commentable.attachable unless comment.nil?
+          activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
+          @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>username ,:item=>values.page_order,:item_name=>values.item.name}})
+          @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:type_id=>activity.entity_id,:message=>"#{@activities[activity.action]}", :date=>activity_date }
+      end
       if activity.entity_type=="Folder"
         @folder_name=activity.entity.name
         activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
@@ -175,7 +183,12 @@ class V1::RegistrationsController < Devise::RegistrationsController
            activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
           @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:type_id=>activity.entity_id,:message=>"#{@activities[activity.action]}", :date=>activity_date }
         else
-          if activity.action == "SHARE_MEET"
+          if activity.action == "COMMUNITY_REMOVED"
+             community = Community.where(:_id=>activity.entity_id).first
+             activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
+             @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>community.user.first_name ,:item=>community.name,:item_name=>'nil'}})
+             @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:type_id=>activity.entity_id,:message=>"#{@activities[activity.action]}", :date=>activity_date }
+          elsif activity.action == "SHARE_MEET"
              @item_name = Item.find "#{activity.shared_id}"
              activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
              @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name ,:item=>@community_name,:item_name=>@item_name.name}})
@@ -192,7 +205,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
               activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
              @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@username ,:item=>'Community',:item_name=>@community_name}})
              @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:type_id=>activity.entity_id,:message=>"#{@activities[activity.action]}", :date=>activity_date }
-          end
+           end
         end
       end
     end

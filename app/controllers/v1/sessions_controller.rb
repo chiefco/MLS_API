@@ -290,7 +290,7 @@ class V1::SessionsController < Devise::SessionsController
       unless user.nil? || community.nil?
         community_user=CommunityUser.where(:community_id=>community._id,:user_id=>user._id).first
         community_user.destroy unless community_user.nil?
-      end   
+      end     
       community.remove_invites(mem) if community
     end     
   end
@@ -302,10 +302,14 @@ class V1::SessionsController < Devise::SessionsController
   end
   
   def remove_from_community(community)
-    #~ invitations=@user.community_users.where(:user_id=>@user._id,:community_id=>community["cloud_id"]).first
-    #~ invitations.update_attributes(:status=>false) unless invitations.nil? 
     invitations=@user.community_users.where(:user_id=>@user._id,:community_id=>community["cloud_id"]).first
-    invitations.destroy unless invitations.nil? 
+    puts community["cloud_id"]
+     community=get_community(community)
+      unless invitations.nil?
+        community.activities.create(:action=>"COMMUNITY_REMOVED",:user_id=>@user._id) 
+        invitations.destroy 
+      end
+    community.remove_invites(@user.email) if community
   end
   
   def create_comment(member)

@@ -155,7 +155,7 @@ class Community
   def remove_invites(email)
     invited_users=invitations.where(:email=>email) if invitations
     invitees=community_invitees.where(:email=>email) if community_invitees
-    invited_users.destroy_all if invited_users
+    invited_users.each {|a| a.update_attributes(:invitation_token => nil)} if invited_users
     invitees.destroy_all   if invitees
   end
   

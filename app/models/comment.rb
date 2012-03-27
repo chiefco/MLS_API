@@ -7,11 +7,17 @@ class Comment
   field :commentable_type, :type => String
   field :commentable_id, :type => String
   belongs_to :user
+  has_many :activities, as: :entity
   belongs_to :commentable, polymorphic: true
   default_scope :without=>[:created_at,:updated_at]
   validates_inclusion_of :commentable_type, :in=>["Attachment"], :message=>"commentable_type-invalid_parameter", :code=>3084
   validates_presence_of :message,:code=>3086,:message=>"message-blank_parameter"
   scope :undeleted,self.excludes(:status=>false)
+  after_create :create_activity
+
+  def create_activity
+    self.activities.create(:action=>"COMMENT_CREATED",:user_id=>self.user.nil?  ? 'nil' : self.user._id)
+  end
   
   def self.create_comments(user,messages=nil,attachment)
     comments=[]

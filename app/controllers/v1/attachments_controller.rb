@@ -39,12 +39,7 @@ class V1::AttachmentsController < ApplicationController
     !params[:community].blank? ? community_id = params[:community] : community_id = nil
     if community_id 
       attachments_present = Attachment.where(:file_name => "#{params[:attachment][:file_name]}", :folder_id => params[:attachment][:folder_id], :community_id => community_id) 
-      attachment_present = attachments_present.where(:file_name => "#{params[:attachment][:file_name]}", :is_current_version => true, :is_deleted => false).first
-      
-      community_name = Community.find(community_id).name
-      emails = CommunityUser.where(:community_id => community_id ).map(&:user).map(&:email) - [@current_user.email]
-      Attachment.upload_share(@current_user.email, @current_user.first_name, community_id, community_name, emails, params[:attachment][:file_name]) unless emails.blank?
-      
+      attachment_present = attachments_present.where(:file_name => "#{params[:attachment][:file_name]}", :is_current_version => true, :is_deleted => false).first      
     else
      attachments_present = Attachment.where(:file_name => "#{params[:attachment][:file_name]}", :attachable_id => @current_user.id, :folder_id => params[:attachment][:folder_id], :community_id => community_id)
      attachment_present = attachments_present.where(:file_name => "#{params[:attachment][:file_name]}", :attachable_id => @current_user.id, :is_current_version => true, :is_deleted => false).first
@@ -129,7 +124,7 @@ class V1::AttachmentsController < ApplicationController
   # DELETE /v1/attachments/1
   # DELETE /v1/attachments/1.xml
   def destroy
-    Attachment.share_delete(@attachment.community.id,@attachment.file_name, @current_user) if @attachment.community
+    Attachment.delay.share_delete(@attachment.community.id,@attachment.file_name, @current_user) if @attachment.community
     @activity = Activity.where(:shared_id => params[:id])
     @activity.destroy_all if @activity
     @attachment.destroy

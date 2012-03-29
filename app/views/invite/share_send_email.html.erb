@@ -4,10 +4,10 @@
 in MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
 <% unless @files_name.blank?%>
 <b>Files</b><br/>
-<%= @files_name%><br/><br/>
+<p><%= @files_name%></p><br/><br/>
 <% end %>
 <% unless @folders_name.blank?%>
 <b>Folders</b><br/>
-<%= @folders_name%><br/><br/>
+<p><%= @folders_name%></p><br/><br/>
 <% end %>
 <a href='<%=Rails.env=="development" ? "http://localhost:3000" : "www.meetlinkshare.com" %>/communities/<%= @community_id	%>'>Click here to view shared files</a>

@@ -23,8 +23,8 @@ class Invite < ActionMailer::Base
     mail(:to=>@email,:subject =>"Files shared for virtual team(#{@community_name}) by #{@user_name}")
   end
   
-  def upload_send_email(upload_user, user_name, community_id, community_name, email, file_name)
-    @user_name, @community_id, @community_name, @email, @file_name = user_name, community_id, community_name, email, file_name
+  def upload_send_email(upload_user, user_name, community_id, community_name, email, file_name, file_count)
+    @user_name, @community_id, @community_name, @email, @file_name, @file_count = user_name, community_id, community_name, email, file_name, file_count
      mail(:to=>@email,:subject =>"Files uploaded for virtual team(#{@community_name}) by #{@user_name}")
    end
    

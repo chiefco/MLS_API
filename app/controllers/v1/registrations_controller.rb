@@ -4,6 +4,12 @@ class V1::RegistrationsController < Devise::RegistrationsController
   before_filter :add_pagination,:only=>[:index,:activities]
   before_filter :detect_missing_params, :only=>[:create]
 
+  # Public: Lists all the users in the application
+  #
+  # params - user params are passed
+  # @paginate_options - accepts page size and page no
+  #
+  # Returns all the users
   def index
     @users = User.list(params,@paginate_options)
 
@@ -13,6 +19,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  # Public: Creates a new user
+  # params[:user] - user params are passed
+  # Returns boolean result
   def create
     resource=User.new(params[:user])
     if resource.save
@@ -29,7 +38,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
     end
   end
 
-  #Retrieves the Activities of the User
+  # Public: Lists all the user and community activities
+  # params[:community_id]  - Returns community activity if passed
+  # Returns the user & community activities
   def activities
     @item=[]
     params[:community_id] ? find_communtiy_activities(params[:community_id]) : find_activities
@@ -38,6 +49,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  # Public: Updates the user information
+  # params[:user]  - Updated user params should be passed
+  # Returns the boolean result
   def update
     self.resource = resource_class.to_adapter.get!(send(:"current_#{resource_name}").to_key)
     if params.has_key?(:user) && params[:user]
@@ -68,6 +82,8 @@ class V1::RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  # Public: Displays current user information
+  # Returns the json result with current user info
   def show
     meet_count = Item.upcoming_meetings_counts(@current_user)
     respond_to do |format|
@@ -77,6 +93,8 @@ class V1::RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  # Public: Deletes current user from app
+  # Returns the json result(currnt user status sets to false)
   def close_account
     respond_to do |format|
       @current_user.update_attribute(:authentication_token,nil)
@@ -86,6 +104,8 @@ class V1::RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  # Public: Returns industries present in app
+  # Returns the json result
    def options_for_the_field
     @industry=Industry.all
       respond_to do |format|
@@ -111,6 +131,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
   end
 
   #detects missing parameters in users create
+  #Called on 'before_filter' for create(only)
   def detect_missing_params
     param_must = [:email, :password, :password_confirmation, :first_name, :last_name]
     if params.has_key?(:user) && params[:user].is_a?(Hash)
@@ -121,6 +142,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
     render_missing_params(missing_params) unless missing_params.blank?
   end
 
+  # Public: Logic to return all user activities  
+  # Called from method 'activities' 
+  # Returns the user activities
   def find_activities
     @first_name=@current_user.first_name
     user_communities = @current_user.communities.map(&:id)
@@ -132,6 +156,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  # Public: Logic to return all community activities 
+  # Called from method 'activities' 
+  # Returns the community activities
   def find_communtiy_activities(community_id)
     @community = Community.find(community_id)
     activities = @community.activities
@@ -161,12 +188,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
     end
   end  
 
-  def get_activity(activity, item, item_name)
-    activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
-    @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name, :item=>item, :item_name=>item_name}})
-    @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:type_id=>activity.entity_id,:message=>"#{@activities[activity.action]}", :date=>activity_date }    
-  end  
-
+  # Public: Fetches user activities(activities fetch logic) 
+  # Called from methods 'find_activities'
+  # Returns the user activities
   def get_activities(activity)
     case activity.entity_type
     when "Item"
@@ -199,6 +223,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  # Public: Fetches community activities(activities fetch logic) 
+  # Called from methods 'find_community_activities'
+  # Returns the community activities
   def get_community_activities(activity)  
     if activity.shared_id.nil?
       get_activity(activity, @community.name, 'nil')                                
@@ -216,14 +243,23 @@ class V1::RegistrationsController < Devise::RegistrationsController
         when "COMMUNITY_JOINED"
         @invitation=Invitation.where(:_id=>activity.shared_id).first
         @first_name = User.where(:email => @invitation.email).first.first_name rescue ''
-        get_activity(activity, 'community', @community.name)              
+        get_activity(activity, 'community', @community.name) if !@first_name.blank?
       end
     end 
   end
 
+  # Public: Fetches single activity 
+  # Called fron methods 'find_activities', 'find_community_activities'
+  # Returns the community activities
+  def get_activity(activity, item, item_name)
+    activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
+    @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name, :item=>item, :item_name=>item_name}})
+    @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:type_id=>activity.entity_id,:message=>"#{@activities[activity.action]}", :date=>activity_date }    
+  end   
+
+  #returns the item if provided
   def find_the_item(item)
     @activity_item=Item.where(:_id=>item).first
     @activity_item=@activity_item.nil? ? "nil" : @activity_item.name
   end
 end
-

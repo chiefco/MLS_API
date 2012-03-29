@@ -42,7 +42,6 @@ class V1::SessionsController < Devise::SessionsController
   end
   
   def create_delete_communities
-    #Create New Communities in Cloud from Ipad
     param=[:new,:delete,:update,:remove,:comment,:removeother]
     values=[:create_communities,:delete_communties,:update_communities,:remove_member,:create_comment,:remove_from_community]
     param.each_with_index do |f,i|
@@ -52,33 +51,6 @@ class V1::SessionsController < Devise::SessionsController
         end
       end
     end
-    
-    #~ unless params[:communities].first[:new].nil?
-      #~ params[:communities].first[:new].each do |community|
-        #~ create_communities(community)
-      #~ end
-    #~ end
-    #~ #Delete Communities from Cloud deleted in Ipad
-    #~ unless params[:communities][1][:delete].nil?
-      #~ params[:communities][1][:delete].each do |community|
-        #~ delete_communties(community)
-      #~ end
-    #~ end
-    #~ unless params[:communities][2][:update].nil?
-      #~ params[:communities][2][:update].each do |community|
-        #~ update_communities(community)
-      #~ end
-    #~ end
-    #~ unless params[:communities][3][:remove].nil?
-      #~ params[:communities][3][:remove].each do |community|
-        #~ remove_member(community)
-      #~ end
-    #~ end
-    #~ unless params[:communities][4][:comment].nil?
-      #~ params[:communities][4][:comment].each do |member|
-        #~ create_comment(member)
-      #~ end
-    #~ end
   end
   
   def delete_communties(community)
@@ -96,19 +68,14 @@ class V1::SessionsController < Devise::SessionsController
   #perform synchronisation for the user
   def perform_synchronisation(user)
     initialize_values
-    @meets= params[:user][1][:meet].each do |meet|
+    @meets= params[:user][0][:meet].each do |meet|
       unless meet.values[0].empty?
         create_or_update_meets(meet)
       end
     end
-    #~ params[:user][0][:task].each do |task|
-      #~ unless task.values[0].empty?
-        #~ create_or_update_tasks(task)
-      #~ end
-    #~ end
     get_communities
    respond_to do |format|
-      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:comments=>@comments.flatten,:communities=>@communities,:ipad_ids=>@ipad_ids.uniq,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks,:meets=>params[:user][1][:status]=="true" ? get_meets(true) : get_meets(nil),:other_users=>CommunityUser.other_users(@user._id),:locations=>@user.locations.serializable_hash(:only=>[:_id,:name],:methods=>[:latitude_val,:longitude_val] ))}
+      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:comments=>@comments.flatten,:communities=>@communities,:ipad_ids=>@ipad_ids.uniq,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks,:meets=>params[:user][0][:status]=="true" ? get_meets(true) : get_meets(nil),:other_users=>CommunityUser.other_users(@user._id),:locations=>@user.locations.serializable_hash(:only=>[:_id,:name],:methods=>[:latitude_val,:longitude_val] ))}
     end
   end
 

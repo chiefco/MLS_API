@@ -15,7 +15,7 @@ COMMUNITY_CREATED : <%="#{username}"%> has created a new team and called it <%="
 COMMUNITY_UPDATED : <%="#{username}"%> has updated the  team <%="#{item}"%>
 COMMUNITY_DELETED : <%="#{username}"%> moved team <%="#{item}"%> to trash
 SHARE_ATTACHMENT : <%="#{username}"%> has shared the  file <%=" #{item_name}"%> in <%="#{item}"%> team
-SHARE_MEET : <%="#{username}"%> has shared the  meet <%=" #{item_name}"%> in <%="#{item}"%> team
+SHARE_MEET : <%="#{username}"%> has shared the  note <%=" #{item_name}"%> in <%="#{item}"%> team
 USER_ATTACHMENT : <%="#{username}"%> has uploaded a new file and called it <%="#{item}"%>
 USER_ATTACHMENT_UPDATE : <%="#{username}"%> has updated a file called <%="#{item}"%>
 USER_ATTACHMENT_RESTORE : <%="#{username}"%> has restored a file called <%="#{item}"%>

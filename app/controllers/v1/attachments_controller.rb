@@ -194,7 +194,7 @@ class V1::AttachmentsController < ApplicationController
   # DELETE MULTIPLE /v1/attachments/1.xml
  def attachments_multiple_delete
     Attachment.any_in(_id: params[:attachment]).update_all(:is_deleted => true)
-    attachments = Attachment.list(@current_user.attachments, params, {:page =>1, :per_page => 10})
+    attachments = Attachment.list(@current_user.attachments, params.merge(:user_attachments => true), {:page =>1, :per_page => 10})
     count = @current_user.attachments.where(:folder_id => nil, :is_deleted => false).count
     Folder.any_in(_id: params[:folder]).update_all(:is_deleted => true) if params[:folder] 
     folders = @current_user.folders.where(:parent_id => nil, :is_deleted => false, :community_id => nil)

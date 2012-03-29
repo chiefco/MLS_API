@@ -179,7 +179,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
       comment=Comment.where(:_id=>activity.entity_id).first
       username = comment.user.first_name rescue '' 
       values=comment.commentable.attachable unless comment.nil?
-      get_activity(activity, values.page_order, values.item.name)
+      get_activity(activity, values.page_order, values.item.name) if values.class=="Page"
     when "Folder"
       @folder_name=activity.entity.name
       get_activity(activity, "folder", @folder_name)          

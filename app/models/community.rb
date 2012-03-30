@@ -164,7 +164,7 @@ class Community
     current_user_email = current_user.email
     current_user_name = current_user.first_name
     community_name = Community.find(community_id).name
-    emails = CommunityUser.where(:community_id => community_id ).map(&:user).map(&:email) - [current_user_email]
+    emails = CommunityUser.where(:community_id => community_id, :subscribe_email => true ).map(&:user).map(&:email) - [current_user_email]
     unsubscriber_names, unsubscriber_emails = [], []
      user_ids.each do |id|
        unsubscriber_names<<User.find(id).first_name
@@ -192,7 +192,7 @@ class Community
     current_user_name = current_user.first_name    
     communities.each do |id|
       community_name = Community.find(id).name
-      emails = CommunityUser.where(:community_id => id ).map(&:user).map(&:email) - [current_user_email]
+      emails = CommunityUser.where(:community_id => id, :subscribe_email => true ).map(&:user).map(&:email) - [current_user_email]
       shared_unsubscribe_mail(current_user_name, community_name, emails) unless emails.blank?
      end
   end

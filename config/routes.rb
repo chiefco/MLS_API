@@ -58,6 +58,7 @@ MeetlinkshareApi::Application.routes.draw do
     match '/multiple_member_delete', :to => 'communities#multiple_member_delete'
     match '/remove_shared_team', :to => 'communities#remove_shared_team'
     match '/file_notifications', :to => 'shares#file_notifications'
+    match '/subscribe_status', :to => 'communities#subscribe_status'
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do

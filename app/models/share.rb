@@ -77,7 +77,7 @@ class Share
      community_users = []
      communities.each do |value|
           community_name = Community.find(value).name
-          emails = CommunityUser.where(:community_id => value ).map(&:user).map(&:email) - [user]
+          emails = CommunityUser.where(:community_id => value, :subscribe_email => true ).map(&:user).map(&:email) - [user]
           share_mail(user, user_name, value, community_name, emails, files, folders) unless emails.blank?
      end
    end
@@ -94,7 +94,7 @@ class Share
       current_user_email = current_user.email
       current_user_name = current_user.first_name
       community_name = Community.find(community_id).name
-      emails = CommunityUser.where(:community_id => community_id).map(&:user).map(&:email) - [current_user_email]
+      emails = CommunityUser.where(:community_id => community_id, :subscribe_email => true).map(&:user).map(&:email) - [current_user_email]
       share_delete_notifications(current_user_email,current_user_name, community_id, community_name, emails, count, item_name)
     end
     

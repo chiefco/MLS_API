@@ -138,7 +138,7 @@ class V1::CommunitiesController < ApplicationController
     #To remove community members
     if params[:user_id]
       community_users = community.community_users.any_in(:user_id => params[:user_id]).destroy_all
-      Community.delay.send_notifications(params[:user_id], params[:community_id], @current_user)    
+      Community.send_notifications(params[:user_id], params[:community_id], @current_user)    
     end
 
     #To remove invited members
@@ -160,7 +160,7 @@ class V1::CommunitiesController < ApplicationController
   def remove_shared_team
     respond_to do |format|
       @community_user = CommunityUser.any_in(:community_id => params[:community_id]).where(:user_id => @current_user._id).delete_all
-      Community.delay.shared_unsubscribe(params[:community_id], @current_user)
+      Community.shared_unsubscribe(params[:community_id], @current_user)
       unless @community_user.nil?
         format.json {render :json=>success}
       else

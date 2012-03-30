@@ -1,3 +1,2 @@
-<b><%= @inviter %></b> has invited you to join a MeetLinkshare virtual team called <b><%=@community%></b><br/><br/>
-<b>test</b>
-<a href="https://www.meetlinkshare.com/join_community/<%=@token	%>">Click here to join</a>
+<b><%= @inviter %></b> has invited you to join a MeetLinkshare virtual teammm called <b><%=@community%></b><br/><br/>
+<a href='<%=Rails.env=="development" ? "http://localhost:3000" : "www.meetlinkshare.railsfactory.com" %>/join_community/<%=@token	%>'>Click here to join</a>

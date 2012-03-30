@@ -3,4 +3,4 @@
 <% else%>
 <b><%= @user_name %></b> has deleted <%= @item_name %> in MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
 <% end %>
-<a href="<%=Rails.env=='development' ? 'http://localhost:3000' : 'https://www.meetlinkshare.com' %>/communities/<%= @community_id	%>">Click here to view team</a>
+<a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>>Click here to view team</a>

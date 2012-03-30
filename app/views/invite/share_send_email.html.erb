@@ -10,4 +10,4 @@ in MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
 <b>Folders</b><br/>
 <p><%= @folders_name%></p><br/><br/>
 <% end %>
-<a href='<%=Rails.env=="development" ? "http://localhost:3000" : "www.meetlinkshare.com" %>/communities/<%= @community_id	%>'>Click here to view shared files</a>
+<a href="<%=Rails.env=='development' ? 'http://localhost:3000' : 'https://www.meetlinkshare.com' %>/communities/<%= @community_id	%>">Click here to view shared files</a>

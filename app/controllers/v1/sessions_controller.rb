@@ -16,7 +16,7 @@ class V1::SessionsController < Devise::SessionsController
 
   def index
     respond_to do |format|
-      format.json{render :json =>failure.merge(flash[:alert])}
+      format.json{render :json =>failure.merge(AUTH_FAILED)}
     end
   end
 

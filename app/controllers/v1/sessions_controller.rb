@@ -15,9 +15,8 @@ class V1::SessionsController < Devise::SessionsController
   end
 
   def index
-    flash[:alert] = {:message => "You have not yet confirmed your account, please check your e-mail.", :code => "1003"} if flash[:alert].nil?
     respond_to do |format|
-      format.json{render :json =>failure.merge(flash[:alert])}
+      format.json{render :json =>failure.merge(AUTH_FAILED)}
     end
   end
 

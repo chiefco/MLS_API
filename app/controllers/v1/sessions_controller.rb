@@ -15,8 +15,6 @@ class V1::SessionsController < Devise::SessionsController
   end
 
   def index
-    p "======================="
-    p flash[:alert]
     respond_to do |format|
       format.json{render :json =>failure.merge(flash[:alert])}
     end

@@ -125,6 +125,14 @@ class Item
     self.share._id.to_s
   end
 
+  def creatd_by
+    self.user.first_name
+  end
+
+  def share_attachments(page)
+    self.pages[page].attachment
+  end
+
   def upcoming
     date = item_date
     date = Date.strptime(item_date,"%d/%m/%Y %H:%M:%S") if item_date.is_a?(String)

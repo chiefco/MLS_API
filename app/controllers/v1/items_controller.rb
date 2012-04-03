@@ -41,7 +41,8 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       unless @item.status==false
         if @item
-          @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:methods=>[:created_time,:updated_time,:end_time,:location_name,:item_date, :item_date_local]),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id)}.to_success
+          shared_to = @item.shares.map(&:community)
+          @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:methods=>[:created_time,:updated_time,:end_time,:location_name,:item_date, :item_date_local, :created_by]),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id), :shared_to => shared_to.to_json(:methods => [:users_count, :shares_count]).parse}.to_success
           format.xml  { render :xml => @item.to_xml(ROOT) }
           format.json  { render :json => @item}
         else
@@ -245,6 +246,24 @@ class V1::ItemsController < ApplicationController
     end
   end
 
+  # Public: Lists all pages for the meet
+  # params - meet id is passed
+  # Returns all the pages for the meet
+  def get_page
+    @item = Item.find(params[:id])
+
+    respond_to do |format|
+      if @item
+        params[:page] ? page = params[:page].to_i : page = 0
+        attachment = @item.share_attachments(page)
+        format.json {render :json =>  {:page => attachment.to_json(:only => [:file]).parse}} # index.html.erb
+        format.xml{ render :xml => attachments.to_xml(ROOT)}
+      else
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
+    end  end
+
   def get_criteria(query)
     [ {name: query} , { description: query } ]
   end
@@ -282,7 +301,7 @@ class V1::ItemsController < ApplicationController
   end
 
   def get_item
-    @item=@current_user.items.find(params[:id])
+    @item = @current_user.items.find(params[:id])
   end
 
   def item_count

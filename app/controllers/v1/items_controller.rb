@@ -1,6 +1,6 @@
 class V1::ItemsController < ApplicationController
   before_filter :authenticate_request!
-  before_filter :get_item,:only=>([:update,:show,:item_categories,:destroy,:item_topics,:get_all_tasks,:list_item_attendees,:comments])
+  before_filter :get_item,:only=>([:update,:item_categories,:destroy,:item_topics,:get_all_tasks,:list_item_attendees,:comments])
   before_filter :add_pagination,:only=>[:index]
   before_filter :detect_missing_params, :only=>[:create]
   # GET /items
@@ -38,6 +38,8 @@ class V1::ItemsController < ApplicationController
   # GET /items/1
   # GET /items/1.xml
   def show
+    @item = Item.find(params[:id])
+
     respond_to do |format|
       unless @item.status==false
         if @item

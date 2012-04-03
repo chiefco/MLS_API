@@ -28,28 +28,28 @@ class ApplicationController < ActionController::Base
     Rails.env.production?
   end
 
-  rescue_from Mongoid::Errors::DocumentNotFound do |exception|
-      respond_to do |format|
-        if !exception.identifiers.empty?
-          format.json{render :json=>{:response=>:failure,:errors=>[RECORD_NOT_FOUND]}}
-          format.xml{render :xml=>{:errors=>[RECORD_NOT_FOUND]}.to_failure,:root=>:xml}
-        else
-          format.json{render :json=>{:response=>:failure,:errors=>[BLANK_PARAMETER_ID]}}
-          format.xml{render :xml=>{:errors=>[BLANK_PARAMETER_ID]}.to_failure,:root=>:xml}
-      end
-    end
-  end
+  #~ rescue_from Mongoid::Errors::DocumentNotFound do |exception|
+      #~ respond_to do |format|
+        #~ if !exception.identifiers.empty?
+          #~ format.json{render :json=>{:response=>:failure,:errors=>[RECORD_NOT_FOUND]}}
+          #~ format.xml{render :xml=>{:errors=>[RECORD_NOT_FOUND]}.to_failure,:root=>:xml}
+        #~ else
+          #~ format.json{render :json=>{:response=>:failure,:errors=>[BLANK_PARAMETER_ID]}}
+          #~ format.xml{render :xml=>{:errors=>[BLANK_PARAMETER_ID]}.to_failure,:root=>:xml}
+      #~ end
+    #~ end
+  #~ end
 
-  rescue_from BSON::InvalidObjectId do |exception|
-    respond_to do |format|
-      format.json{render :json=>{:response=>:failure,:errors=>[INVALID_PARAMETER_ID]}}
-      format.xml{render :xml=>{:errors=>[INVALID_PARAMETER_ID]}.to_failure,:root=>:xml}
-    end
-  end
+  #~ rescue_from BSON::InvalidObjectId do |exception|
+    #~ respond_to do |format|
+      #~ format.json{render :json=>{:response=>:failure,:errors=>[INVALID_PARAMETER_ID]}}
+      #~ format.xml{render :xml=>{:errors=>[INVALID_PARAMETER_ID]}.to_failure,:root=>:xml}
+    #~ end
+  #~ end
 
-  rescue_from Exception do |exception|
-    logger.info exception.inspect
-  end
+  #~ rescue_from Exception do |exception|
+    #~ logger.info exception.inspect
+  #~ end
   protect_from_forgery
 
   def authenticate_request!

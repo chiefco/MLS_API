@@ -54,7 +54,7 @@ class V1::SharesController < ApplicationController
     end
 
     # To send the emails
-    @v1_share.delay.share_files(shr_comm.uniq, shr_files.uniq, shr_folders.uniq, @current_user)
+    @v1_share.share_files(shr_comm.uniq, shr_files.uniq, shr_folders.uniq, @current_user)
 
     respond_to do |format|
       format.xml  { render :xml => success.merge(:share=>@v1_share).to_xml(ROOT,:only=>[:name,:_id])}
@@ -74,7 +74,7 @@ class V1::SharesController < ApplicationController
     share = Folder.where(:_id => params[:id]).first
     share = Attachment.where(:_id => params[:id]).first if share.nil?
     item_name = share.name rescue share.file_name
-    Share.delay.shared_delete(share.community.id, 0, item_name, @current_user)
+    Share.shared_delete(share.community.id, 0, item_name, @current_user)
     share.destroy
 
     respond_to do |format|
@@ -91,7 +91,7 @@ class V1::SharesController < ApplicationController
     end
 
     attachments = Attachment.any_in(_id: params[:share_list]).map(&:id)
-    Share.delay.shared_delete(params[:community_id], params[:share_list].count, "", @current_user)
+    Share.shared_delete(params[:community_id], params[:share_list].count, "", @current_user)
     Attachment.delay.delete(attachments) unless attachments.blank?
     
     respond_to do |format|
@@ -101,8 +101,8 @@ class V1::SharesController < ApplicationController
   
   def file_notifications
     community_name = Community.find(params[:community_id]).name
-    emails = CommunityUser.where(:community_id => params[:community_id]).map(&:user).map(&:email) - [@current_user.email]
-    Attachment.delay.upload_share(@current_user.email, @current_user.first_name, params[:community_id], community_name, emails, params[:file_name], params[:file_count]) unless emails.blank?    
+    emails = CommunityUser.where(:community_id => params[:community_id], :subscribe_email => true).map(&:user).map(&:email) - [@current_user.email]
+    Attachment.upload_share(@current_user.email, @current_user.first_name, params[:community_id], community_name, emails, params[:file_name], params[:file_count]) unless emails.blank?    
      respond_to do |format|
       format.json {render :json=>success }
      end

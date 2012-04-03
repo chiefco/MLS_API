@@ -20,13 +20,13 @@ en:
         message: 'You do not have permission to make this API call'
         code: 1001
       unconfirmed: 
-        message: 'Account is not verified'
+        message: 'You have not yet confirmed your account, please check your e-mail'
         code: 1003
       locked:
         message: 'Account is locked or inactive'
         code: 1002
       invalid:
-        message: 'Email/Password is incorrect'
+        message: 'Email/Password is did not match'
         code: 1000
       invalid_token: 
         message: 'Token is not valid'

@@ -272,7 +272,6 @@ class V1::SessionsController < Devise::SessionsController
   
   def remove_from_community(community)
     invitations=@user.community_users.where(:user_id=>@user._id,:community_id=>community["cloud_id"]).first
-    puts community["cloud_id"]
      community=get_community(community)
       unless invitations.nil?
         community.activities.create(:action=>"COMMUNITY_REMOVED",:user_id=>@user._id) 

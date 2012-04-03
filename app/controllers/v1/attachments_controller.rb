@@ -124,7 +124,7 @@ class V1::AttachmentsController < ApplicationController
   # DELETE /v1/attachments/1
   # DELETE /v1/attachments/1.xml
   def destroy
-    Attachment.delay.share_delete(@attachment.community.id,@attachment.file_name, @current_user) if @attachment.community
+    Attachment.share_delete(@attachment.community.id,@attachment.file_name, @current_user) if @attachment.community
     @activity = Activity.where(:shared_id => params[:id])
     @activity.destroy_all if @activity
     @attachment.destroy

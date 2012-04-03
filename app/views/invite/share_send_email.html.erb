@@ -1,5 +1,5 @@
 <b><%= @user_name %></b> has shared 
-<% unless @files_length<=0%> <%= @files_length%> files <% end%><%= (@files_length >0) && (@files_length >0) ? " and " : ''%>
+<% unless @files_length<=0%> <%= @files_length%> files <% end%><%= (@files_length >0) && (@folders_length >0) ? " and " : ''%>
 <% unless @folders_length<0%><%= @folders_length%> folders <% end%>
 in MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
 <% unless @files_name.blank?%>

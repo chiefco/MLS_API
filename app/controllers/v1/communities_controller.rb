@@ -1,6 +1,6 @@
 class V1::CommunitiesController < ApplicationController
   before_filter :authenticate_request!
-  before_filter :find_community,:only=>[:update,:show,:destroy,:members,:invite_member,:validate_folder,:validate_file]
+  before_filter :find_community,:only=>[:update,:show,:destroy,:members,:invite_member,:validate_folder,:validate_file, :subscribe_status]
   before_filter :find_community_members,:only=>[:members]
   before_filter :add_pagination,:only=>[:index]
   before_filter :detect_missing_params, :only=>[:create]
@@ -12,8 +12,11 @@ class V1::CommunitiesController < ApplicationController
     shared_communities = CommunityUser.where(:user_id => "#{@current_user._id}").map(&:community).select{|c| c.user_id != @current_user.id && c.status == true}
     #~ invited_members = (communities.map(&:community_invitees).flatten.map(&:email) + communities.map(&:invitations).flatten.map(&:email)).uniq
     invited_members =  (@current_user.contacts.map(&:email) - [@current_user.email]).uniq
+    mls_users = User.any_in(:email => invited_members).only(:first_name, :last_name, :email)
+    users_email = User.any_in(:email => invited_members).map(&:email)
+    other_members    = invited_members - users_email
     respond_to do |format|
-      format.json {render :json =>  {:communities => communities.to_json(:methods => [:users_count, :shares_count]).parse, :invited_members => invited_members.to_json.parse, :shared_communities => shared_communities.to_json(:methods => [:users_count, :shares_count]).parse}} # index.html.erb
+      format.json {render :json =>  {:communities => communities.to_json(:methods => [:users_count, :shares_count]).parse, :invited_members => invited_members.to_json.parse, :mls_users => mls_users.to_json.parse, :other_members => other_members.to_json.parse, :shared_communities => shared_communities.to_json(:methods => [:users_count, :shares_count]).parse}} # index.html.erb
     end
   end
 
@@ -27,10 +30,15 @@ class V1::CommunitiesController < ApplicationController
       community_owner = @community.community_users.select{|i| i.user_id == @community.user_id && i.status == true}.map(&:user)
       users = (@community.community_users.select{|i| i.status == true}.map(&:user) - community_owner).uniq
       invitees = ((@community.invitations.unused.map(&:email) + @community.community_invitees.map(&:email)) - @community.community_users.map(&:user).map(&:email)).uniq 
+       invited_mls_users = User.any_in(:email => invitees).only(:first_name, :last_name, :email)
+       users_email = User.any_in(:email => invitees).map(&:email)
+       invited_other_members  = invitees - users_email
+    
+      @community_user = @community.community_users.where(:user_id => @current_user._id).first
 
       respond_to do |format|
         if @community.status!=false
-          format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :invitees => invitees.to_json.parse, :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :community_attachments => @community.attachments.current_version.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :folder_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision]).parse, :attachments_count => attachments_count, :folder_share => folders.to_json(:methods => [:user_name]).parse,  :users => users.to_json(:only=>[:_id, :first_name, :email]).parse, :community_owner => community_owner.to_json(:only=>[:_id, :first_name, :email]).parse}.to_success}
+          format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :invitees => invitees.to_json.parse, :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :community_attachments => @community.attachments.current_version.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :folder_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision]).parse, :attachments_count => attachments_count, :folder_share => folders.to_json(:methods => [:user_name]).parse,  :users => users.to_json(:only=>[:_id, :first_name, :last_name, :email]).parse, :community_owner => community_owner.to_json(:only=>[:_id, :first_name, :last_name, :email]).parse, :subscribe_email =>@community_user.to_json(:only => [:subscribe_email]).parse, :invited_mls_users => invited_mls_users.to_json.parse, :invited_other_members => invited_other_members.to_json.parse}.to_success}
         else
           format.json  {render :json=> failure.merge(INVALID_PARAMETER_ID)}
         end
@@ -42,14 +50,14 @@ class V1::CommunitiesController < ApplicationController
     end
   end  
 
-  def create
+  def create    
     @community = @current_user.communities.new(params[:community])    
     respond_to do |format|
       if @community.save
         if !params[:invite_email].nil?
           @community.invite(params[:invite_email][:users], @current_user) unless params[:invite_email][:users].blank? unless params[:invite_email][:users].blank?
         end
-        CommunityUser.create(:user_id=>@current_user._id,:community_id=>@community._id,:role_id=>1)
+        CommunityUser.create(:user_id=>@current_user._id,:community_id=>@community._id,:subscribe_email => params[:subscribe_email], :role_id=>1)
         find_parameters
         format.json {render :json => @community}
       else
@@ -137,7 +145,7 @@ class V1::CommunitiesController < ApplicationController
     #To remove community members
     if params[:user_id]
       community_users = community.community_users.any_in(:user_id => params[:user_id]).destroy_all
-      Community.delay.send_notifications(params[:user_id], params[:community_id], @current_user)    
+      Community.send_notifications(params[:user_id], params[:community_id], @current_user)    
     end
 
     #To remove invited members
@@ -159,7 +167,7 @@ class V1::CommunitiesController < ApplicationController
   def remove_shared_team
     respond_to do |format|
       @community_user = CommunityUser.any_in(:community_id => params[:community_id]).where(:user_id => @current_user._id).delete_all
-      Community.delay.shared_unsubscribe(params[:community_id], @current_user)
+      Community.shared_unsubscribe(params[:community_id], @current_user)
       unless @community_user.nil?
         format.json {render :json=>success}
       else
@@ -196,7 +204,7 @@ class V1::CommunitiesController < ApplicationController
         else
             exist_user = @invitation.community.community_users.where(:user_id => @invitation.user_id).first
            if exist_user.nil? || exist_user.blank?
-              @invitation.community.community_users.create(:user_id=>@invitation.user_id)
+              @invitation.community.community_users.create(:user_id=>@invitation.user_id, :subscribe_email => false)
               @invitation.update_attributes(:invitation_token=>nil)
               @community = @invitation.community
               @community.save_Invitation_activity("COMMUNITY_JOINED", @community._id, @invitation._id, @current_user._id)
@@ -279,6 +287,22 @@ class V1::CommunitiesController < ApplicationController
         format.xml { render :xml=> failure.to_xml(ROOT) }
       end      
     end    
+  end
+  
+  def subscribe_status
+      @community_user = @community.community_users.where(:user_id => @current_user._id).first
+      respond_to do |format|
+      if @community_user.status!=false
+        if @community_user.update_attributes(:subscribe_email => params[:subscribe_email])
+          find_parameters
+          format.json {render :json => @community_user}
+        else
+          format.json  { render :json =>@community_user.all_errors}
+        end
+      else
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
+    end
   end
 
   private

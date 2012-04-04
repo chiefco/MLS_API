@@ -253,12 +253,15 @@ class V1::ItemsController < ApplicationController
   # Returns all the pages for the meet
   def get_page
     @item = Item.find(params[:id])
-
     respond_to do |format|
       if @item
         params[:page] ? page = params[:page].to_i : page = 0
-        attachment = @item.share_attachments(page)
-        format.json {render :json =>  {:page => attachment.to_json(:only => [:file]).parse}} # index.html.erb
+        p "================="
+        p attachment = @item.share_attachments(page)
+        comments = attachment.comments
+        page_count = @item.pages.count
+        format.json {render :json =>  { :page => attachment.to_json(:only => [:file]).parse, :comments => comments.to_json(:only => [:id,:message, :status, :commentable_id, :user_id, :created_at, :updated_at], :methods => [:user_name]).parse, :page_count => page_count }} 
+        # index.html.erb
         format.xml{ render :xml => attachments.to_xml(ROOT)}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }

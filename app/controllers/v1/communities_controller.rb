@@ -295,7 +295,7 @@ class V1::CommunitiesController < ApplicationController
       if @community_user.status!=false
         if @community_user.update_attributes(:subscribe_email => params[:subscribe_email])
           find_parameters
-          format.json {render :json => @community_user}
+          format.json {render :json => { :community_user => @community_user}.to_success }
         else
           format.json  { render :json =>@community_user.all_errors}
         end

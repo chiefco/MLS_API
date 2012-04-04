@@ -18,6 +18,10 @@ class Comment
   def create_activity
     self.activities.create(:action=>"COMMENT_CREATED",:user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end
+
+  def user_name
+    self.user.first_name
+  end
   
   def self.create_comments(user,messages=nil,attachment)
     comments=[]

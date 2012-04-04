@@ -19,7 +19,7 @@ class User
   references_many :contacts
   references_many :communities
   references_many :invitations
-  references_many :comments
+  has_many :comments
   referenced_in :industry
   references_many :shares
   has_many :community_users

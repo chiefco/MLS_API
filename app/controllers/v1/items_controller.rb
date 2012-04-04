@@ -256,11 +256,10 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       if @item
         params[:page] ? page = params[:page].to_i : page = 0
-        p "================="
-        p attachment = @item.share_attachments(page)
+        attachment = @item.share_attachments(page)
         comments = attachment.comments
         page_count = @item.pages.count
-        format.json {render :json =>  { :page => attachment.to_json(:only => [:file]).parse, :comments => comments.to_json(:only => [:id,:message, :status, :commentable_id, :user_id, :created_at, :updated_at], :methods => [:user_name]).parse, :page_count => page_count }} 
+        format.json {render :json =>  { :page => attachment.to_json(:only => [:file]).parse, :comments => comments.to_a.to_json(:only => [:message, :created_at, :updated_at], :methods => [:user_name]).parse, :page_count => page_count, :meet => @item.to_json(:only => [:name]).parse}} 
         # index.html.erb
         format.xml{ render :xml => attachments.to_xml(ROOT)}
       else

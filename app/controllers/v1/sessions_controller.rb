@@ -25,8 +25,9 @@ class V1::SessionsController < Devise::SessionsController
   "receipt-data" =>params[:receipt],
   "password" => "f9071cfbdbdc4f15bf1e222c1df9987e"
   }.to_json}).parse
+  logger.info 
     respond_to do |format|
-      format.json {render :json=> @response_subscription}
+      format.json {render :json=>@response_subscription[:status] }
     end
   end
 

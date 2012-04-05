@@ -77,7 +77,7 @@ MeetlinkshareApi::Application.routes.draw do
     get "v1/activities",:to=>'v1/registrations#activities'
     post "v1/synchronisation",:to=>'v1/sessions#synchronisation'
     post "v1/community_synchronisation", :to => 'v1/sessions#community_synchronisation'
-    post "v1/subcribe_user", :to => 'v1/sessions#subcribe_user'
+    post "v1/subscribe_user", :to => 'v1/sessions#subcribe_user'
     get "v1/image",:to=>'v1/sessions#get_image'
   end
 

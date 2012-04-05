@@ -19,6 +19,16 @@ class V1::SessionsController < Devise::SessionsController
       format.json{render :json =>failure.merge(AUTH_FAILED)}
     end
   end
+  
+  def subcribe_user
+      @response_subscription= HTTParty.post("https://sandbox.itunes.apple.com/verifyReceipt",{ :body=>{
+  "receipt-data" =>params[:receipt],
+  "password" => "f9071cfbdbdc4f15bf1e222c1df9987e"
+  }.to_json}).parse
+    respond_to do |format|
+      format.json {render :json=> @response_subscription}
+    end
+  end
 
   def find_user(resource)
     {:user=>resource.serializable_hash(:only=>[:_id,:authentication_token,:email,:first_name,:last_name,:job_title,:company,:sign_in_count,:last_sign_in_at,:current_sign_in_at,:date_of_birth,:last_sign_in_ip])}.merge(success)

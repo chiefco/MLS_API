@@ -2,12 +2,4 @@
 <% unless @files_length<=0%> <%= @files_length%> files <% end%><%= (@files_length >0) && (@folders_length >0) ? " and " : ''%>
 <% unless @folders_length<0%><%= @folders_length%> folders <% end%>
 in MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
-<% unless @files_name.blank?%>
-<b>Files</b><br/>
-<p><%= @files_name%></p><br/><br/>
-<% end %>
-<% unless @folders_name.blank?%>
-<b>Folders</b><br/>
-<p><%= @folders_name%></p><br/><br/>
-<% end %>
 <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>>Click here to view shared files</a>

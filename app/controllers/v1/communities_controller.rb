@@ -6,7 +6,12 @@ class V1::CommunitiesController < ApplicationController
   before_filter :detect_missing_params, :only=>[:create]
   before_filter :check_authorised_mem, :only=>[:show]
 
-
+    
+  # Public: Lists all the communities, shared communities, list the community users and invited users
+  #
+  # params - community params are passed
+  #
+  # Returns the json result with current user community list, shared comunity with shares count and members count
    def index
     communities = @current_user.communities.undeleted
     shared_communities = CommunityUser.where(:user_id => "#{@current_user._id}").map(&:community).select{|c| c.user_id != @current_user.id && c.status == true}
@@ -19,7 +24,9 @@ class V1::CommunitiesController < ApplicationController
       format.json {render :json =>  {:communities => communities.to_json(:methods => [:users_count, :shares_count]).parse, :invited_members => invited_members.to_json.parse, :mls_users => mls_users.to_json.parse, :other_members => other_members.to_json.parse, :shared_communities => shared_communities.to_json(:methods => [:users_count, :shares_count]).parse}} # index.html.erb
     end
   end
-
+  
+  # Public: Displays community information
+  # Returns the json result with community info
   def show
     if @authoriesd_mem
       @attachments, @items = [], []
@@ -49,7 +56,10 @@ class V1::CommunitiesController < ApplicationController
        end
     end
   end  
-
+  
+  # Public: Creates a new community
+  # params[:community] - community params are passed
+  # Returns json of communtiy
   def create    
     @community = @current_user.communities.new(params[:community])    
     respond_to do |format|
@@ -65,7 +75,10 @@ class V1::CommunitiesController < ApplicationController
       end
     end
   end
-
+  
+  # Public: Updates the community information
+  # params[:user]  - Updated community params should be passed
+  # Returns the boolean result
   def update
     respond_to do |format|
       if @community.status!=false
@@ -80,14 +93,18 @@ class V1::CommunitiesController < ApplicationController
       end
     end
   end
-
+  
+  # Public: Delete communtiy
+  # Returns the json result(communtiy status sets to false)
   def destroy
     @community.update_attributes(:status=>false)
     respond_to do |format|
       format.json {render :json=>success }
     end
   end
-
+  
+  # Public: Delete multiple communtiy
+  # Returns the json result(communtiy status sets to false)
   def multiple_delete
     params[:community].each do |com_id|
       @community = Community.find(com_id)
@@ -104,7 +121,8 @@ class V1::CommunitiesController < ApplicationController
     end
   end
 
-  # Invitation is sent to the member
+  # Public: Invitation is sent to the member
+  # Returns the json result
   def invite_member
     @invitation=@community.invitations.new(params[:invite_member])
     respond_to do |format|
@@ -117,7 +135,7 @@ class V1::CommunitiesController < ApplicationController
     end
   end
 
-  #Retrieves members of the given community
+  #Public: Retrieves members of the given community
   def members
     respond_to do |format|
       format.json{render :json=>{:members=>@community.members}.to_success}

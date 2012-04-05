@@ -71,14 +71,18 @@ class Share
     Share.where(:shared_id => attachment_id, :user_id => user_id, :attachment_id => attachment_id).each{|a| a.update_attributes(:shared_id => new_attachment_id, :attachment_id => new_attachment_id, :user_id => user_id)}
   end
   
-  def share_files(communities, files, folders, current_user)
+  def share_files(communities, files, folders, notes, current_user)
     user = current_user.email
     user_name = current_user.first_name
      community_users = []
      communities.each do |value|
           community_name = Community.find(value).name
           emails = CommunityUser.where(:community_id => value, :subscribe_email => true ).map(&:user).map(&:email) - [user]
-          share_mail(user, user_name, value, community_name, emails, files, folders) unless emails.blank?
+          if notes.length == 0
+            share_mail(user, user_name, value, community_name, emails, files, folders) unless emails.blank?
+          else
+            note_share_mail(user, user_name, value, community_name, emails, notes) unless emails.blank?
+          end
      end
    end
    
@@ -87,6 +91,14 @@ class Share
      folder_names = folders*"," 
      emails.each do |email|
        Invite.share_send_email(user, user_name, community_id, community_name, email, files.length, folders.length, file_names, folder_names).deliver
+     end
+   end
+   
+  # Public: Send mail to community users for meet sharing
+   def note_share_mail(user, user_name, community_id, community_name, emails, notes)
+     note_names = notes*"," 
+     emails.each do |email|
+       Invite.notes_share_send_email(user, user_name, community_id, community_name, email, notes.length,  note_names).deliver
      end
    end
    

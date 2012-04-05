@@ -103,7 +103,7 @@ class Community
   end
 
   def shares_count
-    self.attachments.total_attachments.count + self.shares.select{|i| i.shared_type == 'Meet'}.count
+    self.attachments.total_attachments.count + self.shares.select{|i| i.shared_type == 'Meet'}.map(&:item).uniq.reject{|v| v.status==false}.count
   end
 
   # def folders

@@ -42,8 +42,8 @@ class V1::SessionsController < Devise::SessionsController
   end
   
   def create_delete_communities
-    param=[:new,:delete,:update,:remove,:comment,:removeother]
-    values=[:create_communities,:delete_communties,:update_communities,:remove_member,:create_comment,:remove_from_community]
+    param=[:new,:delete,:update,:remove,:comment,:removeother,:subscribe]
+    values=[:create_communities,:delete_communties,:update_communities,:remove_member,:create_comment,:remove_from_community,:subscribe_community]
     param.each_with_index do |f,i|
       unless params[:communities][i][f].nil? 
           params[:communities][i][f].each do |value|
@@ -73,9 +73,9 @@ class V1::SessionsController < Devise::SessionsController
         create_or_update_meets(meet)
       end
     end
-    get_communities
+    #~ get_communities
    respond_to do |format|
-      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:comments=>@comments.flatten,:communities=>@communities,:ipad_ids=>@ipad_ids.uniq,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks,:meets=>params[:user][0][:status]=="true" ? get_meets(true) : get_meets(nil),:other_users=>CommunityUser.other_users(@user._id),:locations=>@user.locations.serializable_hash(:only=>[:_id,:name],:methods=>[:latitude_val,:longitude_val] ))}
+      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:comments=>@comments.flatten,:ipad_ids=>@ipad_ids.uniq,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks,:meets=>params[:user][0][:status]=="true" ? get_meets(true) : get_meets(nil),:other_users=>CommunityUser.other_users(@user._id),:locations=>@user.locations.serializable_hash(:only=>[:_id,:name],:methods=>[:latitude_val,:longitude_val] ))}
     end
   end
 
@@ -233,7 +233,7 @@ class V1::SessionsController < Devise::SessionsController
       members="#{members}"+",#{mem}"
     end
     community.delete("members")
-    communities=@user.communities.create(:name=>community["name"],:description=>community["description"])
+    communities=@user.communities.create(:name => community["name"],:description => community["description"],:subscribe_email =>community["subscribe"])
     CommunityUser.create(:user_id=>@user._id,:community_id=>communities._id,:role_id=>1)
     @result_hash=@result_hash.merge(community["id"]=>communities._id)
     members.slice!(0)
@@ -286,5 +286,11 @@ class V1::SessionsController < Devise::SessionsController
     attachment=Attachment.where(:_id=>member["cloud_id"]).first
     comment=@user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment._id,:message=>member["message"]) unless attachment.nil?
     @community_comments << {member["id"] => comment._id} unless comment.nil?
+  end
+  
+  def subscribe_community(community)
+    subscribe=get_community(community)
+    community_user=subscribe.community_users.where(:user_id => @user._id).first
+    community_user.update_attributes(:subscribe_email=>community["status"]) if subscribe
   end
 end

@@ -66,7 +66,7 @@ class Community
     @community_values={}
     user.communities.undeleted.each do |f|
       @community<<f._id.to_s
-      @community_values=@community_values.merge({"#{f.id}"=>{:name=>"#{f.name}",:id=>"#{f._id}",:users_count => "#{f.users_count}",:members=>f.members}})
+      @community_values=@community_values.merge({"#{f.id}"=>{:name=>"#{f.name}",:id=>"#{f._id}",:users_count => "#{f.users_count}",:members=>f.members,:subscribe=>f.community_users.where(:user_id=>user._id).first.subscribe_email.to_s}})
     end
     return {:community_arrays=>@community,:community_hashes=>@community_values}
   end
@@ -201,5 +201,9 @@ class Community
    emails.each do |email|
      Invite.shared_unsubscribe_notifications(current_user_name, community_name, email).deliver
    end
-  end  
+ end  
+ 
+ def subscribe
+    community_users.where(:user_id=>user._id).first.subscribe_email.to_s
+ end
 end

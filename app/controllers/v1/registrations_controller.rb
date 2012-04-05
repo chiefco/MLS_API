@@ -148,7 +148,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
   def find_activities
     @first_name=@current_user.first_name
     user_communities = @current_user.communities.map(&:id)
-    activities = (@current_user.activities_users + Activity.any_in(:entity_id => user_communities)).sort{|a, b| a.created_at <=> b.created_at}
+    activities = (@current_user.activities_users + Activity.any_in(:entity_id => user_communities)).uniq.sort{|a, b| a.created_at <=> b.created_at}
     @activities_count = activities.count
 
     activities.reverse.paginate(@paginate_options).each do |activity|

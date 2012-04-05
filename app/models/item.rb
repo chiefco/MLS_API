@@ -152,6 +152,11 @@ class Item
     end
   end
 
+  #Public: Returns the page count for item
+  def page_count
+    self.pages.count
+  end
+
   def self.stats(params,user,item)
     query=""
     query = '{:tasks=>item.tasks.serializable_hash(:only=>[:_id,:description,:due_date,:is_completed])}' if (params[:tasks] == "true")

@@ -3,6 +3,7 @@ class V1::ItemsController < ApplicationController
   before_filter :get_item,:only=>([:update,:item_categories,:destroy,:item_topics,:get_all_tasks,:list_item_attendees,:comments])
   before_filter :add_pagination,:only=>[:index]
   before_filter :detect_missing_params, :only=>[:create]
+
   # GET /items
   # GET /items.xml
   def index
@@ -43,8 +44,8 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       unless @item.status==false
         if @item
-          shared_to = @item.shares.map(&:community)
-          @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:methods=>[:created_time,:updated_time,:end_time,:location_name,:item_date, :item_date_local, :created_by]),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id), :shared_to => shared_to.to_json(:methods => [:users_count, :shares_count]).parse}.to_success
+          shared_to = (@item.shares.map(&:community)).uniq
+          @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:methods=>[:created_time,:updated_time,:end_time,:location_name,:item_date, :item_date_local, :created_by, :page_count]),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id), :shared_to => shared_to.to_json(:methods => [:users_count, :shares_count]).parse}.to_success
           format.xml  { render :xml => @item.to_xml(ROOT) }
           format.json  { render :json => @item}
         else
@@ -259,14 +260,33 @@ class V1::ItemsController < ApplicationController
         attachment = @item.share_attachments(page)
         comments = attachment.comments
         page_count = @item.pages.count
-        format.json {render :json =>  { :page => attachment.to_json(:only => [:file]).parse, :comments => comments.to_a.to_json(:only => [:message, :created_at, :updated_at], :methods => [:user_name]).parse, :page_count => page_count, :meet => @item.to_json(:only => [:name]).parse}} 
+        format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :meet => @item.to_json(:only => [:name]).parse}} 
         # index.html.erb
         format.xml{ render :xml => attachments.to_xml(ROOT)}
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
       end
-    end  end
+    end  
+  end
+
+  # Public: Adds comment to the item pages
+  # params - page attachment id is passed
+  # Returns json result
+  def add_page_comment 
+    attachment = Attachment.where(:_id => params[:attachment_id]).first
+    comment = attachment.comments.new(:message => params[:message], :user_id => @current_user._id, :commentable_type => "Attachment", :created_at => Time.now, :updated_at => Time.now)
+
+    respond_to do |format|
+      if comment.save
+        format.json {render :json =>  { :comment => comment.to_a.to_json(:only => [:message, :created_at, :updated_at], :methods => [:user_name]).parse}.to_success} 
+        format.xml{ render :xml=>success.to_xml(ROOT)}
+      else
+        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
+        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
+    end    
+  end
 
   def get_criteria(query)
     [ {name: query} , { description: query } ]

@@ -60,6 +60,7 @@ MeetlinkshareApi::Application.routes.draw do
     match '/remove_shared_team', :to => 'communities#remove_shared_team'
     match '/file_notifications', :to => 'shares#file_notifications'
     match '/subscribe_status', :to => 'communities#subscribe_status'
+    match '/add_page_comment', :to => 'items#add_page_comment'
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do

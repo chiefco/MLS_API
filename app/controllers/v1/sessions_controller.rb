@@ -27,7 +27,7 @@ class V1::SessionsController < Devise::SessionsController
   }.to_json}).parse
   logger.info 
     respond_to do |format|
-      format.json {render :json=>{:status=>@response_subscription["status"] }}
+      format.json {render :json=>{:status=>@response_subscription["status"].to_s }}
     end
   end
 

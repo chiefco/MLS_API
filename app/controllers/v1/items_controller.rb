@@ -260,7 +260,8 @@ class V1::ItemsController < ApplicationController
         attachment = @item.share_attachments(page)
         comments = attachment.comments
         page_count = @item.pages.count
-        format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :meet => @item.to_json(:only => [:name]).parse}} 
+        
+        format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
         # index.html.erb
         format.xml{ render :xml => attachments.to_xml(ROOT)}
       else

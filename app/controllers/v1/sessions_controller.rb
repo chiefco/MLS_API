@@ -27,6 +27,7 @@ class V1::SessionsController < Devise::SessionsController
     status=response_subscription["status"].to_i
     logger.info "ggggggggggggggggggggggggggggggggggggggggg"
     logger.info status.zero?
+    logger.info status
     logger.info "ggggggggggggggggggggggggggggggggggggggggg"
     save_subscription(response_subscription) if status.zero?
     respond_to do |format|

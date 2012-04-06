@@ -21,13 +21,13 @@ class V1::SessionsController < Devise::SessionsController
   end
   
   def subcribe_user
-      @response_subscription= HTTParty.post("https://sandbox.itunes.apple.com/verifyReceipt",{ :body=>{
-  "receipt-data" =>params[:receipt],
-  "password" => "f9071cfbdbdc4f15bf1e222c1df9987e"
-  }.to_json}).parse
-  logger.info 
+    get_user
+    response_subscription= HTTParty.post(SANBOX_URL,{ :body=>{"receipt-data" =>params[:receipt],"password" => PASSWORD}.to_json}).parse
+    @receipt=response_subscription["latest_expired_receipt_info"]
+    status=response_subscription["status"].to_i
+    save_subscription(response_subscription) if status
     respond_to do |format|
-      format.json {render :json=>{:status=>@response_subscription["status"].to_s }}
+      format.json {render :json=>{:status=>SUBSCRIBE[status]}}
     end
   end
 
@@ -303,5 +303,14 @@ class V1::SessionsController < Devise::SessionsController
     subscribe=get_community(community)
     community_user=subscribe.community_users.where(:user_id => @user._id).first
     community_user.update_attributes(:subscribe_email=>community["status"]) if subscribe
+  end
+  
+  def save_subscription(receipt_response)
+    if @user && @receipt
+      expiry_date=Time.at(@receipt["purchase_date_ms"].to_i/1000) 
+      @receipt["product_id"]=="meetlinkshareMonthly" ? @user.update_attributes(:expiry_date=>expiry_date+30.days,:subscription_type=>"month") : @user.update_attributes(:expiry_date=>expiry_date+365.days,:subscription_type=>"year")
+      response_values={:product_id=>@receipt["product_id"],:transaction_id=>@receipt["transaction_id"],:receipt_details=>receipt_response}
+      @user.subscription.nil? ? @user.create_subscription(response_values) :  @user.subscription.update_attributes(response_values)
+    end
   end
 end

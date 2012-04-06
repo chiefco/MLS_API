@@ -24,10 +24,11 @@ class User
   references_many :shares
   has_many :community_users
   attr_accessor :set_password
+  has_one :subscription
 
   devise :confirmable, :database_authenticatable, :registerable, :recoverable, :rememberable, :token_authenticatable, :trackable
   attr_protected :authentication_token,:is_admin,:reset_password_token,:confirmation_token
-  attr_accessible :email,:password,:password_confirmation,:first_name,:last_name,:company,:job_title,:date_of_birth,:industry_id
+  attr_accessible :email,:password,:password_confirmation,:first_name,:last_name,:company,:job_title,:date_of_birth,:industry_id,:expiry_date,:subscription_type
 
   validates_presence_of :first_name, :message=>"first_name - Blank Parameter", :code=>3010
   validates_length_of :last_name, :message=>"Last name - Parameter length greater than 40", :maximum =>40, :code=>3011, :allow_blank => true
@@ -53,6 +54,9 @@ class User
   field :company, :type=> String
   field :status, :type=> Boolean,:default=>true
   field :date_of_birth, :type=> Date
+  field :subscription_id,:type=>String
+  field :subscription_type,:type=>String
+  field :expiry_date, :type=> Date
 
   api_accessible :user_with_out_token do |template|
     template.add :email

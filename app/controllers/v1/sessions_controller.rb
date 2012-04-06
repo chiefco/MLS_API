@@ -329,7 +329,7 @@ class V1::SessionsController < Devise::SessionsController
       logger.info @receipt_value
       logger.info "ddddddddddddddddddddddddddd"
     if @user && @receipt_value
-      expiry_date=Time.at(@receipt["purchase_date_ms"].to_i/1000) 
+      expiry_date=Time.at(@receipt_value["purchase_date_ms"].to_i/1000) 
       @receipt["product_id"]=="meetlinkshareMonthly" ? @user.update_attributes(:expiry_date=>expiry_date+30.days,:subscription_type=>"month") : @user.update_attributes(:expiry_date=>expiry_date+365.days,:subscription_type=>"year")
       logger.info "ggggggggggggggggggggggggggggggggggggg"
       response_values={:product_id=>@receipt_value["product_id"],:transaction_id=>@receipt_value["transaction_id"],:receipt_details=>receipt_response}

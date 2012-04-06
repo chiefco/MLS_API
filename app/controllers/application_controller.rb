@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   include SslRequirement
   after_filter :clear_session
-  #~ before_filter :get_user_location
+  before_filter :get_user_location
 
   RESET_TOKEN_SENT={:reset_token_sent=>true}
   RESET_TOKEN_ERROR={:code=>5003,:message=>"Email not found"}
@@ -28,28 +28,29 @@ class ApplicationController < ActionController::Base
     Rails.env.production?
   end
 
-  #~ rescue_from Mongoid::Errors::DocumentNotFound do |exception|
-      #~ respond_to do |format|
-        #~ if !exception.identifiers.empty?
-          #~ format.json{render :json=>{:response=>:failure,:errors=>[RECORD_NOT_FOUND]}}
-          #~ format.xml{render :xml=>{:errors=>[RECORD_NOT_FOUND]}.to_failure,:root=>:xml}
-        #~ else
-          #~ format.json{render :json=>{:response=>:failure,:errors=>[BLANK_PARAMETER_ID]}}
-          #~ format.xml{render :xml=>{:errors=>[BLANK_PARAMETER_ID]}.to_failure,:root=>:xml}
-      #~ end
-    #~ end
-  #~ end
+  rescue_from Mongoid::Errors::DocumentNotFound do |exception|
+      respond_to do |format|
+        if !exception.identifiers.empty?
+          format.json{render :json=>{:response=>:failure,:errors=>[RECORD_NOT_FOUND]}}
+          format.xml{render :xml=>{:errors=>[RECORD_NOT_FOUND]}.to_failure,:root=>:xml}
+        else
+          format.json{render :json=>{:response=>:failure,:errors=>[BLANK_PARAMETER_ID]}}
+          format.xml{render :xml=>{:errors=>[BLANK_PARAMETER_ID]}.to_failure,:root=>:xml}
+      end
+    end
+  end
 
-  #~ rescue_from BSON::InvalidObjectId do |exception|
-    #~ respond_to do |format|
-      #~ format.json{render :json=>{:response=>:failure,:errors=>[INVALID_PARAMETER_ID]}}
-      #~ format.xml{render :xml=>{:errors=>[INVALID_PARAMETER_ID]}.to_failure,:root=>:xml}
-    #~ end
-  #~ end
+  rescue_from BSON::InvalidObjectId do |exception|
+    respond_to do |format|
+      format.json{render :json=>{:response=>:failure,:errors=>[INVALID_PARAMETER_ID]}}
+      format.xml{render :xml=>{:errors=>[INVALID_PARAMETER_ID]}.to_failure,:root=>:xml}
+    end
+  end
 
-  #~ rescue_from Exception do |exception|
-    #~ logger.info exception.inspect
-  #~ end
+  rescue_from Exception do |exception|
+    logger.info exception.inspect
+  end
+  
   protect_from_forgery
 
   def authenticate_request!
@@ -135,9 +136,14 @@ class ApplicationController < ActionController::Base
     begin
       GeoIp.api_key =YAML.load(ERB.new(File.read("#{RAILS_ROOT}/config/external_apis.yml")).result)['geo_ip']['key']
       GeoIp.timeout = 15
-      geo_location = GeoIp.geolocation(request.remote_ip.to_s, { :timezone => true})
-      timezone_name = geo_location[:timezone_name]
-        Time.zone = TIME_ZONE_MAPPING[timezone_name] if TIME_ZONE_MAPPING[timezone_name]
+      p '****************'
+      p request.remote_ip.to_s
+      p request
+      p geo_location = GeoIp.geolocation(request.remote_ip.to_s, { :timezone => true})
+      p timezone_name = geo_location[:timezone_name]
+      p Time.zone = TIME_ZONE_MAPPING[timezone_name] if TIME_ZONE_MAPPING[timezone_name]
+      p Time.zone
+      p Time.now
       rescue
       end    
   end  

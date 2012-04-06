@@ -30,14 +30,17 @@ class V1::SessionsController < Devise::SessionsController
     get_user
     p SANBOX_URL
     response_subscription= HTTParty.post(SANBOX_URL,{ :body=>{"receipt-data" =>params[:receipt],"password" => PASSWORD}.to_json}).parse
-    @receipt=response_subscription["receipt"]
+    logger.info "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    logger.info @receipt_value=response_subscription["receipt"]
     status=response_subscription["status"].to_i
     logger.info "ggggggggggggggggggggggggggggggggggggggggg"
     logger.info status.zero?
     logger.info status.to_s
     logger.info status.to_i
     logger.info "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
-    logger.info @receipt
+    logger.info @receipt_value
+        logger.info "dfffffffffffffffffffffffffffffffff"
+   logger.info response_subscription["receipt"]
     logger.info "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
     logger.info response_subscription
     logger.info "ggggggggggggggggggggggggggggggggggggggggg"
@@ -323,14 +326,13 @@ class V1::SessionsController < Devise::SessionsController
   
   def save_subscription(receipt_response)
       logger.info "ddddddddddddddddddddddddddd"
-      #~ p  receipt_response 
-      logger.info @receipt
+      logger.info @receipt_value
       logger.info "ddddddddddddddddddddddddddd"
-    if @user && @receipt
+    if @user && @receipt_value
       expiry_date=Time.at(@receipt["purchase_date_ms"].to_i/1000) 
       @receipt["product_id"]=="meetlinkshareMonthly" ? @user.update_attributes(:expiry_date=>expiry_date+30.days,:subscription_type=>"month") : @user.update_attributes(:expiry_date=>expiry_date+365.days,:subscription_type=>"year")
       logger.info "ggggggggggggggggggggggggggggggggggggg"
-      response_values={:product_id=>@receipt["product_id"],:transaction_id=>@receipt["transaction_id"],:receipt_details=>receipt_response}
+      response_values={:product_id=>@receipt_value["product_id"],:transaction_id=>@receipt_value["transaction_id"],:receipt_details=>receipt_response}
       @user.subscription.nil? ? @user.create_subscription(response_values) :  @user.subscription.update_attributes(response_values)
     end
   end

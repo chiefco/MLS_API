@@ -35,7 +35,7 @@ gem 'httparty'
 gem 'json'
 gem 'delayed_job'
 gem 'delayed_job_mongoid'
-gem 'geo_ip', '~> 0.3.0'
+
 group :development do
   gem 'sunspot_solr'
 end

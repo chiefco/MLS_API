@@ -57,6 +57,7 @@ class User
   field :subscription_id,:type=>String
   field :subscription_type,:type=>String
   field :expiry_date, :type=> Date
+  field :timezone, :type=> String  
 
   api_accessible :user_with_out_token do |template|
     template.add :email

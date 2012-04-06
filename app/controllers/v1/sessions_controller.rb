@@ -8,6 +8,12 @@ class V1::SessionsController < Devise::SessionsController
     params[:user]={}
     params[:user][:email],params[:user][:password]=user.decode_credentials if user && user.is_a?(String)
     resource = warden.authenticate!(:scope => resource_name, :recall => "V1::Sessions#index")
+
+    if params[:timezone] && resource.timezone != params[:timezone]
+      resource.timezone = params[:timezone]
+      resource.save
+    end      
+    
     respond_to do |format|
       format.xml{ render :xml=>find_user(resource) ,:root => :user}
       format.json{render :json=>find_user(resource)}

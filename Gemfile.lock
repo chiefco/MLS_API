@@ -83,9 +83,6 @@ GEM
       nokogiri (>= 1.4.4)
       ruby-hmac
     formatador (0.2.1)
-    geo_ip (0.3.2)
-      json (~> 1.4)
-      rest-client (~> 1.6.1)
     httparty (0.8.1)
       multi_json
       multi_xml
@@ -136,8 +133,6 @@ GEM
     rake (0.9.2.2)
     rdoc (3.12)
       json (~> 1.4)
-    rest-client (1.6.7)
-      mime-types (>= 1.16)
     rsolr (1.0.7)
       builder (>= 2.1.2)
     rspec (2.6.0)
@@ -196,7 +191,6 @@ DEPENDENCIES
   devise (= 1.4.2)
   exception_notifier (= 1.0.0)
   fog
-  geo_ip (~> 0.3.0)
   httparty
   json
   mongo (= 1.4.0)!

@@ -30,7 +30,7 @@ class V1::SessionsController < Devise::SessionsController
     get_user
     p SANBOX_URL
     response_subscription= HTTParty.post(SANBOX_URL,{ :body=>{"receipt-data" =>params[:receipt],"password" => PASSWORD}.to_json}).parse
-    @receipt=response_subscription["latest_expired_receipt_info"]
+    @receipt=response_subscription["receipt"]
     status=response_subscription["status"].to_i
     logger.info "ggggggggggggggggggggggggggggggggggggggggg"
     logger.info status.zero?

@@ -28,22 +28,9 @@ class V1::SessionsController < Devise::SessionsController
   
   def subcribe_user
     get_user
-    p SANBOX_URL
     response_subscription= HTTParty.post(SANBOX_URL,{ :body=>{"receipt-data" =>params[:receipt],"password" => PASSWORD}.to_json}).parse
-    logger.info "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-    logger.info @receipt_value=response_subscription["receipt"]
+    @receipt_value=response_subscription["receipt"]
     status=response_subscription["status"].to_i
-    logger.info "ggggggggggggggggggggggggggggggggggggggggg"
-    logger.info status.zero?
-    logger.info status.to_s
-    logger.info status.to_i
-    logger.info "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
-    logger.info @receipt_value
-        logger.info "dfffffffffffffffffffffffffffffffff"
-   logger.info response_subscription["receipt"]
-    logger.info "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"
-    logger.info response_subscription
-    logger.info "ggggggggggggggggggggggggggggggggggggggggg"
     save_subscription(response_subscription) if status.zero?
     respond_to do |format|
       format.json {render :json=>{:status=>SUBSCRIBE[status]}}
@@ -325,13 +312,9 @@ class V1::SessionsController < Devise::SessionsController
   end
   
   def save_subscription(receipt_response)
-      logger.info "ddddddddddddddddddddddddddd"
-      logger.info @receipt_value
-      logger.info "ddddddddddddddddddddddddddd"
     if @user && @receipt_value
       expiry_date=Time.at(@receipt_value["purchase_date_ms"].to_i/1000) 
       @receipt_value["product_id"]=="meetlinkshareMonthly" ? @user.update_attributes(:expiry_date=>expiry_date+30.days,:subscription_type=>"month") : @user.update_attributes(:expiry_date=>expiry_date+365.days,:subscription_type=>"year")
-      logger.info "ggggggggggggggggggggggggggggggggggggg"
       response_values={:product_id=>@receipt_value["product_id"],:transaction_id=>@receipt_value["transaction_id"],:receipt_details=>receipt_response}
       @user.subscription.nil? ? @user.create_subscription(response_values) :  @user.subscription.update_attributes(response_values)
     end

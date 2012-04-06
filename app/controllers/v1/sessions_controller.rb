@@ -30,7 +30,7 @@ class V1::SessionsController < Devise::SessionsController
     logger.info "ggggggggggggggggggggggggggggggggggggggggg"
     save_subscription(response_subscription) if status.zero?
     respond_to do |format|
-      format.json {render :json=>response_subscription}
+      format.json {render :json=>{:status=>SUBSCRIBE[status]}}
     end
   end
 

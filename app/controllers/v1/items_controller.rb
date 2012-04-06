@@ -257,11 +257,15 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       if @item
         params[:page] ? page = params[:page].to_i : page = 0
-        attachment = @item.share_attachments(page)
-        comments = attachment.comments
+        attachment = @item.share_attachments(page) rescue nil
+        comments = []
+        comments = attachment.comments if attachment
         page_count = @item.pages.count
-        
-        format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
+        if !comments.blank?
+           format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
+        else
+             format.json {render :json =>  {  :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
+        end
         # index.html.erb
         format.xml{ render :xml => attachments.to_xml(ROOT)}
       else

@@ -7,24 +7,8 @@ class V1::ItemsController < ApplicationController
   # GET /items
   # GET /items.xml
   def index
-    if params[:type]
-      if params[:type] == 'today'
-        items = @current_user.items.today
-        @items = items.paginate(@paginate_options)
-        @item_count = items.count
-      elsif params[:type] == 'tommorrow'
-        items = @current_user.items.tomorrow
-        @items = items.paginate(@paginate_options)
-        @item_count = items.count
-      elsif params[:type] == 'next_week'
-        items = @current_user.items.next_week
-        @items = items.paginate(@paginate_options)
-        @item_count = items.count
-      end
-    else
-      @items = Item.list(params,@paginate_options,@current_user)
-      @item_count = Item.list(params.merge({:item_count => true}), {}, @current_user)
-    end
+    @items = Item.list(params,@paginate_options,@current_user)
+    @item_count = Item.list(params.merge({:item_count => true}), {}, @current_user)
 
     respond_to do |format|
       format.xml  { render :xml => @items}

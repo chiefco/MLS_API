@@ -2,8 +2,8 @@ class Item
   include Mongoid::Document
   include Mongoid::Timestamps
   acts_as_api
-  SORT_BY_ALLOWED = [ :name, :description]
-  ORDER_BY_ALLOWED =  [:asc,:desc]
+  SORT_BY_ALLOWED = [ :name, :description, :updated_at]
+  ORDER_BY_ALLOWED =  [:asc, :desc]
   include Sunspot::Mongoid
   field :name, :type => String
   field :description, :type => String
@@ -194,10 +194,10 @@ class Item
       values=group_values(params[:group_by],result)
       item_count = result.count unless params[:item_count].nil?
     end
-    unless params[:item_count].nil?
-      return item_count
-    else
+    if params[:item_count].nil?
       return values
+    else
+      return item_count
     end
   end
 

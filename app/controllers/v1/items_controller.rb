@@ -242,8 +242,9 @@ class V1::ItemsController < ApplicationController
       if @item
         params[:page] ? page = params[:page].to_i : page = 0
         attachment = @item.share_attachments(page) rescue nil
-        comments = attachment.comments 
+        comments = attachment.comments if attachment
         page_count = @item.pages.count
+
         if attachment
            format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
         else

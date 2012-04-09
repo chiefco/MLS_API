@@ -2,6 +2,7 @@ require 'net/http'
 require 'net/https'
 #~ require 'rest_client'
 class V1::SessionsController < Devise::SessionsController
+  before_filter :get_user,:only=>[:subcribe_user,:synchronisation,:community_synchronisation]
 
   def create
     user=params[:user]
@@ -27,13 +28,13 @@ class V1::SessionsController < Devise::SessionsController
   end
   
   def subcribe_user
-    get_user
     response_subscription= HTTParty.post(SANBOX_URL,{ :body=>{"receipt-data" =>params[:receipt],"password" => PASSWORD}.to_json}).parse
     @receipt_value=response_subscription["receipt"]
     status=response_subscription["status"].to_i
     save_subscription(response_subscription) if status.zero?
+    response_values={:status=>SUBSCRIBE[status],:subscription_type=>@user.subscription_type,:expiry_date=>@user.expiry_date.nil? ?  nil : @user.expiry_date.utc.strftime("%d/%m/%Y %H:%M:%S")}
     respond_to do |format|
-      format.json {render :json=>{:status=>SUBSCRIBE[status]}}
+      format.json {render :json=> !@user.subscription.nil? && status.zero?  ? success.merge(response_values) : failure.merge(response_values)}
     end
   end
 
@@ -45,12 +46,11 @@ class V1::SessionsController < Devise::SessionsController
   def synchronisation
     uri = URI.parse("http://localhost:3000")
 		req = Net::HTTP::Get.new("#{request.path}?".concat(request.query_string))
-    get_user
     @user.nil?  ? stop_synchronisation: perform_synchronisation(@user)
   end
   
   def community_synchronisation
-    get_user;initialize_values;
+    initialize_values;
     create_delete_communities
     get_communities
     respond_to do |format|

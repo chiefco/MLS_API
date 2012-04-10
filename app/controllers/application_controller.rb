@@ -133,4 +133,20 @@ class ApplicationController < ActionController::Base
   def missing_error_code(parameter)
     API_ERRORS["Missing Parameter"].select { |code,message| message.match(/\A#{parameter.to_s}/) }.keys.first
   end
+
+  # Public: check the user subscription
+  # Returns boolean result
+  def valid_subscription
+    type = @current_user.subscription_type
+    file_usage = @current_user.attachments.file_usage.sum(:size)
+
+    case type
+    when 'free'
+      (file_usage && file_usage > 102400) ? false : true
+    when 'monthly'
+      (file_usage && file_usage > 2097152) ? false : true
+    else
+      return true
+    end
+  end  
 end

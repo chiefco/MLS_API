@@ -213,9 +213,11 @@ class V1::SessionsController < Devise::SessionsController
   end
 
   def create_or_update_share
-    @deleted_shares=@meet.shares.where(:ipad_share=>true)
-    @deleted_shares.destroy if @deleted_shares
-    @shares[0][:communities].each_with_index do |f,i|
+    @meet.shares.where(:ipad_share=>true).map(&:community_id).map(&:to_s).uniq 
+    created_shares=@shares[0][:communities].uniq-@meet.shares.where(:ipad_share=>true).map(&:community_id).map(&:to_s).uniq 
+    deleted_shares=@meet.shares.where(:ipad_share=>true).map(&:community_id).map(&:to_s).uniq - @shares[0][:communities].uniq
+    deleted_shares.each {|f| @meet.shares.where(:community_id=>f).first.destroy} unless deleted_shares.empty?
+    created_shares.each_with_index do |f,i|
       @share=@meet.shares.create(:user_id=>@user._id,:community_id=>f,:shared_type=>"Meet",:shared_id=>@meet._id,:ipad_share=>true)
       Share.last.create_activity("SHARE_MEET",f,@meet._id)
       @share_ids<<@shares[1][:share_ids][i]

@@ -1,7 +1,6 @@
 class ApplicationController < ActionController::Base
   include SslRequirement
   after_filter :clear_session
-  before_filter :get_user_location
 
   RESET_TOKEN_SENT={:reset_token_sent=>true}
   RESET_TOKEN_ERROR={:code=>5003,:message=>"Email not found"}
@@ -23,8 +22,6 @@ class ApplicationController < ActionController::Base
   SANBOX_URL="https://sandbox.itunes.apple.com/verifyReceipt"
   LIVE_URL="https://buy.itunes.apple.com/verifyReceipt"
   ROOT={:root=>:xml}
-
-  TIME_ZONE_MAPPING={"Europe/Vienna"=>"Vienna", "America/New_York"=>"Eastern Time (US & Canada)", "Asia/Kamchatka"=>"Kamchatka", "America/Sao_Paulo"=>"Brasilia", "Europe/Copenhagen"=>"Copenhagen", "Europe/Dublin"=>"Dublin", "Europe/Bucharest"=>"Bucharest", "Etc/UTC"=>"UTC", "Europe/Amsterdam"=>"Amsterdam", "Asia/Almaty"=>"Almaty", "Australia/Brisbane"=>"Brisbane", "Asia/Kathmandu"=>"Kathmandu", "Europe/Riga"=>"Riga", "Europe/Helsinki"=>"Helsinki", "Europe/Tallinn"=>"Tallinn", "Asia/Vladivostok"=>"Vladivostok", "Pacific/Auckland"=>"Wellington", "Europe/Ljubljana"=>"Ljubljana", "Australia/Darwin"=>"Darwin", "Pacific/Fiji"=>"Fiji", "America/La_Paz"=>"La Paz", "Pacific/Pago_Pago"=>"Samoa", "Asia/Muscat"=>"Abu Dhabi", "Asia/Kuala_Lumpur"=>"Kuala Lumpur", "America/Argentina/Buenos_Aires"=>"Buenos Aires", "America/Chihuahua"=>"Chihuahua", "Asia/Karachi"=>"Karachi", "Asia/Rangoon"=>"Rangoon", "Asia/Kabul"=>"Kabul", "Australia/Perth"=>"Perth", "Europe/Madrid"=>"Madrid", "Asia/Dhaka"=>"Dhaka", "Atlantic/Cape_Verde"=>"Cape Verde Is.", "Asia/Jakarta"=>"Jakarta", "Pacific/Honolulu"=>"Hawaii", "America/Los_Angeles"=>"Pacific Time (US & Canada)", "America/Chicago"=>"Central Time (US & Canada)", "Asia/Krasnoyarsk"=>"Krasnoyarsk", "Australia/Adelaide"=>"Adelaide", "Africa/Casablanca"=>"Casablanca", "Asia/Colombo"=>"Sri Jayawardenepura", "Europe/Moscow"=>"St. Petersburg", "America/Juneau"=>"Alaska", "Asia/Yakutsk"=>"Yakutsk", "Europe/Stockholm"=>"Stockholm", "Asia/Yerevan"=>"Yerevan", "Pacific/Tongatapu"=>"Nuku'alofa", "Europe/Budapest"=>"Budapest", "Africa/Cairo"=>"Cairo", "Europe/Kiev"=>"Kyiv", "Asia/Hong_Kong"=>"Hong Kong", "Europe/Vilnius"=>"Vilnius", "Asia/Kuwait"=>"Kuwait", "Europe/Bratislava"=>"Bratislava", "Europe/Warsaw"=>"Warsaw", "Asia/Taipei"=>"Taipei", "Africa/Nairobi"=>"Nairobi", "Pacific/Port_Moresby"=>"Port Moresby", "Europe/Belgrade"=>"Belgrade", "America/Tijuana"=>"Tijuana", "Asia/Yekaterinburg"=>"Ekaterinburg", "Europe/Sofia"=>"Sofia", "Pacific/Guam"=>"Guam", "Atlantic/South_Georgia"=>"Mid-Atlantic", "Europe/Minsk"=>"Minsk", "America/Lima"=>"Lima", "America/Halifax"=>"Atlantic Time (Canada)", "Africa/Monrovia"=>"Monrovia", "Asia/Novosibirsk"=>"Novosibirsk", "America/St_Johns"=>"Newfoundland", "Asia/Tehran"=>"Tehran", "Europe/Rome"=>"Rome", "America/Santiago"=>"Santiago", "Atlantic/Azores"=>"Azores", "Europe/Prague"=>"Prague", "Europe/Berlin"=>"Bern", "Pacific/Noumea"=>"New Caledonia", "Asia/Calcutta"=>"Kolkata", "America/Monterrey"=>"Monterrey", "Asia/Chongqing"=>"Chongqing", "Europe/Skopje"=>"Skopje", "Asia/Urumqi"=>"Urumqi", "Australia/Sydney"=>"Sydney", "Asia/Baghdad"=>"Baghdad", "Asia/Tokyo"=>"Sapporo", "America/Denver"=>"Mountain Time (US & Canada)", "Africa/Johannesburg"=>"Pretoria", "Asia/Bangkok"=>"Bangkok", "Asia/Baku"=>"Baku", "America/Mazatlan"=>"Mazatlan", "Africa/Harare"=>"Harare", "Asia/Jerusalem"=>"Jerusalem", "Asia/Magadan"=>"Magadan", "Europe/Sarajevo"=>"Sarajevo", "Asia/Singapore"=>"Singapore", "America/Caracas"=>"Caracas", "Asia/Tbilisi"=>"Tbilisi", "Pacific/Majuro"=>"Marshall Is.", "Europe/Lisbon"=>"Lisbon", "Australia/Melbourne"=>"Melbourne", "Europe/Brussels"=>"Brussels", "America/Bogota"=>"Bogota", "Asia/Shanghai"=>"Beijing", "Europe/Istanbul"=>"Istanbul", "Asia/Kolkata"=>"Chennai", "Asia/Irkutsk"=>"Irkutsk", "Asia/Seoul"=>"Seoul", "Europe/Athens"=>"Athens", "Asia/Ulaanbaatar"=>"Ulaan Bataar", "Asia/Riyadh"=>"Riyadh", "America/Guyana"=>"Georgetown", "Asia/Tashkent"=>"Tashkent", "America/Phoenix"=>"Arizona", "America/Guatemala"=>"Central America", "America/Indiana/Indianapolis"=>"Indiana (East)", "Africa/Algiers"=>"West Central Africa", "America/Godthab"=>"Greenland", "Europe/London"=>"London", "Pacific/Midway"=>"International Date Line West", "America/Mexico_City"=>"Guadalajara", "America/Regina"=>"Saskatchewan", "Europe/Paris"=>"Paris", "Australia/Hobart"=>"Hobart", "Europe/Zagreb"=>"Zagreb"}
 
   def ssl_required?
     logger.info request.env['HTTP_USER_AGENT'] 
@@ -136,20 +133,4 @@ class ApplicationController < ActionController::Base
   def missing_error_code(parameter)
     API_ERRORS["Missing Parameter"].select { |code,message| message.match(/\A#{parameter.to_s}/) }.keys.first
   end
-
-  def get_user_location
-    begin
-      GeoIp.api_key =YAML.load(ERB.new(File.read("#{RAILS_ROOT}/config/external_apis.yml")).result)['geo_ip']['key']
-      GeoIp.timeout = 15
-      p '****************'
-      p request.remote_ip.to_s
-      p request
-      p geo_location = GeoIp.geolocation(request.remote_ip.to_s, { :timezone => true})
-      p timezone_name = geo_location[:timezone_name]
-      p Time.zone = TIME_ZONE_MAPPING[timezone_name] if TIME_ZONE_MAPPING[timezone_name]
-      p Time.zone
-      p Time.now
-      rescue
-      end    
-  end  
 end

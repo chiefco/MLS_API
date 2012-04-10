@@ -7,24 +7,8 @@ class V1::ItemsController < ApplicationController
   # GET /items
   # GET /items.xml
   def index
-    if params[:type]
-      if params[:type] == 'today'
-        items = @current_user.items.today
-        @items = items.paginate(@paginate_options)
-        @item_count = items.count
-      elsif params[:type] == 'tommorrow'
-        items = @current_user.items.tomorrow
-        @items = items.paginate(@paginate_options)
-        @item_count = items.count
-      elsif params[:type] == 'next_week'
-        items = @current_user.items.next_week
-        @items = items.paginate(@paginate_options)
-        @item_count = items.count
-      end
-    else
-      @items = Item.list(params,@paginate_options,@current_user)
-      @item_count = Item.list(params.merge({:item_count => true}), {}, @current_user)
-    end
+    @items = Item.list(params,@paginate_options,@current_user)
+    @item_count = Item.list(params.merge({:item_count => true}), {}, @current_user)
 
     respond_to do |format|
       format.xml  { render :xml => @items}
@@ -258,10 +242,10 @@ class V1::ItemsController < ApplicationController
       if @item
         params[:page] ? page = params[:page].to_i : page = 0
         attachment = @item.share_attachments(page) rescue nil
-        comments = []
         comments = attachment.comments if attachment
         page_count = @item.pages.count
-        if !comments.blank?
+
+        if attachment
            format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
         else
              format.json {render :json =>  {  :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 

@@ -39,7 +39,7 @@ class V1::SessionsController < Devise::SessionsController
   end
 
   def find_user(resource)
-    {:user=>resource.serializable_hash(:only=>[:_id,:authentication_token,:email,:first_name,:last_name,:job_title,:company,:sign_in_count,:last_sign_in_at,:current_sign_in_at,:date_of_birth,:last_sign_in_ip])}.merge(success)
+    {:user=>resource.serializable_hash(:only=>[:_id,:authentication_token,:email,:first_name,:last_name,:job_title,:company,:sign_in_count,:last_sign_in_at,:current_sign_in_at,:date_of_birth,:last_sign_in_ip,:subscription_type],:methods=>[:expiry_subscription])}.merge(success)
   end
 
   # Perform synchronisation for the particular user

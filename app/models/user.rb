@@ -72,6 +72,8 @@ class User
     template.add :last_sign_in_ip
     template.add :sign_in_count
     template.add :date_of_birth
+    template.add :expiry_date
+    template.add :subscription_type
   end
 
   api_accessible :user_with_token , :extend=> :user_with_out_token do |template|
@@ -80,6 +82,10 @@ class User
 
   def self.valid_user?(token='')
     self.where(:authentication_token=>token,:status=>true).first
+  end
+  
+  def expiry_subscription
+    self.expiry_date.nil? ? "nil" : self.expiry_date.strftime("%d/%m/%Y %H:%M:%S")
   end
 
   def pass_create_or_update?

@@ -185,28 +185,28 @@ class V1::SessionsController < Devise::SessionsController
     Item.get_meets(@user,value)
   end
 
-  def create_or_update_pages(pages,value=nil)
+def create_or_update_pages(pages,value=nil)
     @pages=pages
     unless @pages.nil?
       @pages.each do |page|
         unless page[:page_image].empty?
-            if value.nil?
-              @page=@meet.pages.create(:page_order=>page[:page_order])
-              Page.create_page_texts(page[:page_text],@page._id)
-              @ipad_page_ids<<page[:page_id]
-              @attachment=@page.create_attachment(:attachable_type=>"Page",:attachable_id=>@page._id,:file=>decode_image(@page._id,page[:page_image]))
-              comments=Comment.create_comments(@user,page[:comments],@attachment._id)
-              File.delete(@file)
-            else
-              @attachment=Attachment.where(:_id=>page[:cloud_id]).first
-              comments=Comment.create_comments(@user,page[:comments],@attachment._id)
-              Page.create_page_texts(page[:page_text],@attachment.attachable._id)
-              @ipad_page_ids<<page[:page_id]
-              @attachment.update_attributes(:file=>decode_image(ActiveSupport::SecureRandom.hex(16),page[:page_image]))
-               File.delete(@file)
-             end
-             @comments<<comments unless comments.empty? 
-             @synched_pages=@synched_pages.merge({page[:page_id]=>@attachment._id,:page_texts=>@page_texts})
+          if value.nil?
+            @page = @meet.pages.create(:page_order => page[:page_order])
+            Page.create_page_texts(page[:page_text],@page._id)
+            @ipad_page_ids << page[:page_id]
+            @attachment = @page.create_attachment(:attachable_type => "Page", :attachable_id => @page._id, :file => decode_image(@page._id,page[:page_image]), :size => @file.size, :attachment_type => "MEET_ATTACHMENT", :user_id => @user._id)
+            comments = Comment.create_comments(@user,page[:comments],@attachment._id)
+            File.delete(@file)
+          else
+            @attachment = Attachment.where(:_id=>page[:cloud_id]).first
+            comments = Comment.create_comments(@user,page[:comments],@attachment._id)
+            Page.create_page_texts(page[:page_text],@attachment.attachable._id)
+            @ipad_page_ids << page[:page_id]
+            @attachment.update_attributes(:file=>decode_image(ActiveSupport::SecureRandom.hex(16),page[:page_image]), :size => @file.size)
+             File.delete(@file)
+          end
+          @comments << comments unless comments.empty? 
+          @synched_pages = @synched_pages.merge({page[:page_id]=>@attachment._id,:page_texts=>@page_texts})
         end
       end
     end
@@ -316,9 +316,9 @@ class V1::SessionsController < Devise::SessionsController
   def save_subscription(receipt_response)
     if @user && @receipt_value
       expiry_date=Time.at(@receipt_value["purchase_date_ms"].to_i/1000) 
-      @receipt_value["product_id"]=="meetlinkshareMonthly" ? @user.update_attributes(:expiry_date=>expiry_date+30.days,:subscription_type=>"month") : @user.update_attributes(:expiry_date=>expiry_date+365.days,:subscription_type=>"year")
+      @receipt_value["product_id"]=="meetlinkshareMonthly" ? @user.update_attributes(:expiry_date=>expiry_date+30.days,:subscription_type=>"monthly") : @user.update_attributes(:expiry_date=>expiry_date+365.days,:subscription_type=>"yearly")
       response_values={:product_id=>@receipt_value["product_id"],:transaction_id=>@receipt_value["transaction_id"],:receipt_details=>receipt_response}
       @user.subscription.nil? ? @user.create_subscription(response_values) :  @user.subscription.update_attributes(response_values)
     end
-  end
+  end  
 end

@@ -55,7 +55,7 @@ class User
   field :status, :type=> Boolean,:default=>true
   field :date_of_birth, :type=> Date
   field :subscription_id,:type=>String
-  field :subscription_type,:type=>String
+  field :subscription_type,:type => String,:default => "free"
   field :expiry_date, :type=> Time
   field :timezone, :type=> String  
 

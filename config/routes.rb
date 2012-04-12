@@ -61,6 +61,7 @@ MeetlinkshareApi::Application.routes.draw do
     match '/file_notifications', :to => 'shares#file_notifications'
     match '/subscribe_status', :to => 'communities#subscribe_status'
     match '/add_page_comment', :to => 'items#add_page_comment'
+    match '/multiple_note_delete', :to => 'items#multiple_note_delete'
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do

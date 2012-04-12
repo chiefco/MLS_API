@@ -125,8 +125,16 @@ class Item
     self.share._id.to_s
   end
 
-  def creatd_by
+  def created_by
     self.user.first_name
+  end
+  
+  def latitude
+    self.location.latitude rescue nil
+  end
+  
+  def longitude
+    self.location.longitude rescue nil
   end
 
   def share_attachments(page)

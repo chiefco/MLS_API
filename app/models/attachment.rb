@@ -37,6 +37,7 @@ class Attachment
 
   scope :current_version, self.where(:is_current_version => true, :folder_id => nil)  
   scope :undeleted, self.excludes(:is_deleted => true)
+  scope :file_usage, self.excludes(:is_deleted => true, :size.ne => nil)
   scope :total_attachments, self.where(:is_current_version => true, :is_deleted => false)
 
   searchable do
@@ -74,7 +75,7 @@ class Attachment
     query +=  '.where(is_deleted: false, is_current_version: true)'
     query +=  '.where(file_type: params[:file_type])' if params[:file_type]
     query +=  '.and(:folder_id=> nil)' if params[:folder_id]
-    query +=  '.and(:community_id=> nil)' if params[:user_attachments]
+    query +=  '.and(:community_id=> nil, :attachment_type => "PERSONAL_ATTACHMENT")' if params[:user_attachments]
     query += '.any_of(self.get_criteria(params[:q]))' if params[:q]
     #~ query += '.order_by([params[:sort_by],params[:order_by]]).paginate(paginate_options)'
     query += '.order_by([params[:sort_by],params[:order_by]])'

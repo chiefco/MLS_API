@@ -1,7 +1,7 @@
 class V1::ItemsController < ApplicationController
   before_filter :authenticate_request!
   before_filter :get_item,:only=>([:update,:item_categories,:destroy,:item_topics,:get_all_tasks,:list_item_attendees,:comments])
-  before_filter :add_pagination,:only=>[:index]
+  before_filter :add_pagination,:only=>[:index, :multiple_note_delete]
   before_filter :detect_missing_params, :only=>[:create]
 
   # GET /items
@@ -29,7 +29,7 @@ class V1::ItemsController < ApplicationController
       unless @item.status==false
         if @item
           shared_to = (@item.shares.map(&:community)).uniq
-          @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:methods=>[:created_time,:updated_time,:end_time,:location_name,:item_date, :item_date_local, :created_by, :page_count]),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id), :shared_to => shared_to.to_json(:methods => [:users_count, :shares_count]).parse}.to_success
+          @item={:item=>@item.serializable_hash(:only=>[:_id,:name,:description,:item_date,:custom_page],:methods=>[:created_time,:updated_time,:end_time,:location_name,:item_date, :item_date_local, :created_by, :page_count, :latitude, :longitude]),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id), :shared_to => shared_to.to_json(:methods => [:users_count, :shares_count]).parse}.to_success
           format.xml  { render :xml => @item.to_xml(ROOT) }
           format.json  { render :json => @item}
         else
@@ -115,6 +115,25 @@ class V1::ItemsController < ApplicationController
       else
         format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
         format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+      end
+    end
+  end
+  
+  # Public: Delete multiple notes
+  # Returns the json result(notes status sets to false)
+  def multiple_note_delete
+    params[:item].each do |id|
+      @item = Item.find(id)
+      @item.update_attributes(:status=>false)
+    end
+    @items = Item.list(params,@paginate_options,@current_user)
+    @item_count = Item.list(params.merge({:item_count => true}), {}, @current_user)
+     respond_to do |format|
+      format.xml  { render :xml => @items}
+      if params[:group_by]
+        format.json {render :json =>@items.merge({:response=>:success, :count=>@item_count}).to_json}
+      else
+        format.json {render :json =>{:count=>@item_count, :items=>@items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse}.merge(success)}
       end
     end
   end
@@ -241,12 +260,14 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       if @item
         params[:page] ? page = params[:page].to_i : page = 0
+        shared_to = @item.shares.map(&:community).first
+        shared_to.nil? ? share_status = false : share_status = true
         attachment = @item.share_attachments(page) rescue nil
         comments = attachment.comments if attachment
         page_count = @item.pages.count
 
         if attachment
-           format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
+           format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :share_status => share_status, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
         else
              format.json {render :json =>  {  :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
         end

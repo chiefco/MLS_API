@@ -1,0 +1,7 @@
+<% if @notes_length == 1 %>
+  <b><%= @user_name %></b> has shared <%= @note_names %> note in MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
+  <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>>Click here to view uploaded files</a>
+<% else%>
+  <b><%= @user_name %></b> has shared <%= @notes_length %> notes in MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
+  <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>>Click here to view uploaded files</a>
+<% end %>

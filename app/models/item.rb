@@ -140,6 +140,10 @@ class Item
   def share_attachments(page)
     self.pages[page].attachment
   end
+  
+  def shared_teams
+    ((self.shares.map(&:community).map(&:name)).uniq).join(", ") rescue nil
+  end
 
   def upcoming
     date = item_date

@@ -9,13 +9,12 @@ class V1::ItemsController < ApplicationController
   def index
     @items = Item.list(params,@paginate_options,@current_user)
     @item_count = Item.list(params.merge({:item_count => true}), {}, @current_user)
-
     respond_to do |format|
       format.xml  { render :xml => @items}
       if params[:group_by]
         format.json {render :json =>@items.merge({:response=>:success, :count=>@item_count}).to_json}
       else
-        format.json {render :json =>{:count=>@item_count, :items=>@items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse}.merge(success)}
+        format.json {render :json =>{:count=>@item_count, :items=>@items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id, :shared_teams]).parse}.merge(success)}
       end
     end
   end
@@ -138,6 +137,7 @@ class V1::ItemsController < ApplicationController
     end
   end
 
+  # Returns the item topics
   def  item_topics
     respond_to do |format|
       if @item
@@ -260,16 +260,16 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       if @item
         params[:page] ? page = params[:page].to_i : page = 0
-        shared_to = @item.shares.map(&:community).first
-        shared_to.nil? ? share_status = false : share_status = true
+        pages = @item.pages
         attachment = @item.share_attachments(page) rescue nil
         comments = attachment.comments if attachment
-        page_count = @item.pages.count
+        page_texts = pages[page].page_texts
+        page_count = pages.count
 
         if attachment
-           format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :share_status => share_status, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
+          format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :page_texts => page_texts.as_json, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
         else
-             format.json {render :json =>  {  :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
+          format.json {render :json =>  {  :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
         end
         # index.html.erb
         format.xml{ render :xml => attachments.to_xml(ROOT)}
@@ -302,6 +302,7 @@ class V1::ItemsController < ApplicationController
     [ {name: query} , { description: query } ]
   end
 
+  # Find missing params
   def detect_missing_params
     param_must = [:name, :template_id]
     if params.has_key?(:item) && params[:item].is_a?(Hash)
@@ -333,11 +334,15 @@ class V1::ItemsController < ApplicationController
       format.json {render :json=>{:comments=>@item.comments.to_a.to_json(:only=>[:_id,:message,:commentable_type,:commentable_id]).parse}.to_success}
     end
   end
-
+  
+  # Public: Find item by id and current user
+  # params -  id is passed
+  # Returns item
   def get_item
     @item = @current_user.items.find(params[:id])
   end
 
+  # Returns the item_count
   def item_count
     {:count=>@items.count}
   end

@@ -2,6 +2,8 @@ class V1::FoldersController < ApplicationController
   before_filter :authenticate_request!
   before_filter :find_folder,:only=>[:update,:show,:destroy, :move_folders]
   #~ before_filter :add_pagination,:only=>[:index]
+
+  #Public: Lists all the folders of the user
   def index
     if params[:community_id]
       community = Community.where(:_id => params[:community_id]).first
@@ -20,6 +22,7 @@ class V1::FoldersController < ApplicationController
     end
   end
 
+  #Public: To view a particular folder
   def show
    sub_folders
    @folder_attachments = @folder.attachments.where(:is_deleted => false, :is_current_version => true).order_by(:created_at.desc).entries
@@ -29,6 +32,7 @@ class V1::FoldersController < ApplicationController
     end
   end
 
+  #Public: To create a folder
   def create
     check_folder_uniqueness
     if @folder.nil?
@@ -49,7 +53,7 @@ class V1::FoldersController < ApplicationController
     end
   end
 
-
+  #Public: To update a folder
   def update
     respond_to do |format|
       unless @folder.status==false
@@ -73,6 +77,7 @@ class V1::FoldersController < ApplicationController
     end
   end
 
+  #Public: To destroy a folder
   def destroy
     @activity = Activity.where(:shared_id => params[:id])
     @activity.destroy_all if @activity
@@ -88,6 +93,7 @@ class V1::FoldersController < ApplicationController
     end
   end
 
+  #Public: To get the folder tree
   def folder_tree
    @folder = @current_user.folders.select{|f| f['parent_id']==nil && f[:is_deleted]== false && f[:status] == true && f[:community_id] == nil}
     respond_to do |format|
@@ -95,6 +101,7 @@ class V1::FoldersController < ApplicationController
    end
   end
 
+  #Public: Move attachments to a folder
   def move_attachments
    params[:id] = nil if params[:id] == ''
    @attachment = Attachment.find(params[:attachment_id])
@@ -108,6 +115,7 @@ class V1::FoldersController < ApplicationController
     end
   end
 
+  #Public: To move multiple attachments to a folder
   def move_multiple_attachments
     params[:id] = nil if params[:id] == ''
     files_move_to_folder if  params[:move_files]
@@ -121,9 +129,10 @@ class V1::FoldersController < ApplicationController
     end
   end
 
+  #Public: To move folders to a another folder
   def move_folders
    params[:folder_id] = nil if params[:folder_id] == ''
-  @folder.update_attributes(:parent_id=>params[:folder_id])
+   @folder.update_attributes(:parent_id=>params[:folder_id])
     respond_to do |format|
         if  @folder
           format.json  { render :json => success }
@@ -136,37 +145,49 @@ class V1::FoldersController < ApplicationController
 
   private
 
+  #Private: To find the category for CRUD methods
+  #Called on before filter
   def find_folder
     @folder = Folder.find(params[:id])
   end
 
+  #Private: To get the subfolders list
+  #Called from show method
   def sub_folders
     @sub_folders = @folder.children.select{|f| f[:is_deleted]== false}
   end
   
-   def files_move_to_folder
-      params[:move_files].each do |v|
-        attachment = Attachment.find(v)
-        @attachment = attachment.update_attributes(:folder_id=>params[:id]) if attachment
-      end
-  end
-  
-  def folders_move_to_folder
-      params[:move_folders].each do |v|
-        unless params[:id] == v
-          folder = Folder.find(v)
-          @folder = folder.update_attributes(:parent_id=>params[:id]) if folder
-        end
-      end
+  #Private: To get the subfolders list
+  #Called from 'show' method
+  def files_move_to_folder
+    params[:move_files].each do |v|
+      attachment = Attachment.find(v)
+      @attachment = attachment.update_attributes(:folder_id=>params[:id]) if attachment
+    end
   end
 
+  #Private: To get the subfolders list
+  #Called from 'move_multiple_attachments' method  
+  def folders_move_to_folder
+    params[:move_folders].each do |v|
+      unless params[:id] == v
+        folder = Folder.find(v)
+        @folder = folder.update_attributes(:parent_id=>params[:id]) if folder
+      end
+    end
+  end
+
+  #Private: To check folder uniqueness
+  #Called from 'create' method  
   def check_folder_uniqueness
     params[:folder][:parent_id].blank? ? @folder = @current_user.folders.where(:name =>params[:folder][:name], :parent_id => nil).first : @folder = @current_user.folders.where(:name =>params[:folder][:name], :parent_id => params[:folder][:parent_id]).first
   end
   
+  #Private: To create shares
+  #Called from 'create' method   
   def create_share
-      @v1_share = @current_user.shares.create(:user_id => @current_user._id, :shared_id => @folder._id, :community_id => params[:community], :shared_type=> "Folder", :attachment_id =>nil, :item_id => nil, :folder_id => @folder._id)
-      @v1_share.save
-      @v1_share.create_activity("SHARE_FOLDER", params[:community], @folder._id)
+    @v1_share = @current_user.shares.create(:user_id => @current_user._id, :shared_id => @folder._id, :community_id => params[:community], :shared_type=> "Folder", :attachment_id =>nil, :item_id => nil, :folder_id => @folder._id)
+    @v1_share.save
+    @v1_share.create_activity("SHARE_FOLDER", params[:community], @folder._id)
   end
 end

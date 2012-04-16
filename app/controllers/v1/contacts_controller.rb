@@ -78,6 +78,7 @@ class V1::ContactsController < ApplicationController
       end
   end
 
+  #Send the invitaions for the users
   def invite_member
     Invite.send_invitations(@current_user,params[:invite_member][:email]).deliver
     respond_to do |format|
@@ -96,6 +97,7 @@ class V1::ContactsController < ApplicationController
     end
   end
 
+  #To remove the shares for the users
   def remove_share
     respond_to do |format|
       @share=Share.where(:_id=>params[:id]).first

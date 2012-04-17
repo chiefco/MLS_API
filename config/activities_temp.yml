@@ -1,0 +1,29 @@
+ITEM_CREATED : has created a new <%="#{item}"%> and called it
+ITEM_UPDATED : has updated the <%="#{item}"%>
+ITEM_DELETED : moved <%="#{item}"%> to trash
+CATEGORY_CREATED : has created a new category and called it <%="#{item}"%>
+CATEGORY_DELETED : moved category <%="#{item}"%> to trash
+CATEGORY_UPDATED	: has updated the category <%="#{item}" %>
+BOOKMARK_CREATED : has created a new bookmark and called it <%="#{item}" %>
+BOOKMARK_UPDATED : has updated the bookmark <%="#{item}" %>
+BOOKMARK_DELETED	: have moved <%="#{item}" %> to trash
+PAGE_CREATED : New page has been added to
+PAGE_UPDATED	: Page has been updated in
+PAGE_DELETED	: has moved <%="#{item_name}" %> to trash
+CATEGORY_ADDED_ITEM : has moved the <%="#{item}" %> into the category <%="#{item_name}" %>
+COMMUNITY_CREATED : has created a new team and called it
+COMMUNITY_UPDATED : has updated the team
+COMMUNITY_DELETED : has moved team <%="#{item}"%> to trash
+SHARE_ATTACHMENT : has shared the  file <%=" #{item_name}"%> in 
+SHARE_MEET : has shared the note
+USER_ATTACHMENT : has uploaded a new file and called it <%="#{item}"%>
+USER_ATTACHMENT_UPDATE : has updated a file called <%="#{item}"%> 
+USER_ATTACHMENT_RESTORE : has restored a file called <%="#{item}"%> 
+ATTACHMENT_DOWNLOADED : has downloaded <%="#{item}"%>
+COMMUNITY_INVITED : You have invited <%="#{username}"%> to a virtual team called
+COMMUNITY_JOINED : has joined 
+FOLDER_CREATED : has created a new <%="#{item}"%> and called it 
+FOLDER_UPDATED : has updated the  <%="#{item} #{item_name}"%>
+FOLDER_DELETED : moved <%="#{item}"%> to trash
+COMMENT_CREATED : has commented on page <%="#{item}"%> of
+COMMUNITY_REMOVED : has left the team <%="#{item}"%> 

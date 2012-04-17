@@ -203,7 +203,8 @@ class V1::RegistrationsController < Devise::RegistrationsController
       comment=Comment.where(:_id=>activity.entity_id).first
       username = comment.user.first_name rescue '' 
       values=comment.commentable.attachable unless comment.nil?
-      get_activity(activity, values.page_order, values.item.name) if values.class==Page
+      item = values.item
+      get_activity(activity, values.page_order, item.name, item) if values.class==Page
     when "Folder"
       @folder_name=activity.entity.name
       get_activity(activity, "folder", @folder_name)          
@@ -251,10 +252,11 @@ class V1::RegistrationsController < Devise::RegistrationsController
   # Public: Fetches single activity 
   # Called fron methods 'find_activities', 'find_community_activities'
   # Returns the community activities
-  def get_activity(activity, item, item_name)
+  def get_activity(activity, item, item_name, comment_item=nil)
     activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
     @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name, :item=>item, :item_name=>item_name}})
-    @item << {:user => @first_name, :entity => item, :entity_name => item_name, :id => activity.entity._id,:type => activity.entity_type,:type_id => activity.entity_id,:message => "#{@activities[activity.action]}", :date => activity_date, :local_date => activity.updated_at, :entity_id => activity.entity_id, :action => activity.action, :shared_id => activity.shared_id  }    
+    @activities_temp=Yamler.load("#{Rails.root.to_s}/config/activities_temp.yml", {:locals => {:username =>@first_name, :item=>item, :item_name=>item_name}})    
+    @item << {:user => @first_name, :entity => item, :entity_name => item_name, :id => activity.entity._id,:type => activity.entity_type,:type_id => activity.entity_id, :message => "#{@activities[activity.action]}", :message_temp => "#{@activities_temp[activity.action]}", :date => activity_date, :local_date => activity.updated_at, :entity_id => activity.entity_id, :action => activity.action, :shared_id => "#{comment_item.nil? ? activity.shared_id : comment_item._id}"  }    
   end     
 
   #returns the item if provided

@@ -211,6 +211,7 @@ class V1::CommunitiesController < ApplicationController
     end
   end
 
+  # Public: Invitation accepted logic
   def accept_invitation
     respond_to do |format|
       @invitation = Invitation.where(:invitation_token=>params[:accept_invitation]).first
@@ -238,6 +239,7 @@ class V1::CommunitiesController < ApplicationController
     end
   end
 
+  # Public: validated the community params
   def detect_missing_params
     param_must = [:name]
     if params.has_key?(:community) && params[:community].is_a?(Hash)
@@ -248,6 +250,7 @@ class V1::CommunitiesController < ApplicationController
     render_missing_params(missing_params) unless missing_params.blank?
   end
 
+  # Public: Invitation logic when called from community
   def invite_from_community
     @community = Community.find(params[:invite_email]['community'])
     @community.invite(params[:invite_email]['users'], @current_user) if params[:invite_email]['users'] != 'use comma separated emails'
@@ -256,6 +259,7 @@ class V1::CommunitiesController < ApplicationController
     end
   end
 
+  # Public: Removing member from community
   def member_delete
     community_user = CommunityUser.where(:user_id => params[:id], :community_id => params[:community_id]).first
     respond_to do |format|
@@ -267,6 +271,7 @@ class V1::CommunitiesController < ApplicationController
     end
   end
 
+  # Public: Folder validation for unique name
   def validate_folder
     if @community
       folder = Folder.find(params[:folder_id])
@@ -287,6 +292,7 @@ class V1::CommunitiesController < ApplicationController
     end
   end
 
+  # Public: File validation for unique name
   def validate_file
     if @community
       attachment = Attachment.where(:file_name => "#{params[:file_name]}", :folder_id => params[:folder_id], :is_current_version => true).first
@@ -307,6 +313,7 @@ class V1::CommunitiesController < ApplicationController
     end    
   end
   
+  #Public: Checks the subscription status for users
   def subscribe_status
       @community_user = @community.community_users.where(:user_id => @current_user._id).first
       respond_to do |format|
@@ -325,10 +332,14 @@ class V1::CommunitiesController < ApplicationController
 
   private
 
+  #Private: To find the category for CRUD methods
+  #Called on before filter
   def find_community
     @community = Community.find(params[:id])
   end
 
+  #Private: To find the community members
+  #Called on before filter
   def find_community_members
     @community=Community.find(params[:id]) if @current_user.community_membership_ids.include?(params[:id])
   end
@@ -338,8 +349,9 @@ class V1::CommunitiesController < ApplicationController
     @community={:community=>@community.serializable_hash(:only=>[:_id,:name,:description])}.to_success
   end
 
+  #Private: Authorized member check
   def check_authorised_mem
-      @authoriesd_mem = CommunityUser.where(:user_id => @current_user._id, :community_id => params[:id]).first
+    @authoriesd_mem = CommunityUser.where(:user_id => @current_user._id, :community_id => params[:id]).first
   end
     
 end

@@ -102,7 +102,7 @@ class Item
   end
 
   def item_date
-    super().nil? ? "nil" : super().strftime("%d/%m/%Y %H:%M:%S")
+    super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %H:%M:%S")
   end
 
   def item_date_local
@@ -114,11 +114,11 @@ class Item
   end
 
   def created_time
-    self.created_at.strftime("%d/%m/%Y %H:%M:%S")
+    self.created_at.utc.strftime("%d/%m/%Y %H:%M:%S")
   end
 
   def updated_time
-    self.updated_at.strftime("%d/%m/%Y %H:%M:%S")
+    self.updated_at.utc.strftime("%d/%m/%Y %H:%M:%S")
   end
   
   def shared_id
@@ -139,6 +139,10 @@ class Item
 
   def share_attachments(page)
     self.pages[page].attachment
+  end
+  
+  def shared_teams
+    ((self.shares.map(&:community).map(&:name)).uniq).join(", ") rescue nil
   end
 
   def upcoming

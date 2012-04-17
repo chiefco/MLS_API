@@ -2,6 +2,7 @@ class V1::CategoriesController < ApplicationController
   before_filter :authenticate_request!
   before_filter :find_category, :except=>[:index, :create]
 
+  #Public: To list all the categories for the user
   def index
     paginate_options = {}
     paginate_options.store(:page,set_page)
@@ -14,6 +15,7 @@ class V1::CategoriesController < ApplicationController
     end
   end
 
+  #Public: To view a particular team
   def show
     respond_to do |format|
       if @category.status!=false
@@ -25,6 +27,7 @@ class V1::CategoriesController < ApplicationController
     end
   end
 
+  #Public: To create a category(category params should be passed)
   def create
     @category = @current_user.categories.build(params[:category])
     respond_to do |format|
@@ -38,6 +41,7 @@ class V1::CategoriesController < ApplicationController
     end
   end
 
+  #Public: To update a category(category params should be passed)
   def update
     respond_to do |format|
       if @category.status!=false
@@ -54,6 +58,7 @@ class V1::CategoriesController < ApplicationController
     end
   end
 
+  #Public: To destroy a category(category params should be passed)
   def destroy
     @category.update_attributes(:status=>false)
     respond_to do |format|
@@ -62,6 +67,7 @@ class V1::CategoriesController < ApplicationController
     end
   end
 
+  #Public: To get all the sub categories - category id should be passed
   def subcategories
     sub_categories
     respond_to do |format|
@@ -70,6 +76,7 @@ class V1::CategoriesController < ApplicationController
     end
   end
 
+  #Public: To get all the items - category id should be passed
   def items
     @items = @category.items
     sub_categories
@@ -88,12 +95,20 @@ class V1::CategoriesController < ApplicationController
 
   private
 
+  #Private: To find the category for CRUD methods
+  #Called on before filter
   def find_category
     @category= @current_user.categories.find(params[:id])
   end
+  
+  #Private: To find the category for CRUD methods
+  #Called on before filter  
   def sub_categories
     @sub_categories = @category.children
   end
+
+  #Private: To initialize values
+  #Called from public method items
   def initialize_string_values
     @category_val= :Meets
     @item_val=:Categories

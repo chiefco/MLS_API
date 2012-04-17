@@ -12,13 +12,17 @@ class V1::AttachmentsController < ApplicationController
     paginate_options.store(:per_page,set_page_size)
     @attachments = Attachment.list(@current_user.attachments,params,paginate_options)
     size = @current_user.attachments.where(:is_deleted => false).sum(:size)
-    percentage = (((size) * 100)/1073741824) rescue nil
-    percentage>1 ?  percentage = (((size) * 100)/1073741824).round(1) : percentage = (((size) * 100)/1073741824).round(2) unless percentage.nil?
+    subscription_type = @current_user.subscription_type rescue nil
+    
+    #100 MB =104857600 Bytes,  2 GB = 2147483648 Bytes
+    subscription_type == "free" ? usage = 104857600 : usage = 2147483648
+    percentage = (((size) * 100)/usage) rescue nil
+    percentage>1 ?  percentage = (((size) * 100)/usage).round(1) : percentage = (((size) * 100)/usage).round(2) unless percentage.nil?
     params[:user_attachments] ? @count = @current_user.attachments.where(:folder_id => nil, :is_deleted => false).reject{|attachment| attachment.shares.count > 0}.count : @count = @current_user.attachments.where(:folder_id => nil, :is_deleted => false).count
 
 
     respond_to do |format|
-      format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :folder_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision, :is_shared]).parse ,:total=>@count, :size => size, :percentage => percentage}.to_success }
+      format.json  { render :json => { :attachments=>@attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :folder_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision, :is_shared]).parse ,:total=>@count, :size => size, :percentage => percentage, :subscription_type => subscription_type}.to_success }
       format.xml  { render :xml => @attachments.to_xml(:only=>[:_id, :file_type, :file_name, :size, :user_id,  :folder_id, :content_type],:methods => [:user_name]).as_hash.to_success.to_xml(ROOT) }
     end
   end
@@ -34,7 +38,6 @@ class V1::AttachmentsController < ApplicationController
 
   # POST /v1/attachments
   # POST /v1/attachments.xml
-
   def create
     !params[:community].blank? ? community_id = params[:community] : community_id = nil
     if community_id 
@@ -78,6 +81,7 @@ class V1::AttachmentsController < ApplicationController
     end
   end
 
+  #Updates the attachment(should be passed with id)
   def update
     if @attachment
       if params[:encoded]
@@ -135,6 +139,7 @@ class V1::AttachmentsController < ApplicationController
     end
   end
 
+  # Public: To get the file revisions of a particular file
   def get_revisions
     attachment = Attachment.where(:_id => params[:id]).first
     attachment.parent ? parent_attachment = attachment.parent : parent_attachment = attachment
@@ -148,6 +153,7 @@ class V1::AttachmentsController < ApplicationController
     end
   end
 
+  # Public: To validate the attachment
   def validate_attachment
     attachment = Attachment.where(:file_name => "#{params[:file_name]}", :attachable_id => @current_user.id, :folder_id => params[:folder_id], :is_current_version => true).first
 
@@ -162,6 +168,7 @@ class V1::AttachmentsController < ApplicationController
     end      
   end  
 
+  # Public: Restores the file if 'id' is paases
   def restore_file
     attachment = Attachment.where(:_id => params[:id]).first
     attachment.parent ? parent = attachment.parent : parent = attachment
@@ -186,7 +193,7 @@ class V1::AttachmentsController < ApplicationController
   end
 
  # DELETE  MULTIPLE/v1/attachments/1
-  # DELETE MULTIPLE /v1/attachments/1.xml
+ # DELETE MULTIPLE /v1/attachments/1.xml
  def attachments_multiple_delete
     Attachment.any_in(_id: params[:attachment]).update_all(:is_deleted => true)
     attachments = Attachment.list(@current_user.attachments, params.merge(:user_attachments => true), {:page =>1, :per_page => 10})
@@ -202,6 +209,7 @@ class V1::AttachmentsController < ApplicationController
     end
   end
 
+  # Public: To create the activities when attachments are downloaded
   def attachments_download
     @attachment.activities.create(:action=>"ATTACHMENT_DOWNLOADED", :user_id=> @current_user._id)
     respond_to do |format|
@@ -212,10 +220,14 @@ class V1::AttachmentsController < ApplicationController
 
   private
 
+  # Private: Common method for CRUD
+  # Called on before filter
   def find_resource
     @attachment = Attachment.find(params[:id]) rescue nil
   end
 
+  #Private: To validate the file params
+  # Called on before filter  
   def detect_missing_file
     file_missing = true
     file_missing = false if params.has_key?(:encoded) && params[:attachment].is_a?(Hash)

@@ -265,7 +265,7 @@ class V1::ItemsController < ApplicationController
         shared_to.nil? ? share_status = false : share_status = true
         attachment = @item.share_attachments(page) rescue nil
         comments = attachment.comments if attachment
-        page_texts = pages[page].page_texts
+        page_texts = pages[page].page_texts rescue []
         page_count = pages.count
 
         if attachment

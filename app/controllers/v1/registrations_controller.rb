@@ -252,7 +252,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
   # Called fron methods 'find_activities', 'find_community_activities'
   # Returns the community activities
   def get_activity(activity, item, item_name)
-    activity_date = (activity.updated_at).to_time.strftime("%d/%m/%Y") rescue ''
+    activity_date = (activity.updated_at).to_time.strftime("%Y-%m-%d %H:%M:%S") rescue ''
     @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name, :item=>item, :item_name=>item_name}})
     @item<<{:id=>activity.entity._id,:type=>activity.entity_type,:type_id=>activity.entity_id,:message=>"#{@activities[activity.action]}", :date => activity_date, :local_date => activity.updated_at }    
   end   

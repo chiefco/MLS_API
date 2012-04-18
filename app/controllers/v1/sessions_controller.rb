@@ -214,6 +214,7 @@ def create_or_update_pages(pages,value=nil)
   end
 
   def create_or_update_share
+    p "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS"
    shr_files, shr_folders, shr_comm, shr_notes = [], [], [], []
     @meet.shares.where(:ipad_share=>true).map(&:community_id).map(&:to_s).uniq 
     created_shares=@shares[0][:communities].uniq-@meet.shares.where(:ipad_share=>true).map(&:community_id).map(&:to_s).uniq 
@@ -227,7 +228,8 @@ def create_or_update_pages(pages,value=nil)
       @share_ids<<@shares[1][:share_ids][i]
       @synched_hash=@synched_hash.merge({@shares[1][:share_ids][i]=>@share._id.to_s})
     end
-    @share.share_files(shr_comm.uniq, shr_files.uniq, shr_folders.uniq,shr_notes.uniq, @current_user)
+    p "========================="
+    p @share.share_files(shr_comm.uniq, shr_files.uniq, shr_folders.uniq,shr_notes.uniq, @current_user)
   end
 
   def create_or_update_tasks(task)

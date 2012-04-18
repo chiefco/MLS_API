@@ -219,7 +219,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
      end
     when "Community"
       @community = activity.entity
-      @first_name = User.find(activity['user_id']).first_name
+      @first_name = User.find(activity['user_id']).first_name rescue ''
       get_community_activities(activity)     
     end
   end

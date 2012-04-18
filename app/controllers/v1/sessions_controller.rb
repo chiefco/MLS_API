@@ -22,10 +22,9 @@ class V1::SessionsController < Devise::SessionsController
   end
 
   def index
+    warden.message == :unconfirmed ? status = USER_UNCONFIRMED : status = AUTH_FAILED
     respond_to do |format|
-      p '*********'
-      p flash[:alert]
-      format.json{render :json =>failure.merge(AUTH_FAILED)}
+      format.json{render :json =>failure.merge(status)}
     end
   end
   

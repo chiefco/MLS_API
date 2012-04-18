@@ -10,6 +10,7 @@ class Item
   field :item_date, :type => Time
   field :end_time, :type => Time
   field :status, :type => Boolean,:default=>true
+  field :web_status, :type => Boolean,:default=>true
   field :frequency_count, :type => Integer
   field :template_id, :type => String
   field :location_id, :type => String

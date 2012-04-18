@@ -72,7 +72,6 @@ class Share
   end
   
   def share_files(communities, files, folders, notes, current_user)
-    p "shareeeeeeeeee.rb"
     user = current_user.email
     user_name = current_user.first_name
      community_users = []
@@ -80,10 +79,8 @@ class Share
           community_name = Community.find(value).name
           emails = CommunityUser.where(:community_id => value, :subscribe_email => true ).map(&:user).map(&:email) - [user]
           if notes.length == 0
-            p "filesssssssssss"
             share_mail(user, user_name, value, community_name, emails, files, folders) unless emails.blank?
           else
-            p "notessssssssssss"
             note_share_mail(user, user_name, value, community_name, emails, notes) unless emails.blank?
           end
      end

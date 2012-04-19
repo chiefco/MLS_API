@@ -232,7 +232,7 @@ def create_or_update_pages(pages,value=nil)
       @share_ids<<@shares[1][:share_ids][i]
       @synched_hash=@synched_hash.merge({@shares[1][:share_ids][i]=>@share._id.to_s})
     end
-    @share.share_files(shr_comm.uniq, shr_files.uniq, shr_folders.uniq,shr_notes.uniq, @user)
+    @share.share_files(shr_comm.uniq, shr_files.uniq, shr_folders.uniq,shr_notes.uniq, @user) unless @share.nil?
   end
 
   def create_or_update_tasks(task)

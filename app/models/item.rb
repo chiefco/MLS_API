@@ -43,6 +43,7 @@ class Item
   scope :tomorrow,self.where(:item_date.gte=>Date.today, :item_date.lt=>(Date.tomorrow+1.days))
   scope :next_week,self.where(:item_date.gte=>Date.today+7.days)
   scope :past,self.where(:item_date.lt=>Date.today)
+  scope :deleted_drom_web,self.excludes(:web_status=>true)
 
   after_save :sunspot_index
   after_create :create_activity

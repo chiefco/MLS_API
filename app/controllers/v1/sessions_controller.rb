@@ -104,7 +104,7 @@ class V1::SessionsController < Devise::SessionsController
 
   def initialize_values
     @ipad_ids=[];@ipad_page_ids=[]; @share_ids=[];@task_ids=[];@synched_meets={};@synched_pages={};
-    @synched_hash={};@synched_tasks={};@comments=[];@community_comments=[];,@deleted_notes=[];
+    @synched_hash={};@synched_tasks={};@comments=[];@community_comments=[];@deleted_notes=[];
   end
 
   #Invalid user- do not perform synchronisation

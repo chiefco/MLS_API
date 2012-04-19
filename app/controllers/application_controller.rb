@@ -22,6 +22,7 @@ class ApplicationController < ActionController::Base
   SANBOX_URL="https://sandbox.itunes.apple.com/verifyReceipt"
   LIVE_URL="https://buy.itunes.apple.com/verifyReceipt"
   ROOT={:root=>:xml}
+  USER_UNCONFIRMED={:code=>1003,:message=>"You have not yet confirmed your e-mail address, please check your e-mail and confirm your registration"}
 
   def ssl_required?
     logger.info request.env['HTTP_USER_AGENT'] 

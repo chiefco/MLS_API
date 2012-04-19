@@ -35,7 +35,7 @@ class V1::CommunitiesController < ApplicationController
       folders = @community.folders.comm_folders
       attachments_count = @community.attachments.total_attachments.count
       community_owner = @community.community_users.select{|i| i.user_id == @community.user_id && i.status == true}.map(&:user)
-      users = (@community.community_users.select{|i| i.status == true}.map(&:user) - community_owner).uniq
+      users = (@community.community_users.select{|i| i.status == true}.map(&:user) - community_owner -[@current_user]).uniq
       invitees = ((@community.invitations.unused.map(&:email) + @community.community_invitees.map(&:email)) - @community.community_users.map(&:user).map(&:email)).uniq 
        invited_mls_users = User.any_in(:email => invitees).only(:first_name, :last_name, :email)
        users_email = User.any_in(:email => invitees).map(&:email)
@@ -227,6 +227,7 @@ class V1::CommunitiesController < ApplicationController
               @invitation.update_attributes(:invitation_token=>nil)
               @community = @invitation.community
               @community.save_Invitation_activity("COMMUNITY_JOINED", @community._id, @invitation._id, @current_user._id)
+              @community.confirm_notifications(@community._id, @community.name, @current_user)
               format.json {render :json => {:community => @invitation.community.to_json(:only => [:_id, :name]).parse}.to_success}
             else
               @invitation.update_attributes(:invitation_token=>nil)

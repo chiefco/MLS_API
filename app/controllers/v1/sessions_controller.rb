@@ -99,12 +99,12 @@ class V1::SessionsController < Devise::SessionsController
   end
 
   def get_deleted_notes
-    @deleted_notes=@user.items.deleted_drom_web.to_json(:only=>[:_id])
+    @deleted_notes=@user.items.deleted_from_web.to_json(:only=>[:_id])
   end
 
   def initialize_values
     @ipad_ids=[];@ipad_page_ids=[]; @share_ids=[];@task_ids=[];@synched_meets={};@synched_pages={};
-    @synched_hash={};@synched_tasks={};@comments=[];@community_comments=[];
+    @synched_hash={};@synched_tasks={};@comments=[];@community_comments=[];,@deleted_notes=[];
   end
 
   #Invalid user- do not perform synchronisation

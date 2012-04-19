@@ -1,0 +1,2 @@
+<b><%= @user_name %></b> has joined the team <b> <%= @community_name%></b> on MeetLinkshare.<br/>
+<a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>>Click here to view team</a>

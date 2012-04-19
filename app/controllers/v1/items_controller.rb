@@ -108,7 +108,7 @@ class V1::ItemsController < ApplicationController
   def destroy
     respond_to do |format|
       if @item
-      @item.update_attributes(:status=>false)
+      @item.update_attributes(:status=>false, :web_status => false)
         format.xml  { render :xml => success.to_xml(ROOT) }
         format.json  { render :json=> success}
       else
@@ -123,7 +123,7 @@ class V1::ItemsController < ApplicationController
   def multiple_note_delete
     params[:item].each do |id|
       @item = Item.find(id)
-      @item.update_attributes(:status=>false)
+      @item.update_attributes(:status=>false, :web_status => false)
     end
     @items = Item.list(params,@paginate_options,@current_user)
     @item_count = Item.list(params.merge({:item_count => true}), {}, @current_user)

@@ -22,8 +22,9 @@ class V1::SessionsController < Devise::SessionsController
   end
 
   def index
+    warden.message == :unconfirmed ? status = USER_UNCONFIRMED : status = AUTH_FAILED
     respond_to do |format|
-      format.json{render :json =>failure.merge(AUTH_FAILED)}
+      format.json{render :json =>failure.merge(status)}
     end
   end
   
@@ -218,6 +219,7 @@ def create_or_update_pages(pages,value=nil)
   end
 
   def create_or_update_share
+   shr_files, shr_folders, shr_comm, shr_notes = [], [], [], []
     @meet.shares.where(:ipad_share=>true).map(&:community_id).map(&:to_s).uniq 
     created_shares=@shares[0][:communities].uniq-@meet.shares.where(:ipad_share=>true).map(&:community_id).map(&:to_s).uniq 
     deleted_shares=@meet.shares.where(:ipad_share=>true).map(&:community_id).map(&:to_s).uniq - @shares[0][:communities].uniq
@@ -225,9 +227,12 @@ def create_or_update_pages(pages,value=nil)
     created_shares.each_with_index do |f,i|
       @share=@meet.shares.create(:user_id=>@user._id,:community_id=>f,:shared_type=>"Meet",:shared_id=>@meet._id,:ipad_share=>true)
       Share.last.create_activity("SHARE_MEET",f,@meet._id)
+      shr_comm << f
+      shr_notes << @meet.name
       @share_ids<<@shares[1][:share_ids][i]
       @synched_hash=@synched_hash.merge({@shares[1][:share_ids][i]=>@share._id.to_s})
     end
+    @share.share_files(shr_comm.uniq, shr_files.uniq, shr_folders.uniq,shr_notes.uniq, @user)
   end
 
   def create_or_update_tasks(task)

@@ -198,12 +198,26 @@ class Community
   end
    
   def self.shared_unsubscribe_mail(current_user_name, community_name, emails) 
-   emails.each do |email|
-     Invite.shared_unsubscribe_notifications(current_user_name, community_name, email).deliver
-   end
- end  
+     emails.each do |email|
+       Invite.shared_unsubscribe_notifications(current_user_name, community_name, email).deliver
+     end
+  end  
  
- def subscribe
-    community_users.where(:user_id=>user._id).first.subscribe_email.to_s
- end
+   def subscribe
+      community_users.where(:user_id=>user._id).first.subscribe_email.to_s
+    end
+  
+  def confirm_notifications(community_id, community_name, current_user)
+      current_user_email = current_user.email
+      current_user_name = current_user.first_name
+      emails = CommunityUser.where(:community_id => community_id, :subscribe_email => true ).map(&:user).map(&:email) - [current_user_email]
+      join_notifications(current_user_name, community_id, community_name, emails) unless emails.blank?
+    end
+    
+  def join_notifications(current_user_name, community_id, community_name, emails)
+    emails.each do |email|
+       Invite.community_accept_notifications(current_user_name, community_id, community_name, email).deliver
+    end
+  end
+
 end

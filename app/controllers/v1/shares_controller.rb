@@ -45,8 +45,8 @@ class V1::SharesController < ApplicationController
         folder.make_clone(value['item']['community_id'], @current_user) if folder
       else
         item_id = value['item']['shared_id']
-        folder = Item.find(item_id)
-        shr_notes << (folder).name
+        note = Item.find(item_id)
+        shr_notes << (note).name
       end
       @v1_share = @current_user.shares.create(:user_id=>@current_user._id,:shared_id=> value['item']['shared_id'], :community_id=> value['item']['community_id'], :shared_type=> value['item']['shared_type'], :attachment_id => attachment_id, :item_id => item_id, :folder_id => folder_id)
     end

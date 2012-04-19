@@ -99,7 +99,7 @@ class V1::SessionsController < Devise::SessionsController
   end
 
   def get_deleted_notes
-    @deleted_notes=@user.items.deleted_from_web.to_json(:only=>[:_id])
+    @deleted_notes=@user.items.deleted_from_web.map(&:_id)
   end
 
   def initialize_values

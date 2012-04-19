@@ -10,7 +10,7 @@ class Activity
   belongs_to :subject, polymorphic: true
   referenced_in :user
 
-  scope :todays_activities,self.where(:created_at.gte => (Date.today).to_time)
+  scope :todays_activities, self.where(:created_at.gte => Time.now.beginning_of_day)
 
   validates_presence_of :entity_id,:code=>3027,:message=>"activity_id - Required parameter missing"
   validates_presence_of :entity_type,:code=> 3020,:message=>"activity_type - Required parameter missing"

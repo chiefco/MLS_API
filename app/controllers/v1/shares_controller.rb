@@ -55,7 +55,7 @@ class V1::SharesController < ApplicationController
       @v1_share.create_activity("SHARE_"+value['item']['shared_type'].upcase,value['item']['community_id'],value['item']['shared_id'])
     end
     # To send the emails
-    @v1_share.share_files(shr_comm.uniq, shr_files.uniq, shr_folders.uniq,shr_notes.uniq, @current_user)
+    @v1_share.delay.share_files(shr_comm.uniq, shr_files.uniq, shr_folders.uniq,shr_notes.uniq, @current_user)
 
     respond_to do |format|
       format.xml  { render :xml => success.merge(:share=>@v1_share).to_xml(ROOT,:only=>[:name,:_id])}
@@ -75,7 +75,7 @@ class V1::SharesController < ApplicationController
     share = Folder.where(:_id => params[:id]).first
     share = Attachment.where(:_id => params[:id]).first if share.nil?
     item_name = share.name rescue share.file_name
-    Share.shared_delete(share.community.id, 0, item_name, @current_user)
+    Share.delay.shared_delete(share.community.id, 0, item_name, @current_user)
     share.destroy
 
     respond_to do |format|
@@ -92,7 +92,7 @@ class V1::SharesController < ApplicationController
     end
 
     attachments = Attachment.any_in(_id: params[:share_list]).map(&:id)
-    Share.shared_delete(params[:community_id], params[:share_list].count, "", @current_user)
+    Share.delay.shared_delete(params[:community_id], params[:share_list].count, "", @current_user)
     Attachment.delay.delete(attachments) unless attachments.blank?
     
     respond_to do |format|

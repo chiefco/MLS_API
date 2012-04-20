@@ -44,9 +44,15 @@ class V1::RegistrationsController < Devise::RegistrationsController
   def activities
     @item = []
     params[:community_id] ? find_communtiy_activities(params[:community_id]) : find_activities
- 
-    respond_to do |format|
-      format.json {render :json=>{:activities => @item, :count => @activities_count, :todays_activities => (@current_user.activities_users.todays_activities.count + (@contacts_activities.nil? ? 0 : @contacts_activities.todays_activities.count))}.to_success}
+	
+    if @contacts_activities.nil?
+	    respond_to do |format|
+	      format.json {render :json=>{:activities => @item, :count => @activities_count, :todays_activities => @current_user.activities_users.todays_activities.count}.to_success}
+           end
+    else
+	    respond_to do |format|
+	      format.json {render :json=>{:activities => @item, :count => @activities_count, :todays_activities => (@current_user.activities_users.todays_activities.count + @contacts_activities.todays_activities.count)}.to_success}
+           end	    
     end
   end
 
@@ -204,7 +210,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
     when "Comment"
       comment=Comment.where(:_id=>activity.entity_id).first
       username = comment.user.first_name rescue '' 
-      values=comment.commentable.attachable unless comment.nil?
+      values = comment.commentable.attachable unless comment.nil?
       item = values.item
       get_activity(activity, values.page_order, item.name, item) if values.class==Page
     when "Folder"

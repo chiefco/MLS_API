@@ -1,6 +1,6 @@
 ITEM_CREATED : has created a new <%="#{item}"%> and called it
 ITEM_UPDATED : has updated the <%="#{item}"%>
-ITEM_DELETED : moved <%="#{item}"%> to trash
+ITEM_DELETED : moved <%="#{item} #{item_name}"%> to trash
 CATEGORY_CREATED : has created a new category and called it <%="#{item}"%>
 CATEGORY_DELETED : moved category <%="#{item}"%> to trash
 CATEGORY_UPDATED	: has updated the category <%="#{item}" %>

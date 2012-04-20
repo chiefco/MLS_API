@@ -46,11 +46,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
     params[:community_id] ? find_communtiy_activities(params[:community_id]) : find_activities
  
     respond_to do |format|
-      if !params[:community_id]
-        format.json {render :json=>{:activities => @item, :count => @activities_count, :todays_activities => (@current_user.activities_users.todays_activities.count + @contacts_activities.todays_activities.count)}.to_success}
-      else
-        format.json {render :json=>{:activities => @item}.to_success}
-      end
+      format.json {render :json=>{:activities => @item, :count => @activities_count, :todays_activities => (@current_user.activities_users.todays_activities.count + (@contacts_activities.nil? ? 0 : @contacts_activities.todays_activities.count))}.to_success}
     end
   end
 

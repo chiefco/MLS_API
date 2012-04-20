@@ -163,7 +163,7 @@ class V1::CommunitiesController < ApplicationController
     #To remove community members
     if params[:user_id]
       community_users = community.community_users.any_in(:user_id => params[:user_id]).destroy_all
-      Community.send_notifications(params[:user_id], params[:community_id], @current_user)    
+      Community.delay.send_notifications(params[:user_id], params[:community_id], @current_user)    
     end
 
     #To remove invited members
@@ -185,7 +185,7 @@ class V1::CommunitiesController < ApplicationController
   def remove_shared_team
     respond_to do |format|
       @community_user = CommunityUser.any_in(:community_id => params[:community_id]).where(:user_id => @current_user._id).delete_all
-      Community.shared_unsubscribe(params[:community_id], @current_user)
+      Community.delay.shared_unsubscribe(params[:community_id], @current_user)
       unless @community_user.nil?
         format.json {render :json=>success}
       else
@@ -227,7 +227,7 @@ class V1::CommunitiesController < ApplicationController
               @invitation.update_attributes(:invitation_token=>nil)
               @community = @invitation.community
               @community.save_Invitation_activity("COMMUNITY_JOINED", @community._id, @invitation._id, @current_user._id)
-              @community.confirm_notifications(@community._id, @community.name, @current_user)
+              @community.delay.confirm_notifications(@community._id, @community.name, @current_user)
               format.json {render :json => {:community => @invitation.community.to_json(:only => [:_id, :name]).parse}.to_success}
             else
               @invitation.update_attributes(:invitation_token=>nil)

@@ -44,8 +44,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
   def activities
     @item=[]
     params[:community_id] ? find_communtiy_activities(params[:community_id]) : find_activities
+ 
     respond_to do |format|
-      format.json {render :json=>{:activities => @item, :count => @activities_count, :todays_activities => @current_user.activities_users.todays_activities.count}.to_success}
+      format.json {render :json=>{:activities => @item, :count => @activities_count, :todays_activities => (@current_user.activities_users.todays_activities.count + @contacts_activities.todays_activities.count)}.to_success}
     end
   end
 
@@ -147,8 +148,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
   # Returns the user activities
   def find_activities
     @first_name=@current_user.first_name
-    user_communities = @current_user.communities.map(&:id)
-    activities = (@current_user.activities_users + Activity.any_in(:entity_id => user_communities)).uniq.sort{|a, b| a.created_at <=> b.created_at}
+    user_communities = @current_user.communities.undeleted.map(&:id)
+    @contacts_activities = Activity.any_in(:entity_id => user_communities)
+    activities = (@current_user.activities_users + @contacts_activities).uniq.sort_by{|a| a.created_at}
     @activities_count = activities.count
 
     activities.reverse.paginate(@paginate_options).each do |activity|

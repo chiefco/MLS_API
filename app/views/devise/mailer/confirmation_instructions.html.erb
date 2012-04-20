@@ -1,6 +1,6 @@
 <p>Welcome <%= @resource.email %>!</p>
 
-<p>'You recently signed up for MeetLinkShare.  To complete signup, click the link below</p>
+<p>You recently signed up for MeetLinkShare.  To complete signup, click the link below</p>
 
 <p><%= link_to 'Complete Signup', confirmation_url(@resource, :confirmation_token => @resource.confirmation_token) %></p>
 

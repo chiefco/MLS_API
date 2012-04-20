@@ -71,10 +71,10 @@ class Community
     return {:community_arrays=>@community,:community_hashes=>@community_values}
   end
 
-  def community_invite(invites)
+  def community_invite(invites, message)
     invites.each do |invite|
       invitation = Invitation.find(invite[1])
-      Invite.community_invite(invite[0], invitation, invite[2]).deliver
+      Invite.community_invite(invite[0], invitation, invite[2], message).deliver
     end
   end
 
@@ -125,7 +125,7 @@ class Community
    {:members => members.map(&:email), :members_first_name=>members.map(&:first_name),:members_last_name=>members.map(&:last_name),:invitees =>invitees - (members.map(&:email) + owner.email.to_a),:id => _id.to_s }
   end
 
-  def invite(invites, current_user)
+  def invite(invites, current_user, message='')
     community_invites, user_invites = [], []
     invites.split(',').each do |invite_email|
       invite_email = invite_email.strip
@@ -149,7 +149,7 @@ class Community
       end
     end
       
-      self.delay.community_invite(community_invites) unless community_invites.blank?
+      self.delay.community_invite(community_invites, message) unless community_invites.blank?
       self.delay.user_invite(user_invites) unless user_invites.blank?      
   end
 

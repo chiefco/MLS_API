@@ -25,5 +25,5 @@ COMMUNITY_JOINED : has joined
 FOLDER_CREATED : has created a new <%="#{item}"%> and called it <%= "#{item_name}" %>
 FOLDER_UPDATED : has updated the  <%="#{item} #{item_name}"%>
 FOLDER_DELETED : moved <%="#{item}"%> to trash
-COMMENT_CREATED : has commented on page <%="#{item}"%> of
+COMMENT_CREATED : has commented on
 COMMUNITY_REMOVED : has left the team <%="#{item}"%> 

@@ -53,31 +53,31 @@ class V1::SearchesController < ApplicationController
   end
 
   def search
-    #~ items = Sunspot.search(Item) do |search|
-      #~ search.keywords params[:q].downcase, :boost=>4.0
-      #~ search.with(:user_id,@current_user.id)
-    #~ end
-    
-    attachments = @current_user.attachments.solr_search do |search|
+    items = Sunspot.search(Item) do |search|
+      search.keywords params[:q].downcase, :boost=>4.0
       search.with(:user_id,@current_user.id)
-      search.with(:file_name).starting_with(params[:q].downcase)
-    end    
-    
-    if params[:sort] == 'modified'
-      #~ items.results.map(&:name)
-      #~ items.results.sort_by{ |k| k.updated_at }.map(&:name)
-      #~ items = items.results.sort_by{ |k| k.updated_at }.reverse
-      attachments = attachments.results.sort_by{ |k| k.updated_at }.reverse
-    else
-      #~ items = items.results.sort_by{ |k| k.name }
-      attachments = attachments.results.sort_by{ |k| k.file_name }
     end
     
+    #~ attachments = @current_user.attachments.solr_search do |search|
+      #~ search.with(:user_id,@current_user.id)
+      #~ search.with(:file_name).starting_with(params[:q].downcase)
+    #~ end    
+    
+    if params[:sort] == 'modified'
+      items.results.map(&:name)
+      items.results.sort_by{ |k| k.updated_at }.map(&:name)
+      items = items.results.sort_by{ |k| k.updated_at }.reverse
+      #~ attachments = attachments.results.sort_by{ |k| k.updated_at }.reverse
+    else
+      items = items.results.sort_by{ |k| k.name }
+      #~ attachments = attachments.results.sort_by{ |k| k.file_name }
+    end
     unless params[:limit]
       respond_to do |format|
         format.xml  { render :xml => {:response=>:success,:searches=>results}.to_xml(:root=>:result,:only=>SEARCH_FIELDS) }
         #~ format.json {render :json =>{:items=>items.to_json(:only=>[:name,:_id],:methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id, :item_date_local]).parse, :attachments=>attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at], :methods => [:user_name]).parse}.to_success}
-        format.json {render :json =>{:attachments=>attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at], :methods => [:user_name]).parse}.to_success}
+        #~ format.json {render :json =>{:attachments=>attachments.to_json(:only=>[:_id, :file_name, :file_type, :size, :content_type,:file,:created_at], :methods => [:user_name]).parse}.to_success}
+        format.json {render :json =>{:items=>items.to_json(:only=>[:name,:_id],:methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id, :item_date_local]).parse}.to_success}
       end
     else
       items << attachments

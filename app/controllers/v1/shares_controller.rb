@@ -103,7 +103,7 @@ class V1::SharesController < ApplicationController
   def file_notifications
     community_name = Community.find(params[:community_id]).name
     emails = CommunityUser.where(:community_id => params[:community_id], :subscribe_email => true).map(&:user).map(&:email) - [@current_user.email]
-    Attachment.upload_share(@current_user.email, @current_user.first_name, params[:community_id], community_name, emails, params[:file_name], params[:file_count]) unless emails.blank?    
+    Attachment.delay.upload_share(@current_user.email, @current_user.first_name, params[:community_id], community_name, emails, params[:file_name], params[:file_count]) unless emails.blank?    
      respond_to do |format|
       format.json {render :json=>success }
      end

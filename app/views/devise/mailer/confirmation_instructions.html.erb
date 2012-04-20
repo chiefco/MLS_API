@@ -1,0 +1,13 @@
+<p>Welcome <%= @resource.email %>!</p>
+
+<p>'You recently signed up for MeetLinkShare.  To complete signup, click the link below</p>
+
+<p><%= link_to 'Complete Signup', confirmation_url(@resource, :confirmation_token => @resource.confirmation_token) %></p>
+
+<p>Or, you can copy and paste this link into your browser:  full link on the next line.</p>
+
+<p><%= link_to "#{confirmation_url(@resource, :confirmation_token => @resource.confirmation_token)}" , confirmation_url(@resource, :confirmation_token => @resource.confirmation_token) %></p>
+
+<p>Thank you</p>
+
+<p>The Meetlinkshare Team</p>

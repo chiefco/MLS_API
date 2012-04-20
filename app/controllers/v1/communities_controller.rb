@@ -35,7 +35,7 @@ class V1::CommunitiesController < ApplicationController
       folders = @community.folders.comm_folders
       attachments_count = @community.attachments.total_attachments.count
       community_owner = @community.community_users.select{|i| i.user_id == @community.user_id && i.status == true}.map(&:user)
-      users = (@community.community_users.select{|i| i.status == true}.map(&:user) - community_owner -[@current_user]).uniq
+      users = (@community.community_users.select{|i| i.status == true}.map(&:user) - community_owner).uniq
       invitees = ((@community.invitations.unused.map(&:email) + @community.community_invitees.map(&:email)) - @community.community_users.map(&:user).map(&:email)).uniq 
        invited_mls_users = User.any_in(:email => invitees).only(:first_name, :last_name, :email)
        users_email = User.any_in(:email => invitees).map(&:email)
@@ -254,7 +254,7 @@ class V1::CommunitiesController < ApplicationController
   # Public: Invitation logic when called from community
   def invite_from_community
     @community = Community.find(params[:invite_email]['community'])
-    @community.invite(params[:invite_email]['users'], @current_user) if params[:invite_email]['users'] != 'use comma separated emails'
+    @community.invite(params[:invite_email]['users'], @current_user, params[:invite_email]['message']) if params[:invite_email]['users'] != 'use comma separated emails'
     respond_to do |format|
       format.json {render :json => success }
     end

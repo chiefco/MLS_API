@@ -1,6 +1,6 @@
 <% unless @count <=0 %>
-<b><%= @user_name %></b> has deleted <%= @count %> files in MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
+<b><%= @user_name %></b> has deleted <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>><%= @count %> files </a>in MeetLinkshare virtual team called <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>><%= @community_name%></a><br/><br/>
 <% else%>
-<b><%= @user_name %></b> has deleted <%= @item_name %> in MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
+<b><%= @user_name %></b> has deleted <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>><%= @item_name %></a> in MeetLinkshare virtual team called <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>><%= @community_name%></a><br/><br/>
 <% end %>
-<a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>>Click here to view team</a>
+<a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>>If you do not want to receive notifications for this team, please turn them off here</a>

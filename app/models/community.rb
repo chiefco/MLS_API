@@ -170,20 +170,20 @@ class Community
        unsubscriber_names<<User.find(id).first_name
        unsubscriber_emails<<User.find(id).email
      end
-    remove_notifications(current_user_email, current_user_name, community_name, emails, unsubscriber_names)
-    unsubscribe_notifications(current_user_email, current_user_name, community_name, unsubscriber_emails)
+    remove_notifications(current_user_email, current_user_name, community_id, community_name, emails, unsubscriber_names)
+    unsubscribe_notifications(current_user_email, current_user_name, community_id, community_name, unsubscriber_emails)
   end
    
-  def self.remove_notifications(current_user_email, current_user_name, community_name, emails, unsubscriber_names)
+  def self.remove_notifications(current_user_email, current_user_name, community_id, community_name, emails, unsubscriber_names)
    unsubscriber_names = unsubscriber_names*","
     emails.each do |email|
-       Invite.remove_member_notifications(current_user_email, current_user_name, community_name, email, unsubscriber_names).deliver
+       Invite.remove_member_notifications(current_user_email, current_user_name, community_id, community_name, email, unsubscriber_names).deliver
     end
   end
   
-  def self.unsubscribe_notifications(current_user_email, current_user_name, community_name, unsubscriber_emails)
+  def self.unsubscribe_notifications(current_user_email, current_user_name, community_id, community_name, unsubscriber_emails)
     unsubscriber_emails.each do |email|
-       Invite.remove_member_notifications(current_user_email, current_user_name, community_name, email, false).deliver
+       Invite.remove_member_notifications(current_user_email, current_user_name, community_id, community_name, email, false).deliver
     end
   end
     

@@ -1,2 +1,2 @@
-<b><%= @user_name %></b> has joined the team <b> <%= @community_name%></b> on MeetLinkshare.<br/>
-<a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>>Click here to view team</a>
+<b><%= @user_name %></b> has joined the team <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>> <%= @community_name%></a> on MeetLinkshare.<br/><br/>
+<a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>>If you do not want to receive notifications for this team, please turn them off here</a>

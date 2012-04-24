@@ -1,7 +1,9 @@
 <% if @notes_length == 1 %>
-  <b><%= @user_name %></b> has shared <%= @note_names %> note in MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
-  <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>>Click here to view shared notes</a>
+  <b><%= @user_name %></b> has shared <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>><%= @note_names %></a> note in MeetLinkshare virtual team called <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>><%= @community_name%></a><br/><br/>
+	
+	<a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>>If you do not want to receive notifications for this team, please turn them off here</a>
 <% else%>
-  <b><%= @user_name %></b> has shared <%= @notes_length %> notes in MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
-  <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>>Click here to view shared notes</a>
+  <b><%= @user_name %></b> has shared <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>><%= @notes_length %> notes</a> in MeetLinkshare virtual team called <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>><%= @community_name%></a><br/><br/>
+	
+	<a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>>If you do not want to receive notifications for this team, please turn them off here</a>
 <% end %>

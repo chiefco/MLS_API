@@ -223,7 +223,7 @@ class V1::CommunitiesController < ApplicationController
         else
             exist_user = @invitation.community.community_users.where(:user_id => @invitation.user_id).first
            if exist_user.nil? || exist_user.blank?
-              @invitation.community.community_users.create(:user_id=>@invitation.user_id, :subscribe_email => false)
+              @invitation.community.community_users.create(:user_id=>@invitation.user_id, :subscribe_email => true)
               @invitation.update_attributes(:invitation_token=>nil)
               @community = @invitation.community
               @community.save_Invitation_activity("COMMUNITY_JOINED", @community._id, @invitation._id, @current_user._id)

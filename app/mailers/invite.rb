@@ -28,8 +28,8 @@ class Invite < ActionMailer::Base
      mail(:to=>@email, :subject =>"Files uploaded for virtual team(#{@community_name}) by #{@user_name}", :reply_to => "no-reply@info.meetlinkshare.com")
    end
    
-  def remove_member_notifications(current_user_email, current_user_name, community_name, email, names)
-    @user_name, @community_name, @email, @names = current_user_name, community_name, email, names
+  def remove_member_notifications(current_user_email, current_user_name, community_id, community_name, email, names)
+    @user_name,  @community_id, @community_name, @email, @names = current_user_name, community_id, community_name, email, names
      mail(:to=>@email, :subject =>"Notifications for virtual team(#{@community_name}) from #{@user_name}", :reply_to => "no-reply@info.meetlinkshare.com")
   end
   

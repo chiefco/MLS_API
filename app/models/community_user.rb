@@ -4,7 +4,7 @@ class CommunityUser
   field :role_id,:type=>String,:default=>0
   field :status,:type=>Boolean,:default=>true
   field :user_id,:type=>String
-  field :subscribe_email, :type => Boolean,:default=>false
+  field :subscribe_email, :type => Boolean,:default=>true
   referenced_in :community
   belongs_to :user
   scope :undeleted,self.excludes(:status=>false)

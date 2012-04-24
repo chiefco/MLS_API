@@ -137,10 +137,8 @@ class V1::SessionsController < Devise::SessionsController
         meet.delete(:page)
         meet.delete(:share)
         begin
-          unless location.nil?
-            location_meet=@user.locations.find_or_create_by(:name=>location.downcase)
-            meet[:location_id]=location_meet._id unless location_meet.nil?
-          end
+          create_or_update_location(meet[:location_name],  meet[:location_latitude], meet[:location_longitude], meet[:location_state], meet[:location_country])
+          meet[:location_id] = @location_id
           @meet= @user.items.create(meet)
           puts @meet.errors.inspect
           unless @meet.nil?
@@ -167,10 +165,9 @@ class V1::SessionsController < Devise::SessionsController
             meet.delete(:updated_page)
             meet.delete(:page)
             meet.delete(:share)
-            unless location.nil?
-              location_meet=@user.locations.find_or_create_by(:name=>location.downcase)
-              meet[:location_id]=location_meet._id unless location_meet.nil?
-            end
+            
+            create_or_update_location(meet[:location_name],  meet[:location_latitude], meet[:location_longitude], meet[:location_state], meet[:location_country])
+            meet[:location_id] = @location_id
             @meet.update_attributes(meet)
             @id=meet[:cloud_id]
             create_or_update_share
@@ -270,13 +267,13 @@ def create_or_update_pages(pages,value=nil)
   end  
   
   def update_communities(community)
-    members="";
+    members=""; 
     community["members"].each do |mem|
       members="#{members}"+",#{mem}"
     end
     members.slice!(0)
     communities=get_community(community)
-    communities.invite(members.empty? ? "": members,@user) unless communities.nil?
+    communities.invite(members.empty? ? "": members,@user,community["message"]) unless communities.nil?
   end  
   
   def remove_member(community)
@@ -331,4 +328,16 @@ def create_or_update_pages(pages,value=nil)
       @user.subscription.nil? ? @user.create_subscription(response_values) :  @user.subscription.update_attributes(response_values)
     end
   end  
+  
+  private
+  
+  #Private: To create or update user location
+  #Called from the method 'create_or_update_meets'
+  def create_or_update_location(location, latitude, longitude, state, country)
+    unless location.nil?
+      location_present = @user.locations.where(:latitude => latitude, :longitude => longitude).first
+      location_meet=@user.locations.create(:name => location, :latitude => latitude, :longitude => longitude, :state => state, :country => country) if location_present.nil?
+      @location_id=location_meet._id unless location_meet.nil?
+    end
+  end
 end

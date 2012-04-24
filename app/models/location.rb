@@ -1,17 +1,20 @@
 class Location
   include Mongoid::Document
-  include Geocoder::Model::Mongoid
+  #~ include Geocoder::Model::Mongoid
   include Sunspot::Mongoid
   field :name,:type=>String
   field :latitude,:type=>String
   field :longitude,:type=>String
+  field :state,:type=>String
+  field :country,:type=>String
+  
   #~ field :item_id, :type => Integer
   has_one :item
   referenced_in :user
-  geocoded_by :name
+  #~ geocoded_by :name
   #~ after_validation :geocode
-  before_save :find_co_ordinates
-  ALLOWED_FIELDS=[:_id,:name,:latitude,:longitude]
+  #~ before_save :find_co_ordinates
+  ALLOWED_FIELDS=[:_id,:name,:latitude,:longitude,:state,:country,:user_id]
     validates_presence_of :name,:message=>'name - Blank Parameter',:code=>3013
   default_scope :only=>ALLOWED_FIELDS
   SORT_BY_ALLOWED = [:name,:created_at,:updated_at]

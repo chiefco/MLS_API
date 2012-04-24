@@ -50,9 +50,11 @@ class Item
   after_update :update_activity
   
   def location_details
-    val=self.location
-    unless val.nil?
-      [{:name => val.name, :latitude_val => val.latitude_val, :longitude_val => val.longitude_val,:id=>val._id.to_s}]
+    meet_location=self.location
+    unless meet_location.nil?
+      [{:location_id=>meet_location._id.nil? ? '' : "#{meet_location._id.to_s}",:location_name=>meet_location.name.nil? ? '' : meet_location.name, :location_state => meet_location.state.nil?  ? '' : meet_location.state, :location_country => meet_location.country.nil? ? '' : meet_location.country , :latitude_val => meet_location.latitude.nil? ? '' : meet_location.latitude, :longitude_val => meet_location.longitude.nil? ? '' : meet_location.longitude}] 
+      else
+        []
     end
   end
   
@@ -76,7 +78,7 @@ class Item
   end
 
   searchable do
-    text :name do
+    string :name do
       name.downcase
     end
     text :description
@@ -229,12 +231,17 @@ class Item
   def self.get_meets(user,value=nil)
     @meets=[]
     @meets_values={}
+    location_values=[]
     unless value.nil?
       user.items.undeleted.each do |f|
         @meets<<f._id.to_s
-        @meets_values=@meets_values.merge({f.id=>{:name=>f.name,:id=>f._id,:description=>f.description,:location_id=>f.location.nil? ? 'nil' : f.location._id,:item_date=>f.item_date,:location_name=>f[:location_name],:created_at=>f.created_time,:updated_at=>f.updated_time,:pages=>get_pages(f),:shares=>get_shares(f)}})
+        meet_location = f.location
+        test = nil
+       p test = meet_location._id.nil? ? '' : "#{meet_location.id}"  unless meet_location.nil?
+       p location_values=[{:location_id=>test,:location_name=>meet_location.name.nil? ? '' : meet_location.name, :location_state => meet_location.state.nil?  ? '' : meet_location.state, :location_country => meet_location.country.nil? ? '' : meet_location.country , :latitude_val => meet_location.latitude.nil? ? '' : meet_location.latitude, :longitude_val => meet_location.longitude.nil? ? '' : meet_location.longitude}]  unless meet_location.nil?
+        @meets_values=@meets_values.merge({f.id=>{:name=>f.name,:id=>f._id,:description=>f.description, :meet_id => "#{test}", :location_details=>location_values,:item_date=>f.item_date, :created_at=>f.created_time,:updated_at=>f.updated_time,:pages=>get_pages(f),:shares=>get_shares(f)}})
       end
-      return {:meet_arrays=>@meets,:meet_hashes=>@meets_values}
+      return {:meet_arrays=>@meets,:meet_hashes=>(@meets_values.to_json).parse}
     else
       return {:meet_arrays=>[],:meet_hashes=>nil}
     end

@@ -68,6 +68,8 @@ MeetlinkshareApi::Application.routes.draw do
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
     post "v1/forgot_password", :to => "v1/passwords#create"
     post "v1/users/sign_in", :to => "v1/sessions#create"
+    post "v1/users/resend_confirmation_mail", :to => "v1/sessions#resend_confirmation_mail"
+
     post "v1/users", :to => "v1/registrations#create"
     put "v1/user", :to => "v1/registrations#update"
     post "v1/reset_password", :to => "v1/passwords#update"
@@ -81,6 +83,7 @@ MeetlinkshareApi::Application.routes.draw do
     post "v1/community_synchronisation", :to => 'v1/sessions#community_synchronisation'
     post "v1/subscribe_user", :to => 'v1/sessions#subcribe_user'
     get "v1/image",:to=>'v1/sessions#get_image'
+
   end
 
   # The priority is based upon order of creation:

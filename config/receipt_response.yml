@@ -6,4 +6,4 @@
 21006 : This receipt is valid but the subscription has expired. When this status code is returned to your server, the receipt data is also decoded and returned as part of the response.
 21007 : This receipt is a sandbox receipt, but it was sent to the production service for verification.
 21008 : This receipt is a production receipt, but it was sent to the sandbox service for verification.
-0 : Your purchase is success.
+0 : Your purchase is successful.

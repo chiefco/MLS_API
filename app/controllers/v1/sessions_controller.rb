@@ -84,7 +84,7 @@ class V1::SessionsController < Devise::SessionsController
 
   #Resend confirmation email to users
   def resend_confirmation_mail
-    user = User.where(:email => "#{params[:user]}").first
+    user = User.where(:email => "#{params[:user].downcase.strip}").first
     if user
       if !user.confirmed?
         Devise::Mailer.delay.confirmation_instructions(user)

@@ -81,6 +81,27 @@ class V1::SessionsController < Devise::SessionsController
       format.json {render :json=>success.merge({:image=>image,:type=>"jpg"})}
     end
   end
+
+  #Resend confirmation email to users
+  def resend_confirmation_mail
+    user = User.where(:email => "#{params[:user].downcase.strip}").first
+    if user
+      if !user.confirmed?
+        Devise::Mailer.delay.confirmation_instructions(user)
+        respond_to do |format|
+          format.json{render :json => success}
+        end  
+      else
+        respond_to do |format|
+          format.json{render :json => failure.merge({:message => "Account already verified"})}
+        end
+      end
+    else    
+      respond_to do |format|
+        format.json{render :json => failure.merge({:message => "User account dosn't exist"})}
+      end        
+    end
+  end 
   
   private
   #perform synchronisation for the user
@@ -95,7 +116,7 @@ class V1::SessionsController < Devise::SessionsController
     get_deleted_notes
    respond_to do |format|
       format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:deleted_notes => @deleted_notes,:comments=>@comments.flatten,:ipad_ids=>@ipad_ids.uniq,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks,:meets=>params[:user][0][:status]=="true" ? get_meets(true) : get_meets(nil),:other_users=>CommunityUser.other_users(@user._id),:locations=>@user.locations.serializable_hash(:only=>[:_id,:name],:methods=>[:latitude_val,:longitude_val] ))}
-    end
+   end
   end
 
   def get_deleted_notes
@@ -328,9 +349,7 @@ def create_or_update_pages(pages,value=nil)
       @user.subscription.nil? ? @user.create_subscription(response_values) :  @user.subscription.update_attributes(response_values)
     end
   end  
-  
-  private
-  
+
   #Private: To create or update user location
   #Called from the method 'create_or_update_meets'
   def create_or_update_location(location, latitude, longitude, state, country)
@@ -339,5 +358,5 @@ def create_or_update_pages(pages,value=nil)
       location_meet=@user.locations.create(:name => location, :latitude => latitude, :longitude => longitude, :state => state, :country => country) if location_present.nil?
       @location_id=location_meet._id unless location_meet.nil?
     end
-  end
+  end 
 end

@@ -23,6 +23,10 @@ class Comment
     self.user.first_name
   end
   
+  def created_time
+    self.updated_at.utc.strftime("%d/%m/%Y %H:%M:%S")
+  end
+  
   def self.create_comments(user,messages=nil,attachment)
     comments=[]
       unless messages.nil?

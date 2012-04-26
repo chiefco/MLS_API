@@ -236,12 +236,12 @@ class Item
       user.items.undeleted.each do |f|
         @meets<<f._id.to_s
         meet_location = f.location
-        location_values=[],test = nil
+        test = nil
         test = meet_location._id.nil? ? '' : "#{meet_location.id}"  unless meet_location.nil?
         location_values=[{:location_id=>test,:location_name=>meet_location.name.nil? ? '' : meet_location.name, :location_state => meet_location.state.nil?  ? '' : meet_location.state, :location_country => meet_location.country.nil? ? '' : meet_location.country , :latitude_val => meet_location.latitude.nil? ? '' : meet_location.latitude, :longitude_val => meet_location.longitude.nil? ? '' : meet_location.longitude}]  unless meet_location.nil?
         @meets_values=@meets_values.merge({f.id=>{:name=>f.name,:id=>f._id,:description=>f.description, :meet_id => "#{test}", :location_details=>location_values,:item_date=>f.item_date, :created_at=>f.created_time,:updated_at=>f.updated_time,:pages=>get_pages(f),:shares=>get_shares(f)}})
       end
-      return {:meet_arrays=>@meets,:meet_hashes=>(@meets_values.to_json).parse}
+      return {:meet_arrays=>@meets,:meet_hashes=>@meets_values}
     else
       return {:meet_arrays=>[],:meet_hashes=>nil}
     end

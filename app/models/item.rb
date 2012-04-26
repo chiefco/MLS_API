@@ -6,7 +6,7 @@ class Item
   ORDER_BY_ALLOWED =  [:asc, :desc]
   include Sunspot::Mongoid
   field :name, :type => String
-  field :description, :type => String
+  field :description, :type => String,:default=>""
   field :item_date, :type => Time
   field :end_time, :type => Time
   field :status, :type => Boolean,:default=>true

@@ -330,6 +330,23 @@ class V1::CommunitiesController < ApplicationController
       end
     end
   end
+  
+  #Public: Search user own communities
+  def search_own_team
+    communities = Community.search_own(params,@current_user)
+      respond_to do |format|
+        format.json {render :json =>{:communities=>communities.to_json(:methods => [:users_count, :shares_count]).parse}.to_success}
+      end
+  end
+    
+  #Public: Search user shared communities
+  def search_shared_team
+     communities = Community.search_shared(params,@current_user)
+      respond_to do |format|
+        format.json {render :json =>{:communities=>communities.to_json(:methods => [:users_count, :shares_count]).parse}.to_success}
+      end
+  end
+
 
   private
 

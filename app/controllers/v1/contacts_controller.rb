@@ -144,6 +144,14 @@ class V1::ContactsController < ApplicationController
     @item.invitations.find_or_create_by(:email=>email)
     Invite.send_invitations(@current_user,email).deliver
   end
+  
+  #search user contacts
+  def search_contacts
+    @contacts = Contact.search(params,@current_user)
+      respond_to do |format|
+        format.json {render :json =>{:contacts=>@contacts.to_json(:only=>[:first_name, :last_name, :email]).parse}.to_success}
+      end
+  end
 
   #finds the contact
   def find_contact

@@ -1,6 +1,7 @@
 class Contact
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Sunspot::Mongoid
   SORT_BY_ALLOWED = [ :email, :first_name, :last_name, :job_title, :company]
   ORDER_BY_ALLOWED =  [:asc,:desc]
   field :first_name, :type => String
@@ -18,6 +19,15 @@ class Contact
   referenced_in :user
   belongs_to :contact_user, :class_name => "User", :foreign_key => "contact_id"
   scope :undeleted,self.excludes(:status=>false)
+  
+  searchable do
+    text :first_name do
+      first_name.downcase
+    end
+    text :email
+    string :user_id
+  end
+  
   def self.list(params,paginate_options,user)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
@@ -26,5 +36,15 @@ class Contact
     else
       user.contacts.undeleted.order_by([params[:sort_by].to_sym,params[:order_by].to_sym]).paginate(paginate_options)
     end
+  end
+  
+  def self.search(params,user)
+    params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
+    params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
+    user.contacts.undeleted.any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym])
+  end
+  
+   def self.get_criteria(query)
+    [ {first_name: /#{query}/i } , { email: /#{query}/i  }, { last_name: /#{query}/i  }]
   end
 end

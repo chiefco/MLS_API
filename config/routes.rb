@@ -63,6 +63,9 @@ MeetlinkshareApi::Application.routes.draw do
     match '/add_page_comment', :to => 'items#add_page_comment'
     match '/multiple_note_delete', :to => 'items#multiple_note_delete'
     match '/get_user_storage', :to => 'attachments#get_user_storage'
+    match '/search_contacts', :to => 'contacts#search_contacts'
+    match '/search_own_team', :to => 'communities#search_own_team'
+    match '/search_shared_team', :to => 'communities#search_shared_team'
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do

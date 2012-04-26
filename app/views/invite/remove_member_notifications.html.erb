@@ -2,5 +2,5 @@
 <b>You</b> are unsubscribed from the MeetLinkshare virtual team called <b><%= @community_name%></b><br/><br/>
 <% else %>
 <b><%= @user_name %></b> has removed<b> <%= @names%></b> from the MeetLinkshare virtual team called <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>><%= @community_name%></a><br/><br/>
-<% end %>
 <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>>If you do not want to receive notifications for this team, please turn them off here</a>
+<% end %>

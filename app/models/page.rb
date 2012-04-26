@@ -49,7 +49,7 @@ class Page
   end
 
   def save_activity(text)
-    self.item.activities.create(:action=>text,:user_id=>self.item.user.nil?  ? 'nil' : self.item.user._id)
+    self.item.activities.create(:action=>text,:user_id => self.item.user.nil?  ? 'nil' : self.item.user._id, :page_order => self.page_order)
   end
 
   def self.create_page_texts(pagetexts,id)

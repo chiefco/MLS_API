@@ -219,5 +219,17 @@ class Community
        Invite.community_accept_notifications(current_user_name, community_id, community_name, email).deliver
     end
   end
+  
+  def self.search_own(params,user)
+    user.communities.undeleted.any_of(self.get_criteria(params[:q]))
+  end
+  
+  def self.search_shared(params,user)
+    CommunityUser.where(:user_id => "#{user._id}").map(&:community).select{|c| c.user_id != user.id && c.status == true }
+  end
+  
+  def self.get_criteria(query)
+    [ {name: /#{query}/i }]
+  end
 
 end

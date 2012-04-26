@@ -149,7 +149,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
     render_missing_params(missing_params) unless missing_params.blank?
   end
 
-  # Public: Logic to return all user activities  
+  # Private: Logic to return all user activities  
   # Called from method 'activities' 
   # Returns the user activities
   def find_activities
@@ -164,7 +164,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
     end
   end
 
-  # Public: Logic to return all community activities 
+  # Private: Logic to return all community activities 
   # Called from method 'activities' 
   # Returns the community activities
   def find_communtiy_activities(community_id)
@@ -196,23 +196,23 @@ class V1::RegistrationsController < Devise::RegistrationsController
     end
   end  
 
-  # Public: Fetches user activities(activities fetch logic) 
+  # Private: Fetches user activities(activities fetch logic) 
   # Called from methods 'find_activities'
   # Returns the user activities
   def get_activities(activity)
     case activity.entity_type
     when "Item"
-      @item_name=activity.entity.name
+      @item_name = activity.entity.name
       get_activity(activity, "note", @item_name)
     when "Category"
-      @category_name=activity.entity.name
+      @category_name = activity.entity.name
       get_activity(activity, @category_name, 'nil') 
     when "Comment"
-      comment=Comment.where(:_id=>activity.entity_id).first
+      comment = Comment.where(:_id=>activity.entity_id).first
       username = comment.user.first_name rescue '' 
       values = comment.commentable.attachable unless comment.nil?
       item = values.item
-      get_activity(activity, values.page_order, item.name, item) if values.class==Page
+      get_activity(activity, values.page_order, item.name, item, comment.message) if values.class==Page
     when "Folder"
       @folder_name=activity.entity.name
       get_activity(activity, "folder", @folder_name)          
@@ -232,7 +232,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
     end
   end
 
-  # Public: Fetches community activities(activities fetch logic) 
+  # Private: Fetches community activities(activities fetch logic) 
   # Called from methods 'find_community_activities'
   # Returns the community activities
   def get_community_activities(activity)  
@@ -257,19 +257,19 @@ class V1::RegistrationsController < Devise::RegistrationsController
     end 
   end
 
-  # Public: Fetches single activity 
+  # Private: Fetches single activity 
   # Called fron methods 'find_activities', 'find_community_activities'
   # Returns the community activities
-  def get_activity(activity, item, item_name, comment_item=nil)
+  def get_activity(activity, item, item_name, comment_item=nil, message=nil)
     activity_date = (activity.updated_at).to_time.strftime("%Y-%m-%d %H:%M:%S") rescue ''
     @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name, :item=>item, :item_name=>item_name}})
     @activities_temp=Yamler.load("#{Rails.root.to_s}/config/activities_temp.yml", {:locals => {:username =>@first_name, :item=>item, :item_name=>item_name}})    
-    @item << {:user => @first_name, :entity => "#{item}", :entity_name => item_name, :id => activity.entity._id,:type => activity.entity_type,:type_id => activity.entity_id, :message => "#{@activities[activity.action]}", :message_temp => "#{@activities_temp[activity.action]}", :date => activity_date, :local_date => activity.updated_at, :entity_id => activity.entity_id, :action => activity.action, :shared_id => "#{comment_item.nil? ? activity.shared_id : comment_item._id}"  }    
+    @item << {:user => @first_name, :entity => "#{item}", :entity_name => item_name, :id => activity.entity._id, :type => activity.entity_type,:type_id => activity.entity_id, :message => "#{@activities[activity.action]}", :message_temp => "#{@activities_temp[activity.action]}", :date => activity_date, :local_date => activity.updated_at, :entity_id => activity.entity_id, :action => activity.action, :shared_id => "#{comment_item.nil? ? activity.shared_id : comment_item._id}", :comment_msg => "#{message.nil? ? nil : message}", :page => activity.page_order }    
   end     
 
   #returns the item if provided
   def find_the_item(item)
     @activity_item=Item.where(:_id=>item).first
     @activity_item=@activity_item.nil? ? "nil" : @activity_item.name
-  end
+  end   
 end

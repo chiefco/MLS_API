@@ -355,8 +355,12 @@ def create_or_update_pages(pages,value=nil)
   def create_or_update_location(location, latitude, longitude, state, country)
     unless location.nil?
       location_present = @user.locations.where(:latitude => latitude, :longitude => longitude).first
-      location_meet=@user.locations.create(:name => location, :latitude => latitude, :longitude => longitude, :state => state, :country => country) if location_present.nil?
-      @location_id=location_meet._id unless location_meet.nil?
+      if location_present.nil?
+        location_meet=@user.locations.create(:name => location, :latitude => latitude, :longitude => longitude, :state => state, :country => country) 
+        @location_id=location_meet._id unless location_meet.nil?
+      else
+        @location_id=location_present._id
+      end
     end
   end 
 end

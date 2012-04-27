@@ -55,8 +55,8 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
 
   def authenticate_request!
-    @current_user=User.valid_user?(params[:access_token]) if params[:access_token]
-    Time.zone = @current_user.timezone if !@current_user.timezone.nil?
+    @current_user=User.valid_user?(params[:access_token]) if params[:access_token] 
+    Time.zone = @current_user.timezone if !@current_user.timezone.blank?
     
     respond_to do |format|
       format.json{render :json=>UNAUTHORIZED}

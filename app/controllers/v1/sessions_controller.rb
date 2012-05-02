@@ -10,7 +10,7 @@ class V1::SessionsController < Devise::SessionsController
     params[:user][:email],params[:user][:password]=user.decode_credentials if user && user.is_a?(String)
     resource = warden.authenticate!(:scope => resource_name, :recall => "V1::Sessions#index")
 
-    if params[:timezone] && resource.timezone != params[:timezone]
+    if params[:timezone] && !params[:timezone].blank? && resource.timezone != params[:timezone]
       resource.timezone = params[:timezone]
       resource.save
     end      
@@ -29,7 +29,7 @@ class V1::SessionsController < Devise::SessionsController
   end
   
   def subcribe_user
-    response_subscription= HTTParty.post(SANBOX_URL,{ :body=>{"receipt-data" =>params[:receipt],"password" => PASSWORD}.to_json}).parse
+    response_subscription= HTTParty.post(LIVE_URL,{ :body=>{"receipt-data" =>params[:receipt],"password" => PASSWORD}.to_json}).parse
     @receipt_value=response_subscription["receipt"]
     status=response_subscription["status"].to_i
     save_subscription(response_subscription) if status.zero?

@@ -284,7 +284,7 @@ def create_or_update_pages(pages,value=nil)
     CommunityUser.create(:user_id=>@user._id,:community_id=>communities._id,:role_id=>1)
     @result_hash=@result_hash.merge(community["id"]=>communities._id)
     members.slice!(0)
-    communities.invite(members.empty? ? "": members,@user)
+    communities.invite(members.empty? ? "": members,@user, community["message"])
   end  
   
   def update_communities(community)

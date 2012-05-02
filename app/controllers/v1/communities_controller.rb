@@ -5,6 +5,7 @@ class V1::CommunitiesController < ApplicationController
   before_filter :add_pagination,:only=>[:index]
   before_filter :detect_missing_params, :only=>[:create]
   before_filter :check_authorised_mem, :only=>[:show]
+  before_filter :check_subscribed_user, :only=>[:create]
 
     
   # Public: Lists all the communities, shared communities, list the community users and invited users
@@ -14,15 +15,16 @@ class V1::CommunitiesController < ApplicationController
   # Returns the json result with current user community list, shared comunity with shares count and members count
    def index
     communities = @current_user.communities.undeleted
+    @current_user.subscription_type == "free" ? subscribed_user = false : subscribed_user = true
     shared_communities = CommunityUser.where(:user_id => "#{@current_user._id}").map(&:community).select{|c| c.user_id != @current_user.id && c.status == true}
     #~ invited_members = (communities.map(&:community_invitees).flatten.map(&:email) + communities.map(&:invitations).flatten.map(&:email)).uniq
     invited_members =  (@current_user.contacts.map(&:email) - [@current_user.email]).uniq
-    mls_users = User.any_in(:email => invited_members).only(:first_name, :last_name, :email)
+    mls_users = User.any_in(:email => invited_members).only(:first_name, :last_name, :email, :job_title, :company, :industry_id)
     users_email = User.any_in(:email => invited_members).map(&:email)
     other_members    = invited_members - users_email
     respond_to do |format|
-      format.json {render :json =>  {:communities => communities.to_json(:methods => [:users_count, :shares_count]).parse, :invited_members => invited_members.to_json.parse, :mls_users => mls_users.to_json.parse, :other_members => other_members.to_json.parse, :shared_communities => shared_communities.to_json(:methods => [:users_count, :shares_count]).parse}} # index.html.erb
-    end
+      format.json {render :json =>  {:communities => communities.to_json(:methods => [:users_count, :shares_count]).parse, :invited_members => invited_members.to_json.parse, :mls_users => mls_users.to_json(:methods => [:user_info]).parse, :other_members => other_members.to_json.parse, :shared_communities => shared_communities.to_json(:methods => [:users_count, :shares_count]).parse, :subscribed_user => subscribed_user}} # index.html.erb
+    end 
   end
   
   # Public: Displays community information
@@ -35,17 +37,17 @@ class V1::CommunitiesController < ApplicationController
       folders = @community.folders.comm_folders
       attachments_count = @community.attachments.total_attachments.count
       community_owner = @community.community_users.select{|i| i.user_id == @community.user_id && i.status == true}.map(&:user)
-      users = (@community.community_users.select{|i| i.status == true}.map(&:user) - community_owner).uniq
+      users = (@community.community_users.undeleted.map(&:user) - community_owner).uniq
       invitees = ((@community.invitations.unused.map(&:email) + @community.community_invitees.map(&:email)) - @community.community_users.map(&:user).map(&:email)).uniq 
-       invited_mls_users = User.any_in(:email => invitees).only(:first_name, :last_name, :email)
-       users_email = User.any_in(:email => invitees).map(&:email)
-       invited_other_members  = invitees - users_email
+      invited_mls_users = User.any_in(:email => invitees).only(:first_name, :last_name, :email, :job_title, :company, :industry_id)
+      users_email = User.any_in(:email => invitees).map(&:email)
+      invited_other_members  = invitees - users_email
     
       @community_user = @community.community_users.where(:user_id => @current_user._id).first
 
       respond_to do |format|
         if @community.status!=false
-          format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :invitees => invitees.to_json.parse, :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :community_attachments => @community.attachments.current_version.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :folder_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision]).parse, :attachments_count => attachments_count, :folder_share => folders.to_json(:methods => [:user_name]).parse,  :users => users.to_json(:only=>[:_id, :first_name, :last_name, :email]).parse, :community_owner => community_owner.to_json(:only=>[:_id, :first_name, :last_name, :email]).parse, :subscribe_email =>@community_user.to_json(:only => [:subscribe_email]).parse, :invited_mls_users => invited_mls_users.to_json.parse, :invited_other_members => invited_other_members.to_json.parse}.to_success}
+          format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :invitees => invitees.to_json.parse, :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id]).parse, :community_attachments => @community.attachments.current_version.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :folder_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision]).parse, :attachments_count => attachments_count, :folder_share => folders.to_json(:methods => [:user_name]).parse,  :users => users.to_json(:methods => [:user_info]).parse, :community_owner => community_owner.to_json(:only=>[:_id, :first_name, :last_name, :email]).parse, :subscribe_email =>@community_user.to_json(:only => [:subscribe_email]).parse, :invited_mls_users => invited_mls_users.to_json(:methods => [:user_info]).parse, :invited_other_members => invited_other_members.to_json.parse}.to_success}
         else
           format.json  {render :json=> failure.merge(INVALID_PARAMETER_ID)}
         end
@@ -55,24 +57,30 @@ class V1::CommunitiesController < ApplicationController
           format.json{render :json=>{:message=>'Your are not a authorised person to view team'}.to_failure}
        end
     end
-  end  
+  end 
   
   # Public: Creates a new community
   # params[:community] - community params are passed
   # Returns json of communtiy
-  def create    
-    @community = @current_user.communities.new(params[:community])    
-    respond_to do |format|
-      if @community.save
-        if !params[:invite_email].nil?
-          @community.invite(params[:invite_email][:users], @current_user) unless params[:invite_email][:users].blank? unless params[:invite_email][:users].blank?
+  def create  
+    if @subscribed_user    
+        @community = @current_user.communities.new(params[:community])    
+        respond_to do |format|
+          if @community.save
+            if !params[:invite_email].nil?
+              @community.invite(params[:invite_email][:users], @current_user) unless params[:invite_email][:users].blank? unless params[:invite_email][:users].blank?
+            end
+            CommunityUser.create(:user_id=>@current_user._id,:community_id=>@community._id,:subscribe_email => params[:subscribe_email], :role_id=>1)
+            find_parameters
+            format.json {render :json => @community}
+          else
+            format.json {render :json => @community.all_errors}
+          end
         end
-        CommunityUser.create(:user_id=>@current_user._id,:community_id=>@community._id,:subscribe_email => params[:subscribe_email], :role_id=>1)
-        find_parameters
-        format.json {render :json => @community}
-      else
-        format.json {render :json => @community.all_errors}
-      end
+    else
+       respond_to do |format|
+          format.json{render :json=>{:message=>'Your are not a subscribed user to create new team'}.to_failure}
+       end
     end
   end
   
@@ -370,6 +378,11 @@ class V1::CommunitiesController < ApplicationController
   #Private: Authorized member check
   def check_authorised_mem
     @authoriesd_mem = CommunityUser.where(:user_id => @current_user._id, :community_id => params[:id]).first
+  end
+  
+  #Private: Subscribed member check
+  def check_subscribed_user
+    @subscribed_user = @current_user.subscription_type == "free" ? false :  true
   end
     
 end

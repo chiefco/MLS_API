@@ -121,6 +121,13 @@ class User
   def self.get_criteria(query)
     [ {first_name: query} , { last_name: query }, { email: query }, { job_title: query }, { company: query} ]
   end
+  
+  def user_info
+    industry = self.industry.name rescue ''
+    communities = self.communities.undeleted.count rescue 0
+    items = self.items.undeleted.count rescue 0
+    [industry, items, communities]
+  end
 
   def community_membership_ids
     community_users.collect{|c| c.community_id.to_s}

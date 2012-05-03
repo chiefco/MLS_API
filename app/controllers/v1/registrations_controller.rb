@@ -154,9 +154,9 @@ class V1::RegistrationsController < Devise::RegistrationsController
   # Returns the user activities
   def find_activities
     @first_name=@current_user.first_name
-    user_communities = @current_user.communities.undeleted.map(&:id)
+    user_communities = (@current_user.communities.undeleted.map(&:id) + CommunityUser.where(:user_id => "#{@current_user._id}").map(&:community_id)).uniq
     @contacts_activities = Activity.any_in(:entity_id => user_communities)
-    activities = (@current_user.activities_users + @contacts_activities).uniq.sort_by{|a| a.created_at}
+    activities = (@current_user.activities_users + @contacts_activities).uniq.sort_by{|a| a.updated_at}
     @activities_count = activities.count
 
     activities.reverse.paginate(@paginate_options).each do |activity|
@@ -180,16 +180,24 @@ class V1::RegistrationsController < Devise::RegistrationsController
         else
           case activity.action
           when "SHARE_MEET"
-            @item_name = Item.find "#{activity.shared_id}"
-            get_activity(activity, @community_name, @item_name.name)
+          @item_name = Item.find "#{activity.shared_id}"
+          get_activity(activity, @community_name, @item_name.name)
           when "SHARE_ATTACHMENT"
-            @attachment = Attachment.where(:_id => activity.shared_id).first
-            @attachment_name = @attachment.file_name rescue ''
-            get_activity(activity, @community_name, @attachment_name) 
+          @attachment = Attachment.where(:_id => activity.shared_id).first
+          @attachment_name = @attachment.file_name rescue ''
+          get_activity(activity, @community_name, @attachment_name) 
           when "COMMUNITY_JOINED"           
-            @invitation=Invitation.where(:_id=>activity.shared_id).first
-            @username = User.where(:email => @invitation.email).first.first_name rescue ''
-            get_activity(activity, 'community', @community_name)            
+          @invitation=Invitation.where(:_id=>activity.shared_id).first
+          @username = User.where(:email => @invitation.email).first.first_name rescue ''
+          get_activity(activity, 'community', @community_name)   
+          when "COMMENT_CREATED"
+          comment = Comment.find(activity.shared_id)
+          username = comment.user.first_name rescue '' 
+          values = comment.commentable.attachable unless comment.nil?
+          attachment = comment.commentable
+          comment_count = attachment.comments.count rescue 0 
+          item = values.item
+          get_activity(activity, values.page_order, item.name, item, comment.message, comment_count, attachment._id) if values.class==Page                     
           end
         end
       end
@@ -253,6 +261,12 @@ class V1::RegistrationsController < Devise::RegistrationsController
         @invitation=Invitation.where(:_id=>activity.shared_id).first
         @first_name = User.where(:email => @invitation.email).first.first_name rescue ''
         get_activity(activity, 'community', @community.name) if !@first_name.blank?
+        when "COMMENT_CREATED"
+        comment = Comment.find(activity.shared_id)
+        username = comment.user.first_name rescue '' 
+        values = comment.commentable.attachable unless comment.nil?
+        item = values.item
+        get_activity(activity, values.page_order, item.name, item, comment.message) if values.class==Page
       end
     end 
   end
@@ -260,12 +274,12 @@ class V1::RegistrationsController < Devise::RegistrationsController
   # Private: Fetches single activity 
   # Called fron methods 'find_activities', 'find_community_activities'
   # Returns the community activities
-  def get_activity(activity, item, item_name, comment_item=nil, message=nil)
+  def get_activity(activity, item, item_name, comment_item=nil, message=nil, comment_count=nil, attachment_id=nil)
     timezone = @current_user.timezone
     timezone.blank? ? activity_date = activity.updated_at.strftime("%Y-%m-%d %H:%M:%S") : activity_date = activity.updated_at.in_time_zone(timezone).utc.strftime("%Y-%m-%d %H:%M:%S") rescue ''
     @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name, :item=>item, :item_name=>item_name}})
     @activities_temp=Yamler.load("#{Rails.root.to_s}/config/activities_temp.yml", {:locals => {:username =>@first_name, :item=>item, :item_name=>item_name}})    
-    @item << {:user => @first_name, :entity => "#{item}", :entity_name => item_name, :id => activity.entity._id, :type => activity.entity_type,:type_id => activity.entity_id, :message => "#{@activities[activity.action]}", :message_temp => "#{@activities_temp[activity.action]}", :date => activity_date, :local_date => activity.updated_at, :entity_id => activity.entity_id, :action => activity.action, :shared_id => "#{comment_item.nil? ? activity.shared_id : comment_item._id}", :comment_msg => "#{message.nil? ? nil : message}", :page => activity.page_order }    
+    @item << {:user => @first_name, :entity => "#{item}", :entity_name => item_name, :id => activity.entity._id, :type => activity.entity_type,:type_id => activity.entity_id, :message => "#{@activities[activity.action]}", :message_temp => "#{@activities_temp[activity.action]}", :date => activity_date, :local_date => activity.updated_at, :entity_id => activity.entity_id, :action => activity.action, :shared_id => "#{comment_item.nil? ? activity.shared_id : comment_item._id}", :comment_msg => message, :page => activity.page_order, :comment_count => comment_count, :attachment_id => attachment_id }    
   end     
 
   #returns the item if provided

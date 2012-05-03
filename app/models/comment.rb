@@ -18,9 +18,10 @@ class Comment
   def create_activity
     attachment = self.commentable
     page = attachment.attachable
-    duplicate_comment = attachment.comments.where(:user_id => self.user_id, :_id.ne => self._id).first
-    if duplicate_comment
-      self.user.activities_users.where(:shared_id => duplicate_comment._id).first.update_attributes(:shared_id => self._id) rescue ''
+    
+    duplicate_activity = self.user.activities_users.where(:action => "COMMENT_CREATED", :page_order => page.page_order.to_s).first
+    if duplicate_activity
+      duplicate_activity.update_attributes(:shared_id => self._id) 
     else
       page.item.shares.map(&:community)[0].activities.create(:action=>"COMMENT_CREATED", :user_id=>self.user.nil?  ? 'nil' : self.user._id, :page_order => page.page_order, :shared_id => self._id)    
     end      

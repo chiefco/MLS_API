@@ -262,11 +262,13 @@ class V1::RegistrationsController < Devise::RegistrationsController
         @first_name = User.where(:email => @invitation.email).first.first_name rescue ''
         get_activity(activity, 'community', @community.name) if !@first_name.blank?
         when "COMMENT_CREATED"
-        comment = Comment.find(activity.shared_id)
-        username = comment.user.first_name rescue '' 
-        values = comment.commentable.attachable unless comment.nil?
-        item = values.item
-        get_activity(activity, values.page_order, item.name, item, comment.message) if values.class==Page
+          comment = Comment.find(activity.shared_id)
+          username = comment.user.first_name rescue '' 
+          values = comment.commentable.attachable unless comment.nil?
+          attachment = comment.commentable
+          comment_count = attachment.comments.count rescue 0 
+          item = values.item
+          get_activity(activity, values.page_order, item.name, item, comment.message, comment_count, attachment._id) if values.class==Page          
       end
     end 
   end

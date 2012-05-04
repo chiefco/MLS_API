@@ -262,13 +262,13 @@ class V1::RegistrationsController < Devise::RegistrationsController
         @first_name = User.where(:email => @invitation.email).first.first_name rescue ''
         get_activity(activity, 'community', @community.name) if !@first_name.blank?
         when "COMMENT_CREATED"
-          comment = Comment.find(activity.shared_id)
-          username = comment.user.first_name rescue '' 
-          values = comment.commentable.attachable unless comment.nil?
-          attachment = comment.commentable
-          comment_count = attachment.comments.count rescue 0 
-          item = values.item
-          get_activity(activity, values.page_order, item.name, item, comment.message, comment_count, attachment._id) if values.class==Page          
+        comment = Comment.find(activity.shared_id)
+        @first_name = comment.user.first_name rescue '' 
+        values = comment.commentable.attachable unless comment.nil?
+        attachment = comment.commentable
+        comment_count = attachment.comments.count rescue 0 
+        item = values.item
+        get_activity(activity, values.page_order, item.name, item, comment.message, comment_count, attachment._id) if values.class==Page          
       end
     end 
   end
@@ -279,7 +279,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
   def get_activity(activity, item, item_name, comment_item=nil, message=nil, comment_count=nil, attachment_id=nil)
     timezone = @current_user.timezone
     timezone.blank? ? activity_date = activity.updated_at.strftime("%Y-%m-%d %H:%M:%S") : activity_date = activity.updated_at.in_time_zone(timezone).utc.strftime("%Y-%m-%d %H:%M:%S") rescue ''
-    @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username =>@first_name, :item=>item, :item_name=>item_name}})
+    @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username => @first_name, :item=>item, :item_name=>item_name}})
     @activities_temp=Yamler.load("#{Rails.root.to_s}/config/activities_temp.yml", {:locals => {:username =>@first_name, :item=>item, :item_name=>item_name}})    
     @item << {:user => @first_name, :entity => "#{item}", :entity_name => item_name, :id => activity.entity._id, :type => activity.entity_type,:type_id => activity.entity_id, :message => "#{@activities[activity.action]}", :message_temp => "#{@activities_temp[activity.action]}", :date => activity_date, :local_date => activity.updated_at, :entity_id => activity.entity_id, :action => activity.action, :shared_id => "#{comment_item.nil? ? activity.shared_id : comment_item._id}", :comment_msg => message, :page => activity.page_order, :comment_count => comment_count, :attachment_id => attachment_id }    
   end     

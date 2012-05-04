@@ -6,6 +6,8 @@ class Comment
   field :status,:type=>Boolean,:default=>true
   field :commentable_type, :type => String
   field :commentable_id, :type => String
+  field :community_id, :type => String
+
   belongs_to :user
   has_many :activities, as: :entity
   belongs_to :commentable, polymorphic: true
@@ -16,8 +18,15 @@ class Comment
   after_create :create_activity
 
   def create_activity
+    commented_community = Community.find(self.community_id) rescue nil
     page = self.commentable.attachable
-    page.item.shares.map(&:community)[0].activities.create(:action=>"COMMENT_CREATED", :user_id=>self.user.nil?  ? 'nil' : self.user._id, :page_order => page.page_order, :shared_id => self._id)
+    duplicate_activity = commented_community.activities.where(:action => "COMMENT_CREATED", :page_order => page.page_order.to_s, :page_id => page._id, :user_id => self.user_id).first rescue nil
+
+    if duplicate_activity
+      duplicate_activity.update_attributes(:shared_id => self._id)
+    else
+      commented_community.activities.create(:action=>"COMMENT_CREATED", :user_id=>self.user.nil?  ? 'nil' : self.user._id, :page_order => page.page_order, :shared_id => self._id, :page_id => page._id)
+    end
   end
 
   def user_name

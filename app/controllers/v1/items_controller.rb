@@ -287,7 +287,7 @@ class V1::ItemsController < ApplicationController
   # Returns json result
   def add_page_comment 
     attachment = Attachment.where(:_id => params[:attachment_id]).first
-    comment = attachment.comments.new(:message => params[:message], :user_id => @current_user._id, :commentable_type => "Attachment", :created_at => Time.now, :updated_at => Time.now)
+    comment = attachment.comments.new(:message => params[:message], :user_id => @current_user._id, :commentable_type => "Attachment", :created_at => Time.now, :updated_at => Time.now, :community_id => params[:community_id])
 
     respond_to do |format|
       if comment.save

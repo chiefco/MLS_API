@@ -51,6 +51,11 @@ class Invite < ActionMailer::Base
   def community_accept_notifications(current_user_name, community_id, community_name, email)
     @user_name, @community_id, @community_name, @email  = current_user_name, community_id, community_name, email
      mail(:to=>@email, :subject =>"#{@user_name}  has joined the team #{@community_name} on Meetlinkshare", :reply_to => "no-reply@info.meetlinkshare.com")
+   end
+   
+  def comment_notifications(current_user_name, community_id, community_name, message, email, item_id, page_order)
+    @user_name, @community_id, @community_name, @message, @email, @item_id, @page_order  = current_user_name, community_id, community_name, message, email, item_id, page_order
+     mail(:to=>@email, :subject =>"#{@user_name}  commented on your page", :reply_to => "no-reply@info.meetlinkshare.com")
   end
 
 end

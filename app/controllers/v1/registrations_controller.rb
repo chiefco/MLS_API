@@ -197,7 +197,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
           attachment = comment.commentable
           comment_count = attachment.comments.count rescue 0 
           item = values.item
-          get_activity(activity, values.page_order, item.name, item, comment.message, comment_count, attachment._id) if values.class==Page                     
+          get_activity(activity, values.page_order, item.name, nil, comment.message, comment_count, attachment._id) if values.class==Page                     
           end
         end
       end
@@ -268,7 +268,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
         attachment = comment.commentable
         comment_count = attachment.comments.count rescue 0 
         item = values.item
-        get_activity(activity, values.page_order, item.name, item, comment.message, comment_count, attachment._id) if values.class==Page          
+        get_activity(activity, values.page_order, item.name, nil, comment.message, comment_count, attachment._id) if values.class==Page          
       end
     end 
   end

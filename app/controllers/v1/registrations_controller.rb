@@ -169,7 +169,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
   # Returns the community activities
   def find_communtiy_activities(community_id)
     @community = Community.find(community_id)
-    activities = @community.activities
+    activities = @community.activities.order('updated_at desc')
     @activities_count = activities.count
     @community_name = @community.name
     activities.reverse.paginate(@paginate_options).each do |activity|
@@ -197,7 +197,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
           attachment = comment.commentable
           comment_count = attachment.comments.count rescue 0 
           item = values.item
-          get_activity(activity, values.page_order, item.name, nil, comment.message, comment_count, attachment._id) if values.class==Page                     
+          get_activity(activity, values.page_order, item.name, nil, comment.message, comment_count, attachment._id, item._id) if values.class==Page                     
           end
         end
       end
@@ -268,7 +268,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
         attachment = comment.commentable
         comment_count = attachment.comments.count rescue 0 
         item = values.item
-        get_activity(activity, values.page_order, item.name, nil, comment.message, comment_count, attachment._id) if values.class==Page          
+        get_activity(activity, values.page_order, item.name, nil, comment.message, comment_count, attachment._id, item._id) if values.class==Page          
       end
     end 
   end
@@ -276,12 +276,12 @@ class V1::RegistrationsController < Devise::RegistrationsController
   # Private: Fetches single activity 
   # Called fron methods 'find_activities', 'find_community_activities'
   # Returns the community activities
-  def get_activity(activity, item, item_name, comment_item=nil, message=nil, comment_count=nil, attachment_id=nil)
+  def get_activity(activity, item, item_name, comment_item=nil, message=nil, comment_count=nil, attachment_id=nil, item_id=nil)
     timezone = @current_user.timezone
     timezone.blank? ? activity_date = activity.updated_at.strftime("%Y-%m-%d %H:%M:%S") : activity_date = activity.updated_at.in_time_zone(timezone).utc.strftime("%Y-%m-%d %H:%M:%S") rescue ''
     @activities=Yamler.load("#{Rails.root.to_s}/config/activities.yml", {:locals => {:username => @first_name, :item=>item, :item_name=>item_name}})
     @activities_temp=Yamler.load("#{Rails.root.to_s}/config/activities_temp.yml", {:locals => {:username =>@first_name, :item=>item, :item_name=>item_name}})    
-    @item << {:user => @first_name, :entity => "#{item}", :entity_name => item_name, :id => activity.entity._id, :type => activity.entity_type,:type_id => activity.entity_id, :message => "#{@activities[activity.action]}", :message_temp => "#{@activities_temp[activity.action]}", :date => activity_date, :local_date => activity.updated_at, :entity_id => activity.entity_id, :action => activity.action, :shared_id => "#{comment_item.nil? ? activity.shared_id : comment_item._id}", :comment_msg => message, :page => activity.page_order, :comment_count => comment_count, :attachment_id => attachment_id }    
+    @item << {:user => @first_name, :entity => "#{item}", :entity_name => item_name, :id => activity.entity._id, :type => activity.entity_type,:type_id => activity.entity_id, :message => "#{@activities[activity.action]}", :message_temp => "#{@activities_temp[activity.action]}", :date => activity_date, :local_date => activity.updated_at, :entity_id => activity.entity_id, :action => activity.action, :shared_id => "#{comment_item.nil? ? activity.shared_id : comment_item._id}", :comment_msg => message, :page => activity.page_order, :comment_count => comment_count, :attachment_id => attachment_id, :item_id => item_id }    
   end     
 
   #returns the item if provided

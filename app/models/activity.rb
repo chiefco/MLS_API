@@ -1,7 +1,7 @@
 class Activity
   include Mongoid::Document
   include Mongoid::Timestamps
-  SORT_BY_ALLOWED = [ :activity_type,:created_at]
+  SORT_BY_ALLOWED = [ :activity_type,:created_at, :updated_at]
   ORDER_BY_ALLOWED =  [:asc,:desc]
   field :action, :type => String
   field :shared_id, :type => String

@@ -23,7 +23,7 @@ class Comment
     duplicate_activity = commented_community.activities.where(:action => "COMMENT_CREATED", :page_order => page.page_order.to_s, :page_id => page._id, :user_id => self.user_id).first rescue nil
 
     if duplicate_activity
-      duplicate_activity.update_attributes(:shared_id => self._id)
+      duplicate_activity.update_attributes(:shared_id => self._id, :updated_at => Time.now)
     else
       commented_community.activities.create(:action=>"COMMENT_CREATED", :user_id=>self.user.nil?  ? 'nil' : self.user._id, :page_order => page.page_order, :shared_id => self._id, :page_id => page._id) rescue ''
     end

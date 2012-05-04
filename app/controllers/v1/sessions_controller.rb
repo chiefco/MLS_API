@@ -186,7 +186,6 @@ class V1::SessionsController < Devise::SessionsController
             meet.delete(:updated_page)
             meet.delete(:page)
             meet.delete(:share)
-            
             create_or_update_location(meet[:location_name],  meet[:location_latitude], meet[:location_longitude], meet[:location_state], meet[:location_country])
             meet[:location_id] = @location_id
             @meet.update_attributes(meet)
@@ -331,7 +330,7 @@ def create_or_update_pages(pages,value=nil)
   
   def create_comment(member)
     attachment=Attachment.where(:_id=>member["cloud_id"]).first
-    comment=@user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment._id,:message=>member["message"]) unless attachment.nil?
+    comment=@user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment._id,:message=>member["message"],:community_id=>member["community_id"]) unless attachment.nil?
     @community_comments << {member["id"] => comment._id} unless comment.nil?
   end
   

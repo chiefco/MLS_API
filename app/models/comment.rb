@@ -41,7 +41,7 @@ class Comment
     comments=[]
       unless messages.nil?
           messages.each do |message|
-          comment=user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment,:message=>message[:message])
+          comment=user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment,:message=>message[:message],:community_id=>message[:community_id])
           comments<<{message[:comment_id]=>comment._id}
         end
       end

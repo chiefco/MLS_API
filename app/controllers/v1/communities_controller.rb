@@ -351,7 +351,7 @@ class V1::CommunitiesController < ApplicationController
   def search_shared_team
      communities = Community.search_shared(params,@current_user)
       respond_to do |format|
-        format.json {render :json =>{:communities=>communities.to_json(:methods => [:users_count, :shares_count]).parse}.to_success}
+        format.json {render :json =>{:communities=>communities.to_json(:only=>[:_id,:name], :methods => [:users_count, :shares_count]).parse}.to_success}
       end
   end
 

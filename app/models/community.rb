@@ -220,12 +220,13 @@ class Community
     end
   end
   
-  def self.search_own(params,user)
-    user.communities.undeleted.any_of(self.get_criteria(params[:q]))
+  def self.search_own(params,user)    
+      params[:q] !='' ? user.communities.undeleted.any_of(self.get_criteria(params[:q])) : user.communities.undeleted
   end
   
   def self.search_shared(params,user)
-    CommunityUser.where(:user_id => "#{user._id}").map(&:community).select{|c| c.user_id != user.id && c.status == true }
+    community_ids = CommunityUser.where(:user_id => "#{user._id}").map(&:community).select{|c| c.user_id != user._id}.map(&:_id)
+    params[:q] !='' ? Community.undeleted.any_in(:_id => community_ids).any_of(self.get_criteria(params[:q])) : Community.undeleted.any_in(:_id => community_ids)
   end
   
   def self.get_criteria(query)

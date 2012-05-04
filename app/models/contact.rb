@@ -41,7 +41,18 @@ class Contact
   def self.search(params,user)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
-    user.contacts.undeleted.any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym])
+    email = user.contacts.undeleted.map(&:email)
+    mls_user_email = User.any_in(:email => email).map(&:email)
+    others_email = email - mls_user_email
+    if params[:q] !=''
+        mls_user = User.any_in(:email => email).any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym])
+        other_members = Contact.any_in(:email => others_email).any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym])
+    else
+        mls_user = User.any_in(:email => email).order_by([params[:sort_by].to_sym,params[:order_by].to_sym])
+        other_members = Contact.any_in(:email => others_email).order_by([params[:sort_by].to_sym,params[:order_by].to_sym])
+    end
+    return mls_user, other_members.map(&:email)
+    #~ user.contacts.undeleted.any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym])
   end
   
    def self.get_criteria(query)

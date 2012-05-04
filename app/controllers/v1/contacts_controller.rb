@@ -147,9 +147,9 @@ class V1::ContactsController < ApplicationController
   
   #search user contacts
   def search_contacts
-    @contacts = Contact.search(params,@current_user)
+    contacts = Contact.search(params,@current_user)
       respond_to do |format|
-        format.json {render :json =>{:contacts=>@contacts.to_json(:only=>[:first_name, :last_name, :email]).parse}.to_success}
+        format.json {render :json =>{:mls_users=>contacts[0].to_json(:only=>[:first_name, :last_name, :job_title, :company, :email], :methods => [:user_info]).parse, :other_users=>contacts[1]}.to_success}
       end
   end
 

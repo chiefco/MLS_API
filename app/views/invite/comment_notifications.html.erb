@@ -1,4 +1,4 @@
 Hi, <br/><br/>
 <b><%= @user_name %></b> has commented on your page.<br/><br/>
-<%= @user_name %> wrote: <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}/items/#{ @item_id}?page=#{@page_order.to_i - 1}" : "https://www.meetlinkshare.com/communities/#{@community_id}/items/#{ @item_id}?page=#{@page_order}" %>>"<%= @message%>"</a><br/><br/>
+<%= @user_name %> wrote: <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}/items/#{ @item_id}?page=#{@page_order}" : "https://www.meetlinkshare.com/communities/#{@community_id}/items/#{ @item_id}?page=#{@page_order}" %>>"<%= @message%>"</a><br/><br/>
 <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>>If you do not want to receive notifications for this team, please turn them off here</a>

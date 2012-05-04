@@ -288,7 +288,7 @@ class V1::ItemsController < ApplicationController
   def add_page_comment 
     attachment = Attachment.where(:_id => params[:attachment_id]).first
     comment = attachment.comments.new(:message => params[:message], :user_id => @current_user._id, :commentable_type => "Attachment", :created_at => Time.now, :updated_at => Time.now, :community_id => params[:community_id])
-
+    Item.delay.comment_notifications(params[:attachment_id], params[:community_id],  params[:message], @current_user)
     respond_to do |format|
       if comment.save
         format.json {render :json =>  { :comment => comment.to_a.to_json(:only => [:message, :created_at, :updated_at], :methods => [:user_name]).parse}.to_success} 

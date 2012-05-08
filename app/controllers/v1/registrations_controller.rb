@@ -191,7 +191,7 @@ class V1::RegistrationsController < Devise::RegistrationsController
           @username = User.where(:email => @invitation.email).first.first_name rescue ''
           get_activity(activity, 'community', @community_name)   
           when "COMMENT_CREATED"
-          if !params[:page_size] = "50"
+          if params[:page] && params[:page_size] != "50"
             comment = Comment.find(activity.shared_id)
             username = comment.user.first_name rescue '' 
             values = comment.commentable.attachable unless comment.nil?

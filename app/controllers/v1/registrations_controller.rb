@@ -191,13 +191,15 @@ class V1::RegistrationsController < Devise::RegistrationsController
           @username = User.where(:email => @invitation.email).first.first_name rescue ''
           get_activity(activity, 'community', @community_name)   
           when "COMMENT_CREATED"
-          comment = Comment.find(activity.shared_id)
-          username = comment.user.first_name rescue '' 
-          values = comment.commentable.attachable unless comment.nil?
-          attachment = comment.commentable
-          comment_count = attachment.comments.count rescue 0 
-          item = values.item
-          get_activity(activity, values.page_order, item.name, nil, comment.message, comment_count, attachment._id, item._id) if values.class==Page                     
+          if !params[:page_size] = "50"
+            comment = Comment.find(activity.shared_id)
+            username = comment.user.first_name rescue '' 
+            values = comment.commentable.attachable unless comment.nil?
+            attachment = comment.commentable
+            comment_count = attachment.comments.count rescue 0 
+            item = values.item
+            get_activity(activity, values.page_order, item.name, nil, comment.message, comment_count, attachment._id, item._id) if values.class==Page                     
+          end
           end
         end
       end

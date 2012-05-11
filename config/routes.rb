@@ -66,6 +66,7 @@ MeetlinkshareApi::Application.routes.draw do
     match '/search_contacts', :to => 'contacts#search_contacts'
     match '/search_own_team', :to => 'communities#search_own_team'
     match '/search_shared_team', :to => 'communities#search_shared_team'
+    match '/multiple_contact_delete', :to => 'contacts#multiple_contact_delete'
   end
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do

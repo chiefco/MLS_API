@@ -151,6 +151,18 @@ class V1::ContactsController < ApplicationController
       respond_to do |format|
         format.json {render :json =>{:mls_users=>contacts[0].to_json(:only=>[:first_name, :last_name, :job_title, :company, :email], :methods => [:user_info]).parse, :other_users=>contacts[1]}.to_success}
       end
+    end
+    
+  #Delete multiple contacts  
+  def multiple_contact_delete
+      contacts = Contact.any_in(:email =>params[:mail_ids]).where(:user_id => @current_user._id).destroy_all
+      respond_to do |format|
+        if contacts
+          format.json {render :json=>success}
+        else
+          format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        end
+     end
   end
 
   #finds the contact

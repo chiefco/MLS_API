@@ -16,14 +16,15 @@ class V1::CommunitiesController < ApplicationController
    def index
     communities = @current_user.communities.undeleted
     @current_user.subscription_type == "free" ? subscribed_user = false : subscribed_user = true
-    shared_communities = CommunityUser.where(:user_id => "#{@current_user._id}").map(&:community).select{|c| c.user_id != @current_user.id && c.status == true}
+    shared_communities = CommunityUser.where(:user_id => "#{@current_user._id}").map(&:community).select{|c| c.user_id != @current_user.id && c.status == true}.each {|c| c.unread_notification = c.unread_notifications(@current_user)}
     #~ invited_members = (communities.map(&:community_invitees).flatten.map(&:email) + communities.map(&:invitations).flatten.map(&:email)).uniq
     invited_members =  (@current_user.contacts.map(&:email) - [@current_user.email]).uniq
     mls_users = User.any_in(:email => invited_members).only(:first_name, :last_name, :email, :job_title, :company, :industry_id)
     users_email = User.any_in(:email => invited_members).map(&:email)
     other_members    = invited_members - users_email
+
     respond_to do |format|
-      format.json {render :json =>  {:communities => communities.to_json(:methods => [:users_count, :shares_count]).parse, :invited_members => invited_members.to_json.parse, :mls_users => mls_users.to_json(:methods => [:user_info]).parse, :other_members => other_members.to_json.parse, :shared_communities => shared_communities.to_json(:methods => [:users_count, :shares_count]).parse, :subscribed_user => subscribed_user}} # index.html.erb
+      format.json {render :json =>  {:communities => communities.to_json(:methods => [:users_count, :shares_count, :unread_notifications]).parse, :invited_members => invited_members.to_json.parse, :mls_users => mls_users.to_json(:methods => [:user_info]).parse, :other_members => other_members.to_json.parse, :shared_communities => shared_communities.to_json(:methods => [:users_count, :shares_count]).parse, :subscribed_user => subscribed_user}} # index.html.erb
     end 
   end
   
@@ -31,6 +32,8 @@ class V1::CommunitiesController < ApplicationController
   # Returns the json result with community info
   def show
     if @authoriesd_mem
+      notification = @community.notifications.where(:user_id => @current_user._id).first
+      notification ? notification.update_attributes(:last_viewed => Time.now) : @community.notifications.create(:user_id => @current_user._id, :last_viewed => Time.now)
       @attachments, @items = [], []
       shares = @community.shares.order_by(:created_at.desc)
       items = shares.select{|i| i.shared_type == 'Meet'}.map(&:item).uniq.reject{|v| v.status==false}

@@ -8,9 +8,9 @@ class Comment
   field :commentable_id, :type => String
   field :community_id, :type => String
 
-  belongs_to :user
+  belongs_to :user, index: true
   has_many :activities, as: :entity
-  belongs_to :commentable, polymorphic: true
+  belongs_to :commentable, polymorphic: true, index: true
   # default_scope :without=>[:created_at,:updated_at]
   validates_inclusion_of :commentable_type, :in=>["Attachment"], :message=>"commentable_type-invalid_parameter", :code=>3084
   validates_presence_of :message,:code=>3086,:message=>"message-blank_parameter"

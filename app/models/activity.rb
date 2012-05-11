@@ -7,9 +7,9 @@ class Activity
   field :shared_id, :type => String
   field :page_order, :type => String, :default => 1
 
-  belongs_to :entity, polymorphic: true
+  belongs_to :entity, polymorphic: true, index: true
   belongs_to :subject, polymorphic: true
-  referenced_in :user
+  referenced_in :user, index: true
 
   scope :todays_activities, self.where(:created_at.gte => Time.now.beginning_of_day)
 

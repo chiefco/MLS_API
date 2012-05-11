@@ -21,8 +21,8 @@ class Item
   #~ validates :name ,:length => { :minimum => 3 ,:maximum =>50,:message=>"name - Invalid length",:code=>3077},:allow_blank=>true
   #~ validates_presence_of :template_id,:message=>'template_id - Blank Parameter',:code=>3025
   belongs_to  :template
-  belongs_to  :location
-  belongs_to  :share
+  belongs_to  :location, index: true
+  belongs_to  :share, index: true
 
   references_many :topics,:dependent => :destroy
   references_many :attendees,:dependent => :destroy
@@ -32,6 +32,7 @@ class Item
   has_many :bookmarked_contents, as: :bookmarkable, :dependent=>:destroy
   has_many :comments, as: :commentable
   has_many :activities, as: :entity
+  has_many :notifications, as: :notifier, :dependent=>:destroy
   has_many :shares
   has_many :invitations
   referenced_in :user

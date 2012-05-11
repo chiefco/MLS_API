@@ -42,16 +42,16 @@ class V1::RegistrationsController < Devise::RegistrationsController
   # params[:community_id]  - Returns community activity if passed
   # Returns the user & community activities
   def activities
-    @item = []
+    @item, @usr_communities, @shard_communities = [], [], []
     params[:community_id] ? find_communtiy_activities(params[:community_id]) : find_activities
 	
     if @contacts_activities.nil?
 	    respond_to do |format|
-	      format.json {render :json=>{:activities => @item, :count => @activities_count, :todays_activities => @current_user.activities_users.todays_activities.count}.to_success}
+	      format.json {render :json=>{:activities => @item, :count => @activities_count, :todays_activities => @current_user.activities_users.todays_activities.count, :communities => @usr_communities.to_json.parse, :shared_communities => @shard_communities.to_json.parse}.to_success}
       end
     else
 	    respond_to do |format|
-	      format.json {render :json=>{:activities => @item, :count => @activities_count, :todays_activities => (@current_user.activities_users.todays_activities.count + @contacts_activities.todays_activities.count)}.to_success}
+	      format.json {render :json=>{:activities => @item, :count => @activities_count, :todays_activities => (@current_user.activities_users.todays_activities.count + @contacts_activities.todays_activities.count), :communities => @usr_communities.to_json.parse, :shared_communities => @shard_communities.to_json.parse}.to_success}
       end	    
     end
   end
@@ -154,7 +154,10 @@ class V1::RegistrationsController < Devise::RegistrationsController
   # Returns the user activities
   def find_activities
     @first_name=@current_user.first_name
-    user_communities = (@current_user.communities.undeleted.map(&:id) + CommunityUser.where(:user_id => "#{@current_user._id}").map(&:community_id)).uniq
+    @usr_communities = @current_user.communities.undeleted.only(:_id, :name)
+    @shard_communities = CommunityUser.where(:user_id => "#{@current_user._id}").map(&:community).select{|c| c.user_id != @current_user.id && c.status == true}
+
+    user_communities = (@usr_communities.map(&:id) + @shard_communities.map(&:_id)).uniq
     @contacts_activities = Activity.any_in(:entity_id => user_communities)
     activities = (@current_user.activities_users + @contacts_activities).uniq.sort_by{|a| a.updated_at}
     @activities_count = activities.count
@@ -191,15 +194,13 @@ class V1::RegistrationsController < Devise::RegistrationsController
           @username = User.where(:email => @invitation.email).first.first_name rescue ''
           get_activity(activity, 'community', @community_name)   
           when "COMMENT_CREATED"
-          if params[:page] && params[:page_size] != "50"
-            comment = Comment.find(activity.shared_id)
-            username = comment.user.first_name rescue '' 
-            values = comment.commentable.attachable unless comment.nil?
-            attachment = comment.commentable
-            comment_count = attachment.comments.count rescue 0 
-            item = values.item
-            get_activity(activity, values.page_order, item.name, nil, comment.message, comment_count, attachment._id, item._id) if values.class==Page                     
-          end
+          comment = Comment.find(activity.shared_id)
+          username = comment.user.first_name rescue '' 
+          values = comment.commentable.attachable unless comment.nil?
+          attachment = comment.commentable
+          comment_count = attachment.comments.count rescue 0 
+          item = values.item
+          get_activity(activity, values.page_order, item.name, nil, comment.message, comment_count, attachment._id, item._id) if values.class==Page                     
           end
         end
       end

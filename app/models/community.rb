@@ -5,6 +5,7 @@ class Community
   field :description, :type => String
   field :status, :type => Boolean, :default => true
   field :invitees, :type => Array
+  field :unread_notification, :type => Integer
   referenced_in :user
   references_many :invitations
   references_many :shares
@@ -13,6 +14,8 @@ class Community
   has_many :activities, as: :entity
   has_many :attachments, :dependent => :destroy  
   has_many :folders, :dependent => :destroy   
+  has_many :notifications, as: :notifier, :dependent=>:destroy  
+
   validates_presence_of :name,:code=>3013,:message=>"name - Blank Parameter"
   scope :undeleted,self.excludes(:status=>false)
 
@@ -106,9 +109,15 @@ class Community
     self.attachments.total_attachments.count + self.shares.select{|i| i.shared_type == 'Meet'}.map(&:item).uniq.reject{|v| v.status==false}.count
   end
 
-  # def folders
-  #   self.shares.select{|i| i.shared_type == 'Folder' && i.status == true}.map(&:folder)
-  # end
+  def unread_notifications(user=nil)
+    user = self.user if user.nil?
+    last_viewed = self.notifications.where(:user_id => user._id).first.last_viewed rescue nil
+    if last_viewed
+      self.activities.where(:updated_at.gt => last_viewed, :user_id.ne => user._id).count
+    else
+      self.activities.where(:updated_at.gt => self.created_at, :user_id.ne => user._id).count
+    end
+  end
 
   def get_meets
     shares.to_a.select{|c| c.shared_type=="Meet"}.map(&:item).uniq.reject{|v| v.status==false}.to_json(:only=>[:_id,:description,:name],:methods=>[:item_date,:created_time,:updated_time,:shared_id,:location_details, :user_details],:include=>{:pages=>{:only=>[:_id,:page_order],:include=>{:attachment=>{:only=>[:file,:_id],:methods=>:messages}},:methods=>[:page_texts]}}).parse

@@ -347,6 +347,7 @@ def create_or_update_pages(pages,value=nil)
       @receipt_value["product_id"]=="meetlinkshareMonthlyNonRecurring" ? @user.update_attributes(:expiry_date=>expiry_date+30.days,:subscription_type=>"monthly") : @user.update_attributes(:expiry_date=>expiry_date+365.days,:subscription_type=>"yearly")
       response_values={:product_id=>@receipt_value["product_id"],:transaction_id=>@receipt_value["transaction_id"],:receipt_details=>receipt_response}
       @user.subscription.nil? ? @user.create_subscription(response_values) :  @user.subscription.update_attributes(response_values)
+       Invite.delay.subscription_notifications(@user.email, @user.first_name)
     end
   end  
 

@@ -56,6 +56,11 @@ class Invite < ActionMailer::Base
   def comment_notifications(current_user_name, community_id, community_name, message, email, item_id, page_order)
     @user_name, @community_id, @community_name, @message, @email, @item_id, @page_order  = current_user_name, community_id, community_name, message, email, item_id, (page_order.to_i - 1)
      mail(:to=>@email, :subject =>"#{@user_name}  commented on your page", :reply_to => "no-reply@info.meetlinkshare.com")
+   end
+   
+  def subscription_notifications(email, current_user_name)
+    @email, @user_name  = email, current_user_name
+     mail(:to=>@email, :subject =>"Thanks for subscribing to MeetLinkShare Premium", :reply_to => "no-reply@info.meetlinkshare.com")
   end
 
 end

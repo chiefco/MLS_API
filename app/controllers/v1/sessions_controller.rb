@@ -31,6 +31,7 @@ class V1::SessionsController < Devise::SessionsController
   def subcribe_user
     response_subscription= HTTParty.post(SANBOX_URL,{ :body=>{"receipt-data" =>params[:receipt]}.to_json}).parse
     @receipt_value=response_subscription["receipt"]
+    logger.info  @receipt_value
     status=response_subscription["status"].to_i
     save_subscription(response_subscription) if status.zero?
     response_values={:status=>SUBSCRIBE[status],:subscription_type=>@user.subscription_type,:expiry_date=>@user.expiry_date.nil? ?  nil : @user.expiry_date.utc.strftime("%d/%m/%Y %H:%M:%S")}
@@ -343,7 +344,7 @@ def create_or_update_pages(pages,value=nil)
   def save_subscription(receipt_response)
     if @user && @receipt_value
       expiry_date=Time.at(@receipt_value["purchase_date_ms"].to_i/1000) 
-      @receipt_value["product_id"]=="meetlinkshareMonthly" ? @user.update_attributes(:expiry_date=>expiry_date+30.days,:subscription_type=>"monthly") : @user.update_attributes(:expiry_date=>expiry_date+365.days,:subscription_type=>"yearly")
+      @receipt_value["product_id"]=="meetlinkshareMonthlyNonRecurring" ? @user.update_attributes(:expiry_date=>expiry_date+30.days,:subscription_type=>"monthly") : @user.update_attributes(:expiry_date=>expiry_date+365.days,:subscription_type=>"yearly")
       response_values={:product_id=>@receipt_value["product_id"],:transaction_id=>@receipt_value["transaction_id"],:receipt_details=>receipt_response}
       @user.subscription.nil? ? @user.create_subscription(response_values) :  @user.subscription.update_attributes(response_values)
     end

@@ -56,7 +56,7 @@ class ApplicationController < ActionController::Base
 
   def authenticate_request!
     @current_user=User.valid_user?(params[:access_token]) if params[:access_token] 
-    Time.zone = @current_user.timezone if !@current_user.timezone.blank?
+    Time.zone = @current_user.timezone if !@current_user.timezone.blank? unless @current_user.nil?
     
     respond_to do |format|
       format.json{render :json=>UNAUTHORIZED}

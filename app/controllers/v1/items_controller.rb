@@ -137,7 +137,7 @@ class V1::ItemsController < ApplicationController
     end
   end
 
-  # Returns the item topics
+  # Public:  Returns the item topics
   def  item_topics
     respond_to do |format|
       if @item
@@ -152,7 +152,7 @@ class V1::ItemsController < ApplicationController
     end
   end
 
-  #finds categories of the item
+  # Public: finds categories of the item
   def item_categories
     respond_to do |format|
       if @item
@@ -166,7 +166,7 @@ class V1::ItemsController < ApplicationController
     end
   end
 
-  #Adds the category to the given item
+  # Public: Adds the category to the given item
   def item_add_category
     @item=@current_user.items.find(params[:item_category][:item_id])
     @category=@current_user.categories.find(params[:item_category][:category_id])
@@ -183,7 +183,7 @@ class V1::ItemsController < ApplicationController
     end
   end
 
-  #Adds the attendee to the given item
+  # Public: Adds the attendee to the given item
   def item_add_attendees
     @item=@current_user.items.find(params[:item_attendee][:item_id])
     respond_to do |format|
@@ -199,7 +199,7 @@ class V1::ItemsController < ApplicationController
     end
   end
 
-  #Removes the attendee of the item
+  # Public: Removes the attendee of the item
   def item_remove_attendees
     @attendee=Attendee.find(params[:attendee_id])
     respond_to do |format|
@@ -214,7 +214,7 @@ class V1::ItemsController < ApplicationController
     end
   end
 
-  #Item tasks
+  # Public: Item tasks
   def tasks
     @tasks =Task.where(:item_id=>params[:item_id]).all
     respond_to do |format|
@@ -223,7 +223,7 @@ class V1::ItemsController < ApplicationController
     end
   end
 
-  #Lists all attendees of the given item
+  # Public: Lists all attendees of the given item
   def list_item_attendees
     respond_to do |format|
       if @item
@@ -238,7 +238,7 @@ class V1::ItemsController < ApplicationController
     end
   end
 
-  #Get all tasks of the desired Item
+  # Public: Get all tasks of the desired Item
   def get_all_tasks
     respond_to do |format|
       if @item
@@ -304,7 +304,7 @@ class V1::ItemsController < ApplicationController
     [ {name: query} , { description: query } ]
   end
 
-  # Find missing params
+  # Public: Find missing params
   def detect_missing_params
     param_must = [:name, :template_id]
     if params.has_key?(:item) && params[:item].is_a?(Hash)
@@ -315,7 +315,7 @@ class V1::ItemsController < ApplicationController
     render_missing_params(missing_params) unless missing_params.blank?
   end
 
-  #Retrieves the Statistics of the Item
+  # Public: Retrieves the Statistics of the Item
   def get_statistics
     @item=@current_user.items.find(params[:item_id])
     respond_to do |format|
@@ -330,7 +330,7 @@ class V1::ItemsController < ApplicationController
     end
   end
 
-  #Retrieves the Item comments
+  # Public: Retrieves the Item comments
   def comments
     respond_to do |format|
       format.json {render :json=>{:comments=>@item.comments.to_a.to_json(:only=>[:_id,:message,:commentable_type,:commentable_id]).parse}.to_success}
@@ -344,8 +344,18 @@ class V1::ItemsController < ApplicationController
     @item = @current_user.items.find(params[:id])
   end
 
-  # Returns the item_count
+  # Public:  Returns the item_count
   def item_count
     {:count=>@items.count}
   end
+  
+  # Public: Failure save
+  # Retruns error message
+  def  failure_save
+    respond_to do |format|
+      format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
+      format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+    end
+  end
+  
 end

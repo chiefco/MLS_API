@@ -28,7 +28,7 @@ class User
 
   devise :confirmable, :database_authenticatable, :registerable, :recoverable, :rememberable, :token_authenticatable, :trackable
   attr_protected :authentication_token,:is_admin,:reset_password_token,:confirmation_token
-  attr_accessible :email,:password,:password_confirmation,:first_name,:last_name,:company,:job_title,:date_of_birth,:industry_id,:expiry_date,:subscription_type
+  attr_accessible :email,:password,:password_confirmation,:first_name,:last_name,:company,:job_title,:date_of_birth,:industry_id,:expiry_date,:status,:subscription_type
 
   validates_presence_of :first_name, :message=>"first_name - Blank Parameter", :code=>3010
   validates_length_of :last_name, :message=>"Last name - Parameter length greater than 40", :maximum =>40, :code=>3011, :allow_blank => true

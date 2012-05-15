@@ -113,4 +113,13 @@ class V1::CategoriesController < ApplicationController
     @category_val= :Meets
     @item_val=:Categories
   end
+  
+  # Public: Failure save
+  # Retruns error message
+  def  failure_save
+    respond_to do |format|
+      format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
+      format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+    end
+  end
 end

@@ -167,7 +167,7 @@ class V1::CommunitiesController < ApplicationController
     end
   end
   
-  #Remove multiple member
+  # Public: Remove multiple member
   def multiple_member_delete
     community = Community.where(:_id => params[:community_id]).first
 
@@ -193,7 +193,7 @@ class V1::CommunitiesController < ApplicationController
     end
   end
   
-  #Remove multiple shared team
+  # Public: Remove multiple shared team
   def remove_shared_team
     respond_to do |format|
       @community_user = CommunityUser.any_in(:community_id => params[:community_id]).where(:user_id => @current_user._id).delete_all
@@ -206,7 +206,7 @@ class V1::CommunitiesController < ApplicationController
     end
   end
 
-  #Change the role of the CommunityUser
+  # Public: Change the role of the CommunityUser
   def change_role
     respond_to do |format|
       @community_user=CommunityUser.where(:community_id=>params[:change_role][:community_id],:user_id=>params[:change_role][:user_id]).first

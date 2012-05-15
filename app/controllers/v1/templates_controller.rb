@@ -2,6 +2,9 @@ class V1::TemplatesController < ApplicationController
   #~ before_filter :authenticate_request!
   before_filter :find_template,:only=>[:update,:destroy,:show,:add_template_definitions]
   FOR_XML={:methods=>:id,:except=>:_id,:root=>:result}
+  
+  # Public: To list all templates 
+  # Returns all the templates
   def index
     @templates = Template.all
     value={:count=>@templates.size,:templates=>@templates}.to_success
@@ -11,6 +14,7 @@ class V1::TemplatesController < ApplicationController
     end
   end
 
+  # Public: To show template
   def show
     respond_to do |format|
       if @template
@@ -24,6 +28,7 @@ class V1::TemplatesController < ApplicationController
     end
   end
 
+  # Public: To create template
   def create
     @template = Template.new(params[:template])
     respond_to do |format|
@@ -38,6 +43,7 @@ class V1::TemplatesController < ApplicationController
     end
   end
 
+  # Public: To update template
   def update
     respond_to do |format|
       if @template
@@ -56,6 +62,7 @@ class V1::TemplatesController < ApplicationController
     end
   end
 
+  # Public: To delete template
   def destroy
      respond_to do |format|
       if @template
@@ -69,7 +76,7 @@ class V1::TemplatesController < ApplicationController
     end
   end
 
-  #Adds Template Definition to the given template
+  # Public: Adds Template Definition to the given template
   def add_template_definitions
     respond_to do |format|
        if @template
@@ -85,7 +92,7 @@ class V1::TemplatesController < ApplicationController
       end
     end
   end
-  #Updates the Template Definitions
+  # Public: Updates the Template Definitions
   def update_template_definitions
     respond_to do |format|
       @template_definition=TemplateDefinition.find(params[:id])
@@ -100,6 +107,7 @@ class V1::TemplatesController < ApplicationController
   end
 
   private
+  # Private: To find template
   def find_template
     @template = Template.find(params[:id])
   end

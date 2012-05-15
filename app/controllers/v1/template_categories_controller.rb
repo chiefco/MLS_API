@@ -76,6 +76,7 @@ class V1::TemplateCategoriesController < ApplicationController
     end
   end
 
+  # Public: To find template category
   def find_template_category
     @template_category = TemplateCategory.find(params[:id])
   end

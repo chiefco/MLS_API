@@ -84,7 +84,7 @@ class V1::BookmarksController < ApplicationController
     end
   end
 
-  #Add items in the bookmark
+  # Public: Add items in the bookmark
   def add_bookmark
     if @v1_bookmark
         @v1_bookmark.user==@current_user ? process_in_bookmark_content : failure_save
@@ -93,6 +93,7 @@ class V1::BookmarksController < ApplicationController
     end
   end
 
+  # Public: To remove bookmark
   def remove_bookmark
       if @v1_bookmark
         @v1_bookmark.user==@current_user ? remove_in_bookmark_content : failure_save
@@ -101,6 +102,7 @@ class V1::BookmarksController < ApplicationController
     end
   end
 
+  # Public: To save bookmark contents
   def save_bookmark_content
     @v1_bookmark.save
     respond_to do |format|
@@ -110,6 +112,7 @@ class V1::BookmarksController < ApplicationController
     end
   end
 
+  # Public: To remove bookmark contents
   def remove_bookmark_content
     respond_to do |format|
       format.json {render :json => success}
@@ -117,17 +120,18 @@ class V1::BookmarksController < ApplicationController
     end
   end
 
-  #Find the Bookmark by param[:id]
+  # Public: Find the Bookmark by param[:id]
   def find_bookmark
-    p '^^^^^^^^^^'
-    p @v1_bookmark = Bookmark.find(params[:id])
+    @v1_bookmark = Bookmark.find(params[:id])
   end
 
+  # Public: Bookmark content process
   def process_in_bookmark_content
     @v1_bookmark=@v1_bookmark.bookmarked_contents.build(params[:add_bookmark])
     @v1_bookmark.bookmarkable.nil? ? failure_save : validate_in_bookmark_content
   end
 
+  # Public: validate bookmark content
   def validate_in_bookmark_content
     @bookmarkable=@v1_bookmark.bookmarkable
       if @bookmarkable.class.to_s == "Page"
@@ -137,14 +141,16 @@ class V1::BookmarksController < ApplicationController
       end
     end
 
-    def remove_in_bookmark_content
+  # Public: To Remove bookmark content
+  def remove_in_bookmark_content
      @v1_bookmark=check_in_bookmark_content
     @v1_bookmark.nil? ?  failure_save  : remove_bookmark_content
    end
 
-    def check_in_bookmark_content
+  # Public: Check if bookmark content is deleted or not
+  def check_in_bookmark_content
      @v1_bookmark.bookmarked_contents.each do |content|
-       if content.id.to_s==params[:content_id]
+       if content.id.to_s == params[:content_id]
          content.delete
        end
      end
@@ -152,6 +158,8 @@ class V1::BookmarksController < ApplicationController
 
   end
 
+  # Public: Failure save
+  # Retruns error message
   def  failure_save
     respond_to do |format|
       format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }

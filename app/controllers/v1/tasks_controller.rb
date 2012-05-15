@@ -62,6 +62,7 @@ class V1::TasksController < ApplicationController
     end
   end
 
+  # Public: Validate the item
   def validate_item(value)
     @count=0
     @item=Item.find(value)
@@ -70,6 +71,7 @@ class V1::TasksController < ApplicationController
     end
   end
 
+  # Public: To save task
   def save_task
     respond_to do |format|
       if @task.save
@@ -85,6 +87,7 @@ class V1::TasksController < ApplicationController
     end
   end
 
+  # Public: Update the task
   def update_task
    respond_to do |format|
       if @task
@@ -110,6 +113,7 @@ class V1::TasksController < ApplicationController
     end
   end
 
+  # Public: Item evalution
   def evaluate_item
     if @count.to_i<1
       respond_to do |format|
@@ -121,7 +125,7 @@ class V1::TasksController < ApplicationController
    end
  end
 
-	#Adds the reminder to the task
+	# Public: Adds the reminder to the task
   def add_reminder
 		@task=Task.find(params[:reminder][:task_id])
 		respond_to do |format|
@@ -141,7 +145,7 @@ class V1::TasksController < ApplicationController
 		end
   end
 
-	#Updates the single Reminder
+	# Public: Updates the single Reminder
   def update_reminder
     respond_to do |format|
       if @reminder
@@ -159,7 +163,7 @@ class V1::TasksController < ApplicationController
     end
   end
 
-  #Deletes the single Reminder
+  # Public: Deletes the single Reminder
   def delete_reminder
     respond_to do |format|
       if @reminder
@@ -173,7 +177,7 @@ class V1::TasksController < ApplicationController
     end
   end
 
-	#Retrieves the single Reminder
+	# Public: Retrieves the single Reminder
   def get_reminder
     respond_to do |format|
       if @reminder
@@ -186,7 +190,7 @@ class V1::TasksController < ApplicationController
     end
   end
 
-  #Retrieves all reminders of the given task
+  # Public: Retrieves all reminders of the given task
   def get_all_reminders
     respond_to do |format|
 			@task=Task.find(params[:task_id])
@@ -201,20 +205,24 @@ class V1::TasksController < ApplicationController
     end
   end
 
+  # Public: To find remainder
   def find_reminder
     @reminder=Reminder.find(params[:id])
   end
 
+  # Public: To get remainder parameters
   def reminder_parameters
     reminder={:reminder=>@reminder.serializable_hash(:only=>[:_id],:include=>{:task=>{:only=>[:_id,:description]}})}.to_success
     reminder[:reminder][:time] = @reminder.time.strftime("%d-%m-%Y")
     @reminder = reminder
   end
 
-	  # finds the task
+	 # Public: To find the task
   def find_task
     @task = Task.find(params[:id])
   end
+  
+  # Public: To get today tasks
   def today_tasks
     @tasks=[]
     @tasks=@current_user.tasks.today_tasks

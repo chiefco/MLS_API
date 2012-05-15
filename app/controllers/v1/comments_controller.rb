@@ -72,10 +72,12 @@ class V1::CommentsController < ApplicationController
     end
   end
 
+  # Public: To get parameters of comments
   def get_parameters
     @comment=@comment.serializable_hash(:only=>[:_id,:message,:is_public,:commentable_type,:commentable_id])
   end
-  #finds the comment
+  
+  # Public: To find the comments
   def find_comment
     @comment=@current_user.comments.find(params[:id])
   end

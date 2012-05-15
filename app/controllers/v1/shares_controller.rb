@@ -83,7 +83,7 @@ class V1::SharesController < ApplicationController
     end
   end
 
-
+  # Public: Delete multiple shares
   def shares_multiple_delete
     folders = Folder.any_in(_id: params[:share_list])
     unless folders.blank?
@@ -100,6 +100,7 @@ class V1::SharesController < ApplicationController
     end
   end
   
+  # Public: Send notifications while upload file via teams
   def file_notifications
     community_name = Community.find(params[:community_id]).name
     emails = CommunityUser.where(:community_id => params[:community_id], :subscribe_email => true).map(&:user).map(&:email) - [@current_user.email]
@@ -110,7 +111,8 @@ class V1::SharesController < ApplicationController
   end
 
   private
-
+  
+  # Private: To find share
   def find_share
     @share= @current_user.shares.find(params[:id])
   end

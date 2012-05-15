@@ -78,7 +78,7 @@ class V1::ContactsController < ApplicationController
       end
   end
 
-  #Send the invitaions for the users
+  # Public: Send the invitaions for the users
   def invite_member
     Invite.send_invitations(@current_user,params[:invite_member][:email]).deliver
     respond_to do |format|
@@ -86,7 +86,7 @@ class V1::ContactsController < ApplicationController
     end
   end
 
-  #Share's the Item to Community Members and Contacts
+  # Public: Share's the Item to Community Members and Contacts
   def share
     find_item
     @community=Community.where(:_id=>params[:share][:community_id]).first
@@ -97,7 +97,7 @@ class V1::ContactsController < ApplicationController
     end
   end
 
-  #To remove the shares for the users
+  # Public: To remove the shares for the users
   def remove_share
     respond_to do |format|
       @share=Share.where(:_id=>params[:id]).first
@@ -109,7 +109,8 @@ class V1::ContactsController < ApplicationController
       end
     end
   end
-
+  
+  # Public: Sharing to members 
   def share_to_members
     @community.members.each do |member|
       @share=@item.shares.create(:user_id=>member[:id])
@@ -118,7 +119,7 @@ class V1::ContactsController < ApplicationController
     end
   end
 
-  #~ # Retrieves the shares of the item
+  # Public:  Retrieves the shares of the item
   def shares
     @item=Item.find(params[:id])
     respond_to do |format|
@@ -126,7 +127,8 @@ class V1::ContactsController < ApplicationController
       format.json{render :json=>{:shares=>@share}}
     end
   end
-
+  
+  # Public: Share send the emails
   def send_shares_emails
     params[:share][:emails].split(',').each do |email|
       @user=User.where(:email=>email).first
@@ -134,18 +136,20 @@ class V1::ContactsController < ApplicationController
     end
   end
 
+  # Public: Creating share
   def create_shares
     @share=@item.shares.create(:user_id=>@user._id)
     @share.create_permission(params[:share][:permission_id])
     Invite.share_community(@user,@item).deliver
   end
-
+  
+  # Public: To send invites
   def send_invites(email)
     @item.invitations.find_or_create_by(:email=>email)
     Invite.send_invitations(@current_user,email).deliver
   end
   
-  #search user contacts
+  # Public: search user contacts
   def search_contacts
     contacts = Contact.search(params,@current_user)
       respond_to do |format|
@@ -153,7 +157,7 @@ class V1::ContactsController < ApplicationController
       end
     end
     
-  #Delete multiple contacts  
+  # Public: Delete multiple contacts  
   def multiple_contact_delete
       contacts = Contact.any_in(:email =>params[:mail_ids]).where(:user_id => @current_user._id).destroy_all
       respond_to do |format|

@@ -104,7 +104,6 @@ class V1::RegistrationsController < Devise::RegistrationsController
   # Returns the json result(currnt user status sets to false)
   def close_account
     respond_to do |format|
-      @current_user.update_attribute(:authentication_token,nil)
       @current_user.update_attribute(:status,false)
       format.json {render :json=>success}
       format.xml {render :xml=>success}

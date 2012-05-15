@@ -3,6 +3,8 @@ class V1::SearchesController < ApplicationController
   before_filter :find_search,:only=>[:show,:update,:destroy]
   before_filter :paginate_params,:only=>:search
   SEARCH_FIELDS=[:response,:searches,:name,:description,:_type,:_id]
+  
+  # Public: Search index
   def index
     @searches = @current_user.searches.all
     respond_to do |format|
@@ -11,6 +13,7 @@ class V1::SearchesController < ApplicationController
     end
   end
 
+  # Public: Show 
   def show
     respond_to do |format|
       format.xml  { render :xml => render_success.to_xml(:root=>:result) }
@@ -18,6 +21,7 @@ class V1::SearchesController < ApplicationController
     end
   end
 
+  # Public: Create search
   def create
     @search = @current_user.searches.build(params[:search])
     respond_to do |format|
@@ -32,6 +36,7 @@ class V1::SearchesController < ApplicationController
     end
   end
 
+  # Public: Update search
   def update
     respond_to do |format|
       if @search.update_attributes(params[:search])
@@ -44,6 +49,7 @@ class V1::SearchesController < ApplicationController
     end
   end
 
+  # Public: Delete search
   def destroy
     @search.destroy
     respond_to do |format|
@@ -52,6 +58,7 @@ class V1::SearchesController < ApplicationController
     end
   end
 
+  # Public: To search user keywords
   def search
     items = Sunspot.search(Item) do |search|
       search.keywords params[:q].downcase, :boost=>4.0
@@ -88,18 +95,19 @@ class V1::SearchesController < ApplicationController
     end
   end
 
-
-
   private
 
+  # Private: To find search 
   def find_search
     @search = @current_user.searches.find(params[:id])
   end
 
+  # Private: Return multiple searches
   def multi_success
     {:response=>:success,:searches=>@searches}
   end
 
+  # Private: Rendering success
   def render_success
     {:response=>:success,:search=>@search.serializable_hash(:except=>[:created_at,:updated_at,:user_id])}
   end

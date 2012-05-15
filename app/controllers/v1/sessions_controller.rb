@@ -116,7 +116,7 @@ class V1::SessionsController < Devise::SessionsController
     #~ get_communities
     get_deleted_notes
    respond_to do |format|
-      format.json{render :json =>success.merge(:synced_ids=>@synched_meets,:deleted_notes => @deleted_notes,:comments=>@comments.flatten,:ipad_ids=>@ipad_ids.uniq,:synched_page_ids=>@ipad_page_ids.uniq,:synched_pages=>@synched_pages,:share_ids=>@share_ids,:shared_hashes=>@synched_hash,:task_ids=>@task_ids,:task_hashes=>@synched_tasks,:meets=>params[:user][0][:status]=="true" ? get_meets(true) : get_meets(nil),:other_users=>CommunityUser.other_users(@user._id),:locations=>@user.locations.serializable_hash(:only=>[:_id,:name],:methods=>[:latitude_val,:longitude_val] ))}
+      format.json{render :json =>success.merge(:synced_ids => @synched_meets, :attachment_ids => @attachment_ids, :deleted_notes => @deleted_notes, :comments => @comments.flatten, :ipad_ids =>@ipad_ids.uniq, :synched_page_ids => @ipad_page_ids.uniq, :synched_pages => @synched_pages, :share_ids => @share_ids, :shared_hashes => @synched_hash, :task_ids => @task_ids, :task_hashes => @synched_tasks, :meets => params[:user][0][:status]=="true" ? get_meets(true) : get_meets(nil), :other_users => CommunityUser.other_users(@user._id), :locations=>@user.locations.serializable_hash(:only=>[:_id,:name], :methods=>[:latitude_val,:longitude_val] ))}
    end
   end
 
@@ -127,6 +127,7 @@ class V1::SessionsController < Devise::SessionsController
   def initialize_values
     @ipad_ids=[];@ipad_page_ids=[]; @share_ids=[];@task_ids=[];@synched_meets={};@synched_pages={};
     @synched_hash={};@synched_tasks={};@comments=[];@community_comments=[];@deleted_notes=[];
+    @attachment_ids={}
   end
 
   #Invalid user- do not perform synchronisation
@@ -156,6 +157,8 @@ class V1::SessionsController < Devise::SessionsController
         @pages=meet[:page][:new_page]
         @shares=meet[:share]
         location=meet[:location_name]
+        audio = meet[:audio]
+        meet.delete(:audio)
         meet.delete(:page)
         meet.delete(:share)
         begin
@@ -167,6 +170,7 @@ class V1::SessionsController < Devise::SessionsController
             @id=@meet._id
              create_or_update_share
              create_or_update_pages(@pages)
+             create_audio(@meet, audio[0][:audio_data], audio[0][:id])
             @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
             @ipad_ids<<meet[:meet_id]
           end
@@ -183,10 +187,12 @@ class V1::SessionsController < Devise::SessionsController
             @pages=meet[:page][:new_page]
             @shares=meet[:share]
             location=meet[:location_name]
+            audio = meet[:audio]
             @updated_pages=meet[:updated_page]
             meet.delete(:updated_page)
             meet.delete(:page)
             meet.delete(:share)
+            meet.delete(:audio)
             create_or_update_location(meet[:location_name],  meet[:location_latitude], meet[:location_longitude], meet[:location_state], meet[:location_country])
             meet[:location_id] = @location_id
             @meet.update_attributes(meet)
@@ -194,6 +200,7 @@ class V1::SessionsController < Devise::SessionsController
             create_or_update_share
             create_or_update_pages(@pages)
             create_or_update_pages(@updated_pages,:update)
+            create_audio(@meet, audio[0][:audio_data], audio[0][:id])
             @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
             @ipad_ids<<meet[:meet_id]
           end
@@ -234,6 +241,14 @@ def create_or_update_pages(pages,value=nil)
         end
       end
     end
+  end
+  
+  
+ 
+  def create_audio(meet, audio_data,ipad_id)
+    audio_file = decode_image("#{meet.name}.caf", audio_data)
+    attachment= meet.create_attachment(:file => audio_file, :size => audio_file.size, :attachment_type => "ITEM_ATTACHMENT", :file_name => "#{meet.name}.caf", :content_type => "audio/x-caf")
+    @attachment_ids=@attachment_ids.merge({ipad_id => attachment._id.to_s}) unless attachment.nil?
   end
 
   def create_or_update_share

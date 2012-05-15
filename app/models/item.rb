@@ -28,7 +28,7 @@ class Item
   references_many :attendees,:dependent => :destroy
   references_many :tasks,:dependent => :destroy
   has_many :pages,:dependent => :destroy
-  has_many :attachments, as: :attachable, :dependent=>:destroy
+  has_one :attachment, as: :attachable, :dependent=>:destroy
   has_many :bookmarked_contents, as: :bookmarkable, :dependent=>:destroy
   has_many :comments, as: :commentable
   has_many :activities, as: :entity

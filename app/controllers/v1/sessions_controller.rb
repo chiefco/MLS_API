@@ -161,7 +161,7 @@ class V1::SessionsController < Devise::SessionsController
         meet.delete(:audio)
         meet.delete(:page)
         meet.delete(:share)
-        begin
+        #~ begin
           create_or_update_location(meet[:location_name],  meet[:location_latitude], meet[:location_longitude], meet[:location_state], meet[:location_country])
           meet[:location_id] = @location_id
           @meet= @user.items.create(meet)
@@ -204,10 +204,10 @@ class V1::SessionsController < Devise::SessionsController
             @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
             @ipad_ids<<meet[:meet_id]
           end
-        rescue Exception=> e
-          puts e
-          logger.info e
-        end
+        #~ rescue Exception=> e
+          #~ puts e
+          #~ logger.info e
+        #~ end
       end
     end
   end

@@ -174,15 +174,15 @@ class V1::SessionsController < Devise::SessionsController
             @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
             @ipad_ids<<meet[:meet_id]
           end
-        rescue Exception => e
-          puts e
-        end
+        #~ rescue Exception => e
+          #~ puts e
+        #~ end
       elsif status.keys[0]=="delete"
         @deleted_meet=Item.where(:_id=>meet[:cloud_id]).first
         @deleted_meet.update_attributes(:status=>false) unless @deleted_meet.nil?
       else
         @meet=Item.where(:_id=>meet[:cloud_id]).first
-        begin
+        #~ begin
           unless @meet.nil?
             @pages=meet[:page][:new_page]
             @shares=meet[:share]

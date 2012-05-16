@@ -170,7 +170,7 @@ class V1::SessionsController < Devise::SessionsController
             @id=@meet._id
              create_or_update_share
              create_or_update_pages(@pages)
-             create_audio(@meet, audio[0][:audio_data], audio[0][:id])
+             create_audio(@meet, audio[0][:audio_data], audio[0][:id]) if audio
             @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
             @ipad_ids<<meet[:meet_id]
           end
@@ -200,7 +200,7 @@ class V1::SessionsController < Devise::SessionsController
             create_or_update_share
             create_or_update_pages(@pages)
             create_or_update_pages(@updated_pages,:update)
-            create_audio(@meet, audio[0][:audio_data], audio[0][:id])
+            create_audio(@meet, audio[0][:audio_data], audio[0][:id]) if audio
             @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
             @ipad_ids<<meet[:meet_id]
           end

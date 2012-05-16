@@ -252,7 +252,7 @@ def create_or_update_pages(pages,value=nil)
       attachment= meet.create_attachment(:file => audio_file, :size => audio_file.size, :attachment_type => "ITEM_ATTACHMENT", :file_name => "#{meet.name}_#{Time.now.to_s}.caf", :content_type => "audio/x-caf")
     else
       logger.info '****************************updation of attachment ***********************************'
-      attachment= meet.update_attributes(:file => audio_file, :size => audio_file.size, :file_name => "#{meet.name}_#{Time.now.to_s}.caf", :content_type => "audio/x-caf")
+      attachment= meet.attachment.update_attributes(:file => audio_file, :size => audio_file.size, :file_name => "#{meet.name}_#{Time.now.to_s}.caf", :content_type => "audio/x-caf")
     end
     @attachment_ids=@attachment_ids.merge({ipad_id => attachment._id.to_s}) unless attachment.nil?
   end

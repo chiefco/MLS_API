@@ -8,6 +8,7 @@ class Attachment
   mount_uploader :file, FileUploader
   belongs_to :attachable, polymorphic: true
   belongs_to :user
+  belongs_to :item
   belongs_to :community
   referenced_in :folder
   has_many :bookmarked_contents, as: :bookmarkable
@@ -92,7 +93,7 @@ class Attachment
   end
 
   def create_activity
-    save_activity("USER_ATTACHMENT")
+    save_activity("USER_ATTACHMENT")  unless self.attachment_type == "ITEM_ATTACHMENT"
   end
 
   def save_activity(text)

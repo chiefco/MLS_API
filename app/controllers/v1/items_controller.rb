@@ -264,12 +264,14 @@ class V1::ItemsController < ApplicationController
         shared_to = @item.shares.map(&:community).first
         shared_to.nil? ? share_status = false : share_status = true
         attachment = @item.share_attachments(page) rescue nil
+        i=Item.find ("4fb46224da39f3146b000025")
+        audio = i.attachments.last rescue []
         comments = attachment.comments if attachment
         page_texts = pages[page].page_texts rescue []
         page_count = pages.count
 
         if attachment
-          format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :page_texts => page_texts.as_json, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :share_status => share_status, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
+          format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :page_texts => page_texts.as_json, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :share_status => share_status,:meet => @item.to_json(:only=>[:name,:_id,:description]).parse,  :audio =>audio.as_json}} 
         else
           format.json {render :json =>  {  :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
         end

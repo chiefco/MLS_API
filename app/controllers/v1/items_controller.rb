@@ -264,8 +264,7 @@ class V1::ItemsController < ApplicationController
         shared_to = @item.shares.map(&:community).first
         shared_to.nil? ? share_status = false : share_status = true
         attachment = @item.share_attachments(page) rescue nil
-        i=Item.find ("4fb46224da39f3146b000025")
-        audio = i.attachments.last rescue []
+        audio = @item.attachments.last rescue []
         comments = attachment.comments if attachment
         page_texts = pages[page].page_texts rescue []
         page_count = pages.count

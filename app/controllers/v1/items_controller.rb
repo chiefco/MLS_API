@@ -14,7 +14,7 @@ class V1::ItemsController < ApplicationController
       if params[:group_by]
         format.json {render :json =>@items.merge({:response=>:success, :count=>@item_count}).to_json}
       else
-        format.json {render :json =>{:count=>@item_count, :items=>@items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id, :shared_teams]).parse}.merge(success)}
+        format.json {render :json =>{:count=>@item_count, :items=>@items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id, :shared_teams, :audio_count]).parse}.merge(success)}
       end
     end
   end

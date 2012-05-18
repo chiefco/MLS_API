@@ -149,6 +149,10 @@ class Item
   def shared_teams
     ((self.shares.map(&:community).map(&:name)).uniq).join(", ") rescue nil
   end
+  
+  def audio_count
+    self.attachments.count
+  end
 
   def upcoming
     date = item_date

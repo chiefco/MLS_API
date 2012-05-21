@@ -360,8 +360,9 @@ class V1::ItemsController < ApplicationController
           if @current_user._id == @item.user_id
             @authorised_item = true
           else
-            is_shared = @item.shares.map(&:community).map(&:user).select {|u| u._id = "#{@current_user._id}"}.count
-              if is_shared >0
+              is_shared = @item.shares.map(&:community).map(&:community_users)
+              res =  is_shared[0].where(:user_id => @current_user._id).first rescue nil
+              if res
                  @authorised_item = true
               else
                 @authorised_item = false

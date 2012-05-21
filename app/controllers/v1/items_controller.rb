@@ -14,7 +14,7 @@ class V1::ItemsController < ApplicationController
       if params[:group_by]
         format.json {render :json =>@items.merge({:response=>:success, :count=>@item_count}).to_json}
       else
-        format.json {render :json =>{:count=>@item_count, :items=>@items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id, :shared_teams]).parse}.merge(success)}
+        format.json {render :json =>{:count=>@item_count, :items=>@items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id, :shared_teams, :audio_count]).parse}.merge(success)}
       end
     end
   end
@@ -264,12 +264,13 @@ class V1::ItemsController < ApplicationController
         shared_to = @item.shares.map(&:community).first
         shared_to.nil? ? share_status = false : share_status = true
         attachment = @item.share_attachments(page) rescue nil
+        audio = @item.attachments.last rescue []
         comments = attachment.comments if attachment
         page_texts = pages[page].page_texts rescue []
         page_count = pages.count
 
         if attachment
-          format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :page_texts => page_texts.as_json, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :share_status => share_status, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
+          format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :page_texts => page_texts.as_json, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :share_status => share_status,:meet => @item.to_json(:only=>[:name,:_id,:description]).parse,  :audio =>audio.as_json}} 
         else
           format.json {render :json =>  {  :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
         end

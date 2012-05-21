@@ -3,6 +3,7 @@ class V1::ItemsController < ApplicationController
   before_filter :get_item,:only=>([:update,:item_categories,:destroy,:item_topics,:get_all_tasks,:list_item_attendees,:comments])
   before_filter :add_pagination,:only=>[:index, :multiple_note_delete]
   before_filter :detect_missing_params, :only=>[:create]
+  before_filter :authorised_item, :only => [:get_page]
 
   # GET /items
   # GET /items.xml
@@ -259,26 +260,29 @@ class V1::ItemsController < ApplicationController
     @item = Item.find(params[:id])
     respond_to do |format|
       if @item
-        params[:page] ? page = params[:page].to_i : page = 0
-        pages = @item.pages
-        shared_to = @item.shares.map(&:community).first
-        shared_to.nil? ? share_status = false : share_status = true
-        attachment = @item.share_attachments(page) rescue nil
-        audio = @item.attachments.last rescue []
-        comments = attachment.comments if attachment
-        page_texts = pages[page].page_texts rescue []
-        page_count = pages.count
+        if  @authorised_item
+          params[:page] ? page = params[:page].to_i : page = 0
+          pages = @item.pages
+          shared_to = @item.shares.map(&:community).first
+          shared_to.nil? ? share_status = false : share_status = true
+          attachment = @item.share_attachments(page) rescue nil
+          audio = @item.attachments.last rescue []
+          comments = attachment.comments if attachment
+          page_texts = pages[page].page_texts rescue []
+          page_count = pages.count
 
-        if attachment
-          format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :page_texts => page_texts.as_json, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :share_status => share_status,:meet => @item.to_json(:only=>[:name,:_id,:description]).parse,  :audio =>audio.as_json}} 
+          if attachment
+            format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :page_texts => page_texts.as_json, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :share_status => share_status,:meet => @item.to_json(:only=>[:name,:_id,:description]).parse,  :audio =>audio.as_json}.to_success} 
+          else
+            format.json {render :json =>  {  :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}.to_success} 
+          end
+          # index.html.erb
+          format.xml{ render :xml => attachments.to_xml(ROOT)}
         else
-          format.json {render :json =>  {  :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}} 
+             format.json{render :json=>{:message=> @message}.to_failure}
         end
-        # index.html.erb
-        format.xml{ render :xml => attachments.to_xml(ROOT)}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end  
   end
@@ -295,8 +299,7 @@ class V1::ItemsController < ApplicationController
         format.json {render :json =>  { :comment => comment.to_a.to_json(:only => [:message, :created_at, :updated_at], :methods => [:user_name]).parse}.to_success} 
         format.xml{ render :xml=>success.to_xml(ROOT)}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end    
   end
@@ -325,8 +328,7 @@ class V1::ItemsController < ApplicationController
         format.json{ render :json=>success.merge(@items).merge(item_count)}
         format.xml{ render :xml=>success.merge(@items).merge(item_count).to_xml(ROOT)}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end
   end
@@ -348,6 +350,31 @@ class V1::ItemsController < ApplicationController
   # Public:  Returns the item_count
   def item_count
     {:count=>@items.count}
+  end
+  
+  # Public:  Check authorisation for view item
+  def authorised_item
+    @item = Item.find(params[:id])
+    if @item
+      if  @item.status == true
+          if @current_user._id == @item.user_id
+            @authorised_item = true
+          else
+            is_shared = Item.last.shares.map(&:community).map(&:user).select {|u| u._id = "#{@current_user._id}"}.count
+              if is_shared >0
+                 @authorised_item = true
+              else
+                @authorised_item = false
+                @message = "Your are not a authorised person to view this note"
+              end
+          end
+      else
+          @authorised_item = false
+          @message = "Note has been deleted by the owner"
+        end
+    else
+      failure_save
+    end
   end
   
   # Public: Failure save

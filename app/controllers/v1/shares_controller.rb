@@ -29,7 +29,7 @@ class V1::SharesController < ApplicationController
   # POST /v1/shares
   # POST /v1/shares.xml
   def create
-    shr_files, shr_folders, shr_comm, shr_notes = [], [], [], []
+    shr_files, shr_folders, shr_comm, shr_notes, shr_notes_id = [], [], [], [], []
     params[:share].each do |key, value|
       attachment_id, item_id, folder_id = nil
       shr_comm << value['item']['community_id']
@@ -46,6 +46,7 @@ class V1::SharesController < ApplicationController
       else
         item_id = value['item']['shared_id']
         note = Item.find(item_id)
+        shr_notes_id << (note)._id
         shr_notes << (note).name
       end
       @v1_share = @current_user.shares.create(:user_id=>@current_user._id,:shared_id=> value['item']['shared_id'], :community_id=> value['item']['community_id'], :shared_type=> value['item']['shared_type'], :attachment_id => attachment_id, :item_id => item_id, :folder_id => folder_id)
@@ -55,7 +56,7 @@ class V1::SharesController < ApplicationController
       @v1_share.create_activity("SHARE_"+value['item']['shared_type'].upcase,value['item']['community_id'],value['item']['shared_id'])
     end
     # To send the emails
-    @v1_share.delay.share_files(shr_comm.uniq, shr_files.uniq, shr_folders.uniq,shr_notes.uniq, @current_user)
+    @v1_share.delay.share_files(shr_comm.uniq, shr_files.uniq, shr_folders.uniq,shr_notes.uniq, shr_notes_id, @current_user)
 
     respond_to do |format|
       format.xml  { render :xml => success.merge(:share=>@v1_share).to_xml(ROOT,:only=>[:name,:_id])}

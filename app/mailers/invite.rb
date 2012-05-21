@@ -43,8 +43,8 @@ class Invite < ActionMailer::Base
     mail(:to=>@email, :subject =>"Files deleted for virtual team(#{@community_name}) by #{@user_name}", :reply_to => "no-reply@info.meetlinkshare.com")
   end
   
-  def notes_share_send_email(user, user_name, community_id, community_name, email, notes_length,  note_names)
-      @user, @user_name, @community_id,@community_name,@email, @notes_length, @note_names = user, user_name,community_id, community_name, email, notes_length, note_names
+  def notes_share_send_email(user, user_name, community_id, community_name, email, notes_length,  note_names, notes_id)
+      @user, @user_name, @community_id,@community_name,@email, @notes_length, @note_names, @notes_id = user, user_name,community_id, community_name, email, notes_length, note_names, notes_id
     mail(:to=>@email, :subject =>"Notes shared for virtual team(#{@community_name}) by #{@user_name}", :reply_to => "no-reply@info.meetlinkshare.com")
   end
   

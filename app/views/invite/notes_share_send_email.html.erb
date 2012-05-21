@@ -1,5 +1,5 @@
 <% if @notes_length == 1 %>
-  <b><%= @user_name %></b> has shared <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>><%= @note_names %></a> note in MeetLinkshare virtual team called <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>><%= @community_name%></a><br/><br/>
+  <b><%= @user_name %></b> has shared <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}/items/#{@notes_id[0]}" : "https://www.meetlinkshare.com/communities/#{@community_id}items/#{@notes_id[0]}" %>><%= @note_names %></a> note in MeetLinkshare virtual team called <a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>><%= @community_name%></a><br/><br/>
 	
 	<a href=<%= Rails.env=="development" ? "http://localhost:3000/communities/#{@community_id}" : "https://www.meetlinkshare.com/communities/#{@community_id}" %>>If you do not want to receive notifications for this team, please turn them off here</a>
 <% else%>

@@ -65,6 +65,11 @@ class Item
       {:first_name => val.first_name, :last_name => val.last_name, :email => val.email}
     end
   end
+  
+  def audio_attachment
+    attachment=self.attachments
+    attachment.blank? ? 'nil' : attachment.last.file
+  end
 
   def create_activity
     save_activity("ITEM_CREATED")

@@ -1,21 +1,21 @@
 development:
-  host: dbh30.mongolab.com
-  port: 27307
-  username: dbuser
-  password: mls123
-  database: meetlinkshare_api_development
+  host: ds031947.mongolab.com
+  port: 31947
+  username: mls_staging
+  password: staging123
+  database: mls_staging
 
 test:
   host: localhost
   database: meetlinkshare_api_test
 
 # set these environment variables on your prod server
-production:
-  host: dbh44.mongolab.com
-  port: 27447
-  username: mlsdbuser
-  password: m33tl1nk
-  database: mlsbeta1
+development:
+  host: ds031947.mongolab.com
+  port: 31947
+  username: mls_staging
+  password: staging123
+  database: mls_staging
   # slaves:
   #   - host: slave1.local
   #     port: 27018

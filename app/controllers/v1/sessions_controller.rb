@@ -370,6 +370,12 @@ def create_or_update_pages(pages,value=nil)
       resource.timezone = params[:timezone]
       resource.save
     end  
+    
+    respond_to do |format|
+      format.xml{ render :xml=>find_user(resource) ,:root => :user}
+      format.json{render :json=>find_user(resource)}
+    end    
+  end
 
   #Private: To create or update user location
   #Called from the method 'create_or_update_meets'

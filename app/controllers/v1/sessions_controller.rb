@@ -9,22 +9,18 @@ class V1::SessionsController < Devise::SessionsController
     params[:user]={}
     params[:user][:email],params[:user][:password]=user.decode_credentials if user && user.is_a?(String)
     resource = warden.authenticate!(:scope => resource_name, :recall => "V1::Sessions#index")
-
-    if params[:timezone] && !params[:timezone].blank? && resource.timezone != params[:timezone]
-      resource.timezone = params[:timezone]
-      resource.save
-    end      
-    
-    respond_to do |format|
-      format.xml{ render :xml=>find_user(resource) ,:root => :user}
-      format.json{render :json=>find_user(resource)}
-    end
+    create_user(resource)
   end
 
   def index
-    warden.message == :unconfirmed ? status = USER_UNCONFIRMED : status = AUTH_FAILED
-    respond_to do |format|
-      format.json{render :json =>failure.merge(status)}
+   if warden.message == :unconfirmed 
+      user = User.where(:email => params[:user][:email]).first      
+      create_user(user) if user.valid_password?(params[:user][:password])
+    else
+      status = AUTH_FAILED
+      respond_to do |format|
+         format.json{render :json =>failure.merge(status)}
+      end
     end
   end
   
@@ -366,6 +362,14 @@ def create_or_update_pages(pages,value=nil)
        Invite.delay.subscription_notifications(@user.email, @user.first_name)
     end
   end  
+  
+  def create_user(resource)
+    authentication_token = resource.authentication_token
+    resource.reset_authentication_token! if authentication_token.nil?
+    if params[:timezone] && !params[:timezone].blank? && resource.timezone != params[:timezone]
+      resource.timezone = params[:timezone]
+      resource.save
+    end  
 
   #Private: To create or update user location
   #Called from the method 'create_or_update_meets'

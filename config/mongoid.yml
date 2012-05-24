@@ -10,12 +10,12 @@ test:
   database: meetlinkshare_api_test
 
 # set these environment variables on your prod server
-development:
-  host: ds031947.mongolab.com
-  port: 31947
-  username: mls_staging
-  password: staging123
-  database: mls_staging
+production:
+  host: dbh44.mongolab.com
+  port: 27447
+  username: mlsdbuser
+  password: m33tl1nk
+  database: mlsbeta1
   # slaves:
   #   - host: slave1.local
   #     port: 27018

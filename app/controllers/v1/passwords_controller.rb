@@ -3,20 +3,28 @@ class V1::PasswordsController < Devise::PasswordsController
 
 
   def create
-    self.resource = resource_class.send_reset_password_instructions(params[:user])
-    if successful_and_sane?(resource)
-      success_message=success.merge(RESET_TOKEN_SENT)
-      respond_to do |format|
-        format.xml{ render :xml=>success_message, :root => :result}
-        format.json{render :json=>success_message.to_json}
+    if check_account_status
+      self.resource = resource_class.send_reset_password_instructions(params[:user])
+      if successful_and_sane?(resource)
+        success_message=success.merge(RESET_TOKEN_SENT)
+        respond_to do |format|
+          format.xml{ render :xml=>success_message, :root => :result}
+          format.json{render :json=>success_message.to_json}
+        end
+      else
+        failure_message=failure.merge(RESET_TOKEN_ERROR)
+        respond_to do |format|
+          format.xml{ render :xml=>failure_message, :root => :errors}
+          format.json{render :json=>failure_message.to_json,:root => :errors}
+        end
       end
-    else
-      failure_message=failure.merge(RESET_TOKEN_ERROR)
-      respond_to do |format|
-        format.xml{ render :xml=>failure_message, :root => :errors}
-        format.json{render :json=>failure_message.to_json,:root => :errors}
-      end
-    end
+   else
+     failure_message=failure.merge(ACCOUNT_DELETED)
+        respond_to do |format|
+          format.xml{ render :xml=>failure_message, :root => :errors}
+          format.json{render :json=>failure_message.to_json,:root => :errors}
+        end
+   end
   end
 
   def update
@@ -46,6 +54,11 @@ class V1::PasswordsController < Devise::PasswordsController
     self.resource.password = params[:user][:password] if params[:user][:password]
     self.resource.password_confirmation = params[:user][:password_confirmation] if params[:user][:password_confirmation]
     self.resource.save
+  end
+  
+  def check_account_status
+    user = User.where(:email => params[:user][:email]).first
+    user ? user.status : true
   end
 
 end

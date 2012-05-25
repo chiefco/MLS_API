@@ -23,6 +23,7 @@ class ApplicationController < ActionController::Base
   LIVE_URL="https://buy.itunes.apple.com/verifyReceipt"
   ROOT={:root=>:xml}
   USER_UNCONFIRMED={:code=>1003,:message=>"You have not yet confirmed your e-mail address, please check your e-mail and confirm your registration"}
+  ACCOUNT_DELETED = {:code=>1006,:message=>"Your account has been deleted. Please contact Meetlinkshare support."}
 
   def ssl_required?
     logger.info request.env['HTTP_USER_AGENT'] 

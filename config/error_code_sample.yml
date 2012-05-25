@@ -4,6 +4,7 @@ Authentication/Authorization Failed:
   1003: Account is locked or inactive 
   1004: Authentication/Authorization Failed
   1005: Token is not valid
+  1006: Your account has been deleted. Please contact Meetlinkshare support.
 Missing Parameter:
   2001: size - Required parameter missing
   2002: email - Required parameter missing

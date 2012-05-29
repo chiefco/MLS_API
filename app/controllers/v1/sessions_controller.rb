@@ -112,7 +112,7 @@ class V1::SessionsController < Devise::SessionsController
     #~ get_communities
     get_deleted_notes
    respond_to do |format|
-      format.json{render :json =>success.merge(:synced_ids => @synched_meets, :deleted_notes => @deleted_notes, :comments => @comments.flatten, :ipad_ids =>@ipad_ids.uniq, :synched_page_ids => @ipad_page_ids.uniq, :synched_pages => @synched_pages, :share_ids => @share_ids, :shared_hashes => @synched_hash, :task_ids => @task_ids, :task_hashes => @synched_tasks, :meets => params[:user][0][:status]=="true" ? get_meets(true) : get_meets(nil), :other_users => CommunityUser.other_users(@user._id), :locations=>@user.locations.serializable_hash(:only=>[:_id,:name], :methods=>[:latitude_val,:longitude_val] ))}
+      format.json{render :json =>success.merge(:synced_ids => @synched_meets, :attachment_ids => @attachment_ids, :deleted_notes => @deleted_notes, :comments => @comments.flatten, :ipad_ids =>@ipad_ids.uniq, :synched_page_ids => @ipad_page_ids.uniq, :synched_pages => @synched_pages, :share_ids => @share_ids, :shared_hashes => @synched_hash, :task_ids => @task_ids, :task_hashes => @synched_tasks, :meets => params[:user][0][:status]=="true" ? get_meets(true) : get_meets(nil), :other_users => CommunityUser.other_users(@user._id), :locations=>@user.locations.serializable_hash(:only=>[:_id,:name], :methods=>[:latitude_val,:longitude_val] ))}
    end
   end
 
@@ -166,7 +166,7 @@ class V1::SessionsController < Devise::SessionsController
             @id=@meet._id
              create_or_update_share
              create_or_update_pages(@pages)
-             #~ create_audio(@meet, audio[0][:audio_data], audio[0][:id]) unless audio[0].blank?
+             create_audio(@meet, audio[0][:audio_data], audio[0][:id]) unless audio[0].blank?
             @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
             @ipad_ids<<meet[:meet_id]
           end
@@ -196,7 +196,7 @@ class V1::SessionsController < Devise::SessionsController
             create_or_update_share
             create_or_update_pages(@pages)
             create_or_update_pages(@updated_pages,:update)
-            #~ create_audio(@meet, audio[0][:audio_data], audio[0][:id]) unless audio[0].blank?
+            create_audio(@meet, audio[0][:audio_data], audio[0][:id]) unless audio[0].blank?
             @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
             @ipad_ids<<meet[:meet_id]
           end

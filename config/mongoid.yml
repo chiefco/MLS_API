@@ -11,11 +11,11 @@ test:
 
 # set these environment variables on your prod server
 production:
-  host: dbh44.mongolab.com
-  port: 27447
-  username: mlsdbuser
+  host: ds029667.mongolab.com
+  port: 29667
+  username: meetlinkshare
   password: m33tl1nk
-  database: mlsbeta1
+  database: meetlinkshare_production
   # slaves:
   #   - host: slave1.local
   #     port: 27018

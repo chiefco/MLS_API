@@ -4,10 +4,12 @@ class Bookmark
   include Sunspot::Mongoid
   field :name, :type => String
   field :status, :type => Boolean,:default=>true
+  field :start_time, :type=>Integer
   validates_presence_of :name, :message=>"name - Blank Parameter", :code=>3013
-  validates_length_of     :name, :message=>"name-invalid length", :maximum =>40,:minimum=>1, :code=>3073, :allow_blank => true
-  references_many :bookmarked_contents,:dependent=>:destroy
+  #~ validates_length_of     :name, :message=>"name-invalid length", :maximum =>40,:minimum=>1, :code=>3073, :allow_blank => true
+  #~ references_many :bookmarked_contents,:dependent=>:destroy
   has_many :activities, as: :entity
+  belongs_to :attachment
   referenced_in :user
   after_save :sunspot_index
   after_create :create_activity
@@ -18,6 +20,7 @@ class Bookmark
     string :name
     string :user_id
   end
+  
   def self.list
     query = 'bookmarks'
     query += '.where()'
@@ -41,7 +44,7 @@ class Bookmark
   end
 
   def save_activity(text)
-    self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
+    self.activities.create(:action=>text, :user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end
 
 end

@@ -11,6 +11,7 @@ class Attachment
   belongs_to :item
   belongs_to :community
   referenced_in :folder
+  has_many :bookmarks
   has_many :bookmarked_contents, as: :bookmarkable
   references_many :shares, :dependent => :destroy
   references_many :revisions, :dependent => :destroy

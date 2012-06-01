@@ -42,8 +42,8 @@ class V1::SessionsController < Devise::SessionsController
 
   # Perform synchronisation for the particular user
   def synchronisation
-    uri = URI.parse("http://localhost:3000")
-		req = Net::HTTP::Get.new("#{request.path}?".concat(request.query_string))
+    #~ uri = URI.parse("http://localhost:3000")
+		#~ req = Net::HTTP::Get.new("#{request.path}?".concat(request.query_string))
     @user.nil?  ? stop_synchronisation: perform_synchronisation(@user)
   end
   
@@ -112,7 +112,7 @@ class V1::SessionsController < Devise::SessionsController
     #~ get_communities
     get_deleted_notes
    respond_to do |format|
-      format.json{render :json =>success.merge(:synced_ids => @synched_meets, :deleted_notes => @deleted_notes, :comments => @comments.flatten, :ipad_ids =>@ipad_ids.uniq, :synched_page_ids => @ipad_page_ids.uniq, :synched_pages => @synched_pages, :share_ids => @share_ids, :shared_hashes => @synched_hash, :task_ids => @task_ids, :task_hashes => @synched_tasks, :meets => params[:user][0][:status]=="true" ? get_meets(true) : get_meets(nil), :other_users => CommunityUser.other_users(@user._id), :locations=>@user.locations.serializable_hash(:only=>[:_id,:name], :methods=>[:latitude_val,:longitude_val] ))}
+    format.json{render :json =>success.merge(:synced_ids => @synched_meets, :attachment_ids => @attachment_ids, :bookmarked_ids => @bookmarked_ids, :deleted_notes => @deleted_notes, :comments => @comments.flatten, :ipad_ids =>@ipad_ids.uniq, :synched_page_ids => @ipad_page_ids.uniq, :synched_pages => @synched_pages, :share_ids => @share_ids, :shared_hashes => @synched_hash, :task_ids => @task_ids, :task_hashes => @synched_tasks, :meets => params[:user][0][:status]=="true" ? get_meets(true) : get_meets(nil), :other_users => CommunityUser.other_users(@user._id), :locations=>@user.locations.serializable_hash(:only=>[:_id,:name], :methods=>[:latitude_val,:longitude_val] ))}
    end
   end
 
@@ -123,7 +123,7 @@ class V1::SessionsController < Devise::SessionsController
   def initialize_values
     @ipad_ids=[];@ipad_page_ids=[]; @share_ids=[];@task_ids=[];@synched_meets={};@synched_pages={};
     @synched_hash={};@synched_tasks={};@comments=[];@community_comments=[];@deleted_notes=[];
-    @attachment_ids={}
+    @attachment_ids={};@bookmarked_ids={};
   end
 
   #Invalid user- do not perform synchronisation
@@ -166,7 +166,7 @@ class V1::SessionsController < Devise::SessionsController
             @id=@meet._id
              create_or_update_share
              create_or_update_pages(@pages)
-             #~ create_audio(@meet, audio[0][:audio_data], audio[0][:id]) unless audio[0].blank?
+             create_audio(@meet, audio[0][:audio_data], audio[0][:id], audio[0][:bookmarks]) unless audio[0].blank? || audio[0]['audio_data'].blank?
             @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
             @ipad_ids<<meet[:meet_id]
           end
@@ -195,8 +195,8 @@ class V1::SessionsController < Devise::SessionsController
             @id=meet[:cloud_id]
             create_or_update_share
             create_or_update_pages(@pages)
-            create_or_update_pages(@updated_pages,:update)
-            #~ create_audio(@meet, audio[0][:audio_data], audio[0][:id]) unless audio[0].blank?
+            create_or_update_pages(@updated_pages,:update)     
+            create_audio(@meet, audio[0][:audio_data], audio[0][:id], audio[0][:bookmarks]) unless audio[0].blank? || audio[0]['audio_data'].blank?
             @synched_meets=@synched_meets.merge({meet[:meet_id] =>@id.to_s})
             @ipad_ids<<meet[:meet_id]
           end
@@ -241,9 +241,13 @@ def create_or_update_pages(pages,value=nil)
   
   
  
-  def create_audio(meet, audio_data,ipad_id)
+  def create_audio(meet, audio_data,ipad_id,bookmarks)
     audio_file = decode_image("#{meet.name}_#{ActiveSupport::SecureRandom.hex(16)}.caf", audio_data)
     attachment= meet.attachments.create(:file => audio_file, :size => audio_file.size, :attachment_type => "ITEM_ATTACHMENT", :file_name => "#{meet.name}_#{ActiveSupport::SecureRandom.hex(16)}.caf", :content_type => "audio/x-caf")
+    bookmarks.each do |bookmark|
+      bookmrk = attachment.bookmarks.create(:name => bookmark['name'], :start_time => bookmark['start_time'].to_i, :user_id => @user._id)
+      @bookmarked_ids = @bookmarked_ids.merge({ bookmark['id'] => bookmrk._id.to_s}) 
+    end
     @attachment_ids=@attachment_ids.merge({ipad_id => attachment._id.to_s}) unless attachment.nil?
   end
 

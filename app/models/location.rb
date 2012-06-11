@@ -25,22 +25,26 @@ class Location
     string :user_id
   end
   
+  # Get latitude of location
   def latitude_val
     val=self.latitude
     val.nil? ? "nil" : val.to_f.to_s
   end
   
+   # Get lonngitude of location
    def longitude_val
     val=self.longitude
     val.nil? ? "nil" : val.to_f.to_s
   end
 
+  # TO find_co_ordinates
   def find_co_ordinates
     latitude,longitude=Geocoder.coordinates(self.name) if self.latitude.nil? || self.longitude.nil?
     self.latitude="#{latitude} #{compass_point(latitude)}" unless latitude.nil?
     self.longitude="#{longitude} #{compass_point(longitude)}" unless longitude.nil?
   end
 
+  # Get compass point
   def compass_point(value)
     Geocoder::Calculations.compass_point(value)
   end
@@ -57,6 +61,7 @@ class Location
     super(options)
   end
 
+  # List all locations of users
   def self.list(params,paginate_options)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
@@ -67,10 +72,12 @@ class Location
     end
   end
 
+  # Criteria for location list
   def self.get_criteria(query)
     [ {name: query} ]
   end
 
+  # Get altitude
   def self.get_altitude(location)
     Geocoder.coordinates(location)
   end

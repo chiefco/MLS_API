@@ -195,11 +195,18 @@ class V1::RegistrationsController < Devise::RegistrationsController
           when "COMMENT_CREATED"
           comment = Comment.find(activity.shared_id)
           username = comment.user.first_name rescue '' 
-          values = comment.commentable.attachable unless comment.nil?
-          attachment = comment.commentable
-          comment_count = attachment.comments.count rescue 0 
-          item = values.item
-          get_activity(activity, values.page_order, item.name, nil, comment.message, comment_count, attachment._id, item._id) if values.class==Page                     
+          if comment.item_id
+            item = Item.find(comment.item_id) unless comment.nil?
+            comment_count = item.comments.count rescue 0 
+            attachment = item.pages[0].attachment
+            get_activity(activity, 1, item.name, nil, comment.message, comment_count, attachment._id, item._id)
+          else         
+            values = comment.commentable.attachable unless comment.nil?
+            attachment = comment.commentable
+            comment_count = attachment.comments.count rescue 0 
+            item = values.item
+            get_activity(activity, values.page_order, item.name, nil, comment.message, comment_count, attachment._id, item._id) if values.class==Page
+          end      
           end
         end
       end
@@ -264,13 +271,20 @@ class V1::RegistrationsController < Devise::RegistrationsController
         @first_name = User.where(:email => @invitation.email).first.first_name rescue ''
         get_activity(activity, 'community', @community.name) if !@first_name.blank?
         when "COMMENT_CREATED"
-        comment = Comment.find(activity.shared_id)
-        @first_name = comment.user.first_name rescue '' 
-        values = comment.commentable.attachable unless comment.nil?
-        attachment = comment.commentable
-        comment_count = attachment.comments.count rescue 0 
-        item = values.item
-        get_activity(activity, values.page_order, item.name, nil, comment.message, comment_count, attachment._id, item._id) if values.class==Page          
+         comment = Comment.find(activity.shared_id)
+          @first_name = comment.user.first_name rescue '' 
+        if comment.item_id
+          item = Item.find(comment.item_id) unless comment.nil?
+          comment_count = item.comments.count rescue 0 
+          attachment = item.pages[0].attachment
+          get_activity(activity, 1, item.name, nil, comment.message, comment_count, attachment._id, item._id)
+        else         
+          values = comment.commentable.attachable unless comment.nil?
+          attachment = comment.commentable
+          comment_count = attachment.comments.count rescue 0 
+          item = values.item
+          get_activity(activity, values.page_order, item.name, nil, comment.message, comment_count, attachment._id, item._id) if values.class==Page
+        end        
       end
     end 
   end

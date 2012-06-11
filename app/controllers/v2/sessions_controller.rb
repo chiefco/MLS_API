@@ -8,7 +8,7 @@ class V2::SessionsController < Devise::SessionsController
     user=params[:user]
     params[:user]={}
     params[:user][:email],params[:user][:password]=user.decode_credentials if user && user.is_a?(String)
-    resource = warden.authenticate!(:scope => resource_name, :recall => "V1::Sessions#index")
+    resource = warden.authenticate!(:scope => resource_name, :recall => "V2::Sessions#index")
     create_user(resource)
   end
 

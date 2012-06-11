@@ -25,10 +25,12 @@ class Page
   after_create :create_activity
   after_update :update_activity
 
+  #  After create page, create activity
   def create_activity
     save_activity("PAGE_CREATED")
   end
 
+  # Update activity
   def update_activity
     if self.status_changed?
       save_activity("PAGE_DELETED")
@@ -37,6 +39,7 @@ class Page
     end
   end
 
+  # List of users activites
   def self.list(pages,params,paginate_options)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
@@ -48,10 +51,12 @@ class Page
     eval(query)
   end
 
+  # Save activitiy
   def save_activity(text)
     self.item.activities.create(:action=>text,:user_id => self.item.user.nil?  ? 'nil' : self.item.user._id, :page_order => self.page_order)
   end
 
+  # Create page texts
   def self.create_page_texts(pagetexts,id)
     @page_texts=[]
     page=Page.where(:_id=>id).first

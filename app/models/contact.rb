@@ -28,6 +28,7 @@ class Contact
     string :user_id
   end
   
+  # List all contacts of user
   def self.list(params,paginate_options,user)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
@@ -38,6 +39,7 @@ class Contact
     end
   end
   
+  # Search contacts
   def self.search(params,user)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
@@ -55,6 +57,7 @@ class Contact
     #~ user.contacts.undeleted.any_of(self.get_criteria(params[:q])).order_by([params[:sort_by].to_sym,params[:order_by].to_sym])
   end
   
+   # Criteria for search
    def self.get_criteria(query)
     [ {first_name: /#{query}/i } , { email: /#{query}/i  }, { last_name: /#{query}/i  }]
   end

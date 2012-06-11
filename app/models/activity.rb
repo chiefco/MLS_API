@@ -5,6 +5,7 @@ class Activity
   ORDER_BY_ALLOWED =  [:asc,:desc]
   field :action, :type => String
   field :shared_id, :type => String
+  field :item_id, :type => String
   field :page_order, :type => String, :default => 1
 
   belongs_to :entity, polymorphic: true, index: true
@@ -17,6 +18,7 @@ class Activity
   validates_presence_of :entity_type,:code=> 3020,:message=>"activity_type - Required parameter missing"
   validates_inclusion_of :entity_type, :in=>["Item","Category","Bookmark","Topic", "Community","Share", "Attachment", "Invitation", "Folder","Comment"], :message=>"activity_type  - Required parameter missing", :code=>2015
 
+  # List actitivities of user by paginate_options
   def self.list(params,paginate_options,user)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
@@ -28,6 +30,7 @@ class Activity
     eval(query)
   end
 
+  # Get_criteria for list activities
   def self.get_criteria(query)
     [ {activity_type: query} , { description: query }]
   end

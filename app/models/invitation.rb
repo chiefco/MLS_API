@@ -15,6 +15,7 @@ class Invitation
   before_create :create_invitation_token
   scope :unused, self.excludes(:invitation_token => nil)
 
+  # Create Invitation token
   def create_invitation_token
     self.invitation_token=SecureRandom.base64(6).tr('+/=', 'xyz')
     self.invited_at=Time.current

@@ -23,10 +23,12 @@ class Folder
   after_create :create_activity
   after_update :update_activity
 
+  # After create folder, create activity
   def create_activity
     save_activity("FOLDER_CREATED")
   end
 
+  # Update activity
   def update_activity
     if self.status_changed?
       save_activity("FOLDER_DELETED")
@@ -35,31 +37,38 @@ class Folder
     end
   end
 
+   # Save activity
    def save_activity(text)
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end
 
+  # Get subfolders for folders
   def subfolders
     self.children
   end
 
+  # Get folders children count
   def children_count
     self.children.count
   end
   
+  # Get user name for folder
   def user_name
     User.find(self.user_id).first_name
   end
 
+  # Check wheather folder is shared or not?
   def is_shared
     self.shares.count > 0
   end    
   
+  # Delete folder and activites
   def self.delete(folders)
     Folder.any_in(:_id => folders).destroy_all
     Activity.any_in(:shared_id => folders).delete_all
   end
 
+  # Make clone for share folder
   def make_clone(community_id, user, parent_id=nil)
     shared_folder = self.clone
     shared_folder.save

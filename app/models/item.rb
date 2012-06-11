@@ -30,7 +30,7 @@ class Item
   has_many :pages,:dependent => :destroy
   has_many :attachments, as: :attachable, :dependent=>:destroy
   has_many :bookmarked_contents, as: :bookmarkable, :dependent=>:destroy
-  has_many :comments, as: :commentable
+  has_many :comments, as: :commentable, :dependent => :destroy
   has_many :activities, as: :entity
   has_many :notifications, as: :notifier, :dependent=>:destroy
   has_many :shares

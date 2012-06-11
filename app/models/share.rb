@@ -16,6 +16,7 @@ class Share
   #~ after_update :update_activity
 
 
+  # Create activity for share
   def create_activity(text,community_id, shared_id)
     save_activity(text,community_id, shared_id)
   end
@@ -28,6 +29,7 @@ class Share
     #~ end
   #~ end
 
+  # Create permission
   def create_permission(permission)
     access=Permission.where(:_id=>permission).first
     unless access.nil?
@@ -37,40 +39,49 @@ class Share
     end
   end
 
+  # Default permission
   def default_permission
     access=Permission.where(:role_name=>"View").first
     self.update_attributes(:permission_id=>access._id)
   end
 
+  # Get user details of share
   def user_details
     user.serializable_hash(:only=>[:_id,:first_name,:last_name])
   end
 
+  # Get role
   def role
     permission=Permission.find(self.permission_id).role_name
   end
 
+  # Get user name for share
   def user_name
     User.find(self.user_id).first_name
   end
 
+  # Get shared attachments for share
   def share_attachments
     self.attachment
   end
   
+  # Get shared folders
   def share_folders
    self.folder
   end
 
+  # Save activity
   def save_activity(text, community_id, shared_id)
     @community = Community.find "#{community_id}"
     @community.activities.create(:action=>text, :shared_id => shared_id, :user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end
 
+  # Update share
   def self.update(attachment_id, new_attachment_id, user_id)
     Share.where(:shared_id => attachment_id, :user_id => user_id, :attachment_id => attachment_id).each{|a| a.update_attributes(:shared_id => new_attachment_id, :attachment_id => new_attachment_id, :user_id => user_id)}
   end
   
+  # Share files notification
   def share_files(communities, files, folders, notes, notes_id, current_user)
     user = current_user.email
     user_name = current_user.first_name
@@ -86,6 +97,7 @@ class Share
      end
    end
    
+   # Send mail to community users  for  attachments sharing
    def share_mail(user, user_name, community_id, community_name, emails, files, folders)
      file_names = files*"," 
      folder_names = folders*"," 
@@ -94,7 +106,7 @@ class Share
      end
    end
    
-  # Public: Send mail to community users for meet sharing
+  # Send mail to community users for meet sharing
    def note_share_mail(user, user_name, community_id, community_name, emails, notes, notes_id)
      note_names = notes*"," 
      emails.each do |email|
@@ -102,6 +114,7 @@ class Share
      end
    end
    
+   # Send mail to community users  for  delete shares
    def self.shared_delete(community_id, count, item_name, current_user)
       current_user_email = current_user.email
       current_user_name = current_user.first_name
@@ -110,6 +123,7 @@ class Share
       share_delete_notifications(current_user_email,current_user_name, community_id, community_name, emails, count, item_name)
     end
     
+  # Shae delete notifications
   def self.share_delete_notifications(current_user_email,current_user_name, community_id, community_name, emails, count, item_name)
     emails.each do |email|
        Invite.share_delete_email(current_user_email, current_user_name, community_id, community_name, email, count, item_name).deliver

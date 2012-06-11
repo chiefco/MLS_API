@@ -267,12 +267,14 @@ class V2::ItemsController < ApplicationController
           shared_to.nil? ? share_status = false : share_status = true
           attachment = @item.share_attachments(page) rescue nil
           audio = @item.attachments.last rescue []
-          comments = attachment.comments if attachment
+          bookmarks = @item.attachments.last.bookmarks rescue []
+          comments =   attachment.blank? ? [] : attachment.comments
           page_texts = pages[page].page_texts rescue []
           page_count = pages.count
+          comments = comments + @item.comments 
 
           if attachment
-            format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :page_texts => page_texts.as_json, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :share_status => share_status,:meet => @item.to_json(:only=>[:name,:_id,:description]).parse,  :audio =>audio.as_json}.to_success} 
+            format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :page_texts => page_texts.as_json, :comments => comments.to_json(:only => [:message, :created_at, :updated_at], :methods => [:user_name]).parse, :page_count => page_count, :share_status => share_status,:meet => @item.to_json(:only=>[:name,:_id,:description]).parse,  :audio =>audio.as_json, :bookmarks => bookmarks.to_json(:only => [:name, :start_time, :attachment_id, :user_id]).parse  }.to_success} 
           else
             format.json {render :json =>  {  :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}.to_success} 
           end
@@ -290,19 +292,21 @@ class V2::ItemsController < ApplicationController
   # Public: Adds comment to the item pages
   # params - page attachment id is passed
   # Returns json result
-  def add_page_comment 
-    attachment = Attachment.where(:_id => params[:attachment_id]).first
-    comment = attachment.comments.new(:message => params[:message], :user_id => @current_user._id, :commentable_type => "Attachment", :created_at => Time.now, :updated_at => Time.now, :community_id => params[:community_id])
-    Item.delay.comment_notifications(params[:attachment_id], params[:community_id],  params[:message], @current_user)
-    respond_to do |format|
-      if comment.save
-        format.json {render :json =>  { :comment => comment.to_a.to_json(:only => [:message, :created_at, :updated_at], :methods => [:user_name]).parse}.to_success} 
-        format.xml{ render :xml=>success.to_xml(ROOT)}
-      else
-        failure_save
-      end
-    end    
+  def add_page_comment    
+      @item = @current_user.items.find(params[:id])
+      comment = @item.comments.new(:message => params[:message], :user_id => @current_user._id, :commentable_type => "Item", :created_at => Time.now, :updated_at => Time.now, :community_id => params[:community_id], :item_id => params[:id])
+      #@item.delay.comment_notifications(params[:attachment_id], params[:community_id],  params[:message], @current_user)
+      respond_to do |format|
+        if comment.save
+          format.json {render :json =>  { :comment => comment.to_a.to_json(:only => [:message, :created_at, :updated_at], :methods => [:user_name]).parse}.to_success} 
+          format.xml{ render :xml=>success.to_xml(ROOT)}
+        else
+          failure_save
+        end
+      end    
+      
   end
+  
 
   def get_criteria(query)
     [ {name: query} , { description: query } ]

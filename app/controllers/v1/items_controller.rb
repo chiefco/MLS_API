@@ -29,7 +29,7 @@ class V1::ItemsController < ApplicationController
       unless @item.status==false
         if @item
           shared_to = (@item.shares.map(&:community)).uniq
-          @item = {:item => @item.serializable_hash(:only => [:_id, :name, :description, :item_date, :custom_page], :methods => [:created_time, :updated_time, :end_time, :location_name, :location_state, :location_country, :item_date, :item_date_local, :created_by, :page_count, :latitude, :longitude]),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id), :shared_to => shared_to.to_json(:methods => [:users_count, :shares_count]).parse}.to_success
+          @item = {:item => @item.serializable_hash(:only => [:_id, :name, :description, :item_date, :custom_page], :methods => [ :location_name, :location_state, :location_country, :created_by, :page_count, :latitude, :longitude, :item_date, :item_date_local, :created_time,  :end_time,:updated_time]),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id), :shared_to => shared_to.to_json(:methods => [:users_count, :shares_count]).parse}.to_success
           format.xml  { render :xml => @item.to_xml(ROOT) }
           format.json  { render :json => @item}
         else

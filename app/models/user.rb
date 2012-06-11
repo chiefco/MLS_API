@@ -80,34 +80,42 @@ class User
     template.add :authentication_token #,:as=>:access_token
   end
 
+  # Chaeck valid user
   def self.valid_user?(token='')
     self.where(:authentication_token=>token,:status=>true).first
   end
   
+  # Check subscription
   def expiry_subscription
     self.expiry_date.nil? ? "nil" : self.expiry_date.strftime("%d/%m/%Y %H:%M:%S")
   end
 
+  # Set passwor or create new or update
   def pass_create_or_update?
     set_password || new_record?
   end
 
+  # Build success info(json)
   def build_confirm_success_json
     { "response" => "success", "confirmed" => true }.to_json
   end
 
+  # Build failure info(json)
   def build_confirm_failure_json
     { "response" => "failure",  "confirmed" => false}.to_json
   end
 
+  # Build success info(xml)
   def build_confirm_success_xml
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?><result><response>success</response><status>200</status><confirmed>true</confirmed></result>"
   end
 
+  # Build failure info(xml)
   def build_confirm_failure_xml
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?><result><response>failure</response><confirmed>false</confirmed></result>"
   end
 
+  # List all users
   def self.list(params,paginate_options)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
@@ -118,10 +126,12 @@ class User
     end
   end
 
+  # Criteria for list users
   def self.get_criteria(query)
     [ {first_name: query} , { last_name: query }, { email: query }, { job_title: query }, { company: query} ]
   end
   
+  # Get user info
   def user_info
     industry = self.industry.name rescue ''
     communities = self.communities.undeleted.count rescue 0
@@ -129,10 +139,12 @@ class User
     [industry, items, communities]
   end
 
+  # Community membership ids
   def community_membership_ids
     community_users.collect{|c| c.community_id.to_s}
   end
 
+  # To find community membership
   def community_memberships
     Community.find(community_membership_ids)
   end

@@ -9,6 +9,7 @@ class CommunityUser
   belongs_to :user
   scope :undeleted,self.excludes(:status=>false)
 
+  # Get other users for ipad
   def self.other_users(user_id)
     users=where(:user_id =>user_id).map(&:community).select{|c|  c.status == true}.to_json(:only=>[:_id,:name,:description,:subscribe_email],:methods=>[:get_meets, :users_count,:members,:owner,:get_community_attachments,:subscribe]).parse
     return users

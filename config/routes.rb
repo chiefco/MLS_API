@@ -139,9 +139,6 @@ MeetlinkshareApi::Application.routes.draw do
 
   devise_for 'users',:controllers => { :sessions => "v1/sessions",:confirmations=>'v1/confirmations', :registrations=>"v1/registrations",:passwords=>'v1/passwords' } do
     post "v1/forgot_password", :to => "v1/passwords#create"
-    post "v1/users/sign_in", :to => "v1/sessions#create"
-    post "v1/users/resend_confirmation_mail", :to => "v1/sessions#resend_confirmation_mail"
-
     post "v1/users", :to => "v1/registrations#create"
     put "v1/user", :to => "v1/registrations#update"
     post "v1/reset_password", :to => "v1/passwords#update"
@@ -153,29 +150,29 @@ MeetlinkshareApi::Application.routes.draw do
     get "v1/activities",:to=>'v1/registrations#activities'
     post "v1/synchronisation",:to=>'v1/sessions#synchronisation'
     post "v1/community_synchronisation", :to => 'v1/sessions#community_synchronisation'
-    post "v1/subscribe_user", :to => 'v1/sessions#subcribe_user'
-    get "v1/image",:to=>'v1/sessions#get_image'
   end
 
-  # devise_for 'users',:controllers => { :sessions => "v2/sessions",:confirmations=>'v2/confirmations', :registrations=>"v2/registrations",:passwords=>'v2/passwords' } do
-  #   post "v2/forgot_password", :to => "v2/passwords#create"
-  #   post "v2/users/sign_in", :to => "v2/sessions#create"
-  #   post "v2/users/resend_confirmation_mail", :to => "v2/sessions#resend_confirmation_mail"
-
-  #   post "v2/users", :to => "v2/registrations#create"
-  #   put "v2/user", :to => "v2/registrations#update"
-  #   post "v2reset_password", :to => "v2/passwords#update"
-  #   get "v2/user", :to=>"v2/registrations#show"
-  #   get "v2/users", :to=> "v2/registrations#index"
-  #   get "users/confirmation",:to=>"v2/confirmations#show"
-  #   delete "v2/close_account",:to=>'v2/registrations#close_account'
-  #   get "v2/industries",:to=>'v2/registrations#options_for_the_field'
-  #   get "v2/activities",:to=>'v2/registrations#activities'
-  #   post "v2/synchronisation",:to=>'v2/sessions#synchronisation'
-  #   post "v2/community_synchronisation", :to => 'v2/sessions#community_synchronisation'
-  #   post "v2/subscribe_user", :to => 'v2/sessions#subcribe_user'
-  #   get "v2/image",:to=>'v2/sessions#get_image'
-  # end
+  devise_for 'users',:controllers => { :sessions => "v2/sessions",:confirmations=>'v2/confirmations', :registrations=>"v2/registrations",:passwords=>'v2/passwords' } do
+    post "v2/forgot_password", :to => "v2/passwords#create"
+    post "v2/users", :to => "v2/registrations#create"
+    put "v2/user", :to => "v2/registrations#update"
+    post "v2reset_password", :to => "v2/passwords#update"
+    get "v2/user", :to=>"v2/registrations#show"
+    get "v2/users", :to=> "v2/registrations#index"
+    get "users/confirmation",:to=>"v2/confirmations#show"
+    delete "v2/close_account",:to=>'v2/registrations#close_account'
+    get "v2/industries",:to=>'v2/registrations#options_for_the_field'
+    get "v2/activities",:to=>'v2/registrations#activities'
+    post "v2/synchronisation",:to=>'v2/sessions#synchronisation'
+    post "v2/community_synchronisation", :to => 'v2/sessions#community_synchronisation'
+  end
+  
+  devise_for 'users',:controllers => {:sessions => "sessions"} do
+    post "*users/sign_in", :to => "sessions#create"
+    post "*users/resend_confirmation_mail", :to => "sessions#resend_confirmation_mail"
+    post "*subscribe_user", :to => 'sessions#subcribe_user'
+    get "*image",:to=>'sessions#get_image'
+  end
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

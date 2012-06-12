@@ -267,7 +267,7 @@ class V1::ItemsController < ApplicationController
           shared_to.nil? ? share_status = false : share_status = true
           attachment = @item.share_attachments(page) rescue nil
           audio = @item.attachments.last rescue []
-          comments = attachment.comments if attachment
+          comments = @item.comments
           page_texts = pages[page].page_texts rescue []
           page_count = pages.count
 
@@ -291,8 +291,10 @@ class V1::ItemsController < ApplicationController
   # params - page attachment id is passed
   # Returns json result
   def add_page_comment 
-    attachment = Attachment.where(:_id => params[:attachment_id]).first
-    comment = attachment.comments.new(:message => params[:message], :user_id => @current_user._id, :commentable_type => "Attachment", :created_at => Time.now, :updated_at => Time.now, :community_id => params[:community_id])
+    item = Item.where(:_id => params[:id]).first if params[:attachment_id].blank?
+    attachment = Attachment.where(:_id => (!params[:attachment_id].blank? ? params[:attachment_id] : item.pages.first.attachment._id)).first
+    item ||= attachment.attachable.item
+    comment = attachment.comments.new(:message => params[:message], :user_id => @current_user._id, :commentable_type => "Attachment", :created_at => Time.now, :updated_at => Time.now, :community_id => params[:community_id], :item_id => (item && item._id.blank? ? "" : item._id))
     Item.delay.comment_notifications(params[:attachment_id], params[:community_id],  params[:message], @current_user)
     respond_to do |format|
       if comment.save

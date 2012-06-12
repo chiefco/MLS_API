@@ -294,7 +294,8 @@ class V2::ItemsController < ApplicationController
   # Returns json result
   def add_page_comment    
       @item = @current_user.items.find(params[:id])
-      comment = @item.comments.new(:message => params[:message], :user_id => @current_user._id, :commentable_type => "Item", :created_at => Time.now, :updated_at => Time.now, :community_id => params[:community_id], :item_id => params[:id])
+      @attachment = @item.pages.first.attachment
+      comment = @item.comments.new(:message => params[:message], :user_id => @current_user._id, :commentable_id => @attachment.id, :commentable_type => "Attachment", :created_at => Time.now, :updated_at => Time.now, :community_id => params[:community_id])
       #@item.delay.comment_notifications(params[:attachment_id], params[:community_id],  params[:message], @current_user)
       respond_to do |format|
         if comment.save

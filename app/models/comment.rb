@@ -10,11 +10,11 @@ class Comment
   field :item_id , type: String
 
   belongs_to :user, index: true
-  #~ belongs_to :item
   has_many :activities, as: :entity
   belongs_to :commentable, polymorphic: true, index: true
+  belongs_to :item, index: true
   # default_scope :without=>[:created_at,:updated_at]
-  validates_inclusion_of :commentable_type, :in=>["Attachment", "Item"], :message=>"commentable_type-invalid_parameter", :code=>3084
+  validates_inclusion_of :commentable_type, :in=>["Attachment"], :message=>"commentable_type-invalid_parameter", :code=>3084
   validates_presence_of :message,:code=>3086,:message=>"message-blank_parameter"
   scope :undeleted,self.excludes(:status=>false)
   after_create :create_activity
@@ -56,8 +56,9 @@ class Comment
   def self.create_comments(user,messages=nil,attachment)
     comments=[]
       unless messages.nil?
-          messages.each do |message|
-          comment=user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment,:message=>message[:message],:community_id=>message[:community_id])
+        messages.each do |message|
+          item = attachment.attachable.item if attachment.attachable
+          comment=user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment,:message=>message[:message],:community_id=>message[:community_id], :item_id => (item && item._id.blank? ? "" : item._id))
           comments<<{message[:comment_id]=>comment._id}
         end
       end

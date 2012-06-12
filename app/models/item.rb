@@ -27,10 +27,11 @@ class Item
   references_many :topics,:dependent => :destroy
   references_many :attendees,:dependent => :destroy
   references_many :tasks,:dependent => :destroy
+  has_many :comments, :dependent => :destroy
   has_many :pages,:dependent => :destroy
   has_many :attachments, as: :attachable, :dependent=>:destroy
   has_many :bookmarked_contents, as: :bookmarkable, :dependent=>:destroy
-  has_many :comments, as: :commentable, :dependent => :destroy
+  #~ has_many :comments, as: :commentable, :dependent => :destroy
   has_many :activities, as: :entity
   has_many :notifications, as: :notifier, :dependent=>:destroy
   has_many :shares

@@ -345,9 +345,10 @@ def create_or_update_pages(pages,value=nil)
     community.remove_invites(@user.email) if community
   end
   
-  def create_comment(member)
+	def create_comment(member)
     attachment=Attachment.where(:_id=>member["cloud_id"]).first
-    comment=@user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment._id,:message=>member["message"],:community_id=>member["community_id"]) unless attachment.nil?
+    item = attachment.attachable.item unless attachment.nil?
+    comment=@user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment._id,:message=>member["message"],:community_id=>member["community_id"], :item_id => (item && item._id.blank? ? "" : item._id)) unless attachment.nil?
     @community_comments << {member["id"] => comment._id} unless comment.nil?
   end
   

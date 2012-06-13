@@ -271,7 +271,7 @@ class V2::ItemsController < ApplicationController
           comments =   attachment.blank? ? [] : attachment.comments
           page_texts = pages[page].page_texts rescue []
           page_count = pages.count
-          comments = comments + @item.comments 
+          comments = @item.comments 
 
           if attachment
             format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :page_texts => page_texts.as_json, :comments => comments.to_json(:only => [:message, :created_at, :updated_at], :methods => [:user_name]).parse, :page_count => page_count, :share_status => share_status,:meet => @item.to_json(:only=>[:name,:_id,:description]).parse,  :audio =>audio.as_json, :bookmarks => bookmarks.to_json(:only => [:name, :start_time, :attachment_id, :user_id]).parse  }.to_success} 

@@ -267,14 +267,13 @@ class V2::ItemsController < ApplicationController
           shared_to.nil? ? share_status = false : share_status = true
           attachment = @item.share_attachments(page) rescue nil
           audio = @item.attachments.last rescue []
+          comments = @item.comments
           bookmarks = @item.attachments.last.bookmarks rescue []
-          comments =   attachment.blank? ? [] : attachment.comments
           page_texts = pages[page].page_texts rescue []
           page_count = pages.count
-          comments = @item.comments 
 
           if attachment
-            format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :page_texts => page_texts.as_json, :comments => comments.to_json(:only => [:message, :created_at, :updated_at], :methods => [:user_name]).parse, :page_count => page_count, :share_status => share_status,:meet => @item.to_json(:only=>[:name,:_id,:description]).parse,  :audio =>audio.as_json, :bookmarks => bookmarks.to_json(:only => [:name, :start_time, :attachment_id, :user_id]).parse  }.to_success} 
+            format.json {render :json =>  { :page => attachment.to_json(:only => [:_id, :file]).parse, :page_texts => page_texts.as_json, :comments => comments.serializable_hash(:only => [:message, :created_at, :updated_at], :methods => [:user_name]), :page_count => page_count, :share_status => share_status,:meet => @item.to_json(:only=>[:name,:_id,:description]).parse,  :audio =>audio.as_json, :bookmarks => bookmarks.to_json(:only => [:name, :start_time, :attachment_id, :user_id]).parse  }.to_success} 
           else
             format.json {render :json =>  {  :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}.to_success} 
           end

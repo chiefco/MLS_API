@@ -35,6 +35,8 @@ gem 'httparty'
 gem 'json'
 gem 'delayed_job'
 gem 'delayed_job_mongoid'
+gem "rake", "0.9.2"
+
 
 group :development do
   gem 'sunspot_solr'

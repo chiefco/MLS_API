@@ -347,8 +347,9 @@ def create_or_update_pages(pages,value=nil)
   
   def create_comment(member)
     attachment=Attachment.where(:_id=>member["cloud_id"]).first
-    item = attachment.attachable.item if !attachment.nil?  && attachment.attachable_type =="Page"
-    comment=@user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment._id,:message=>member["message"],:community_id=>member["community_id"], :item_id => (item && item._id.blank? ? nil : item._id)) unless attachment.nil?
+    comment=@user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment._id,:message=>member["message"],:community_id=>member["community_id"]) unless attachment.nil?
+    #~ item = attachment.attachable.item if !attachment.nil?  && attachment.attachable_type =="Page"
+    #~ comment=@user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment._id,:message=>member["message"],:community_id=>member["community_id"], :item_id => (item && item._id.blank? ? nil : item._id)) unless attachment.nil?
     @community_comments << {member["id"] => comment._id} unless comment.nil?
   end
   

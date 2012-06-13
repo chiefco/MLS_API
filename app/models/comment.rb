@@ -57,8 +57,9 @@ class Comment
     comments=[]
       unless messages.nil?
         messages.each do |message|
-          item = attachment.attachable.item if attachment.attachable && attachment.attachable_type =="Page"
-          comment=user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment,:message=>message[:message],:community_id=>message[:community_id], :item_id => (item && item._id.blank? ? nil : item._id))
+          #~ item = attachment.attachable.item if attachment.attachable && attachment.attachable_type =="Page"
+          #~ comment=user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment,:message=>message[:message],:community_id=>message[:community_id], :item_id => (item && item._id.blank? ? nil : item._id))
+          comment=user.comments.create(:commentable_type=>"Attachment",:commentable_id=>attachment,:message=>message[:message],:community_id=>message[:community_id])
           comments<<{message[:comment_id]=>comment._id}
         end
       end

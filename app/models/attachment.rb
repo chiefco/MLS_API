@@ -131,6 +131,11 @@ class Attachment
   def messages
     comments.to_a.to_json(:only=>[:_id,:message],:methods=>[:created_time],:include=>{:user=>{:only=>[:email, :first_name, :last_name]}}).parse
   end
+  
+  #Public: Returns the item audio bookmarks
+  def audio_bookmarks
+    self.bookmarks.to_a.to_json(:only=>[:_id,:name, :start_time, :status]).parse
+  end
 
   def self.upload_share(upload_user, user_name, community_id, community_name, emails, file_name, file_count)
     emails.each do |email|

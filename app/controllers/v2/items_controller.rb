@@ -28,17 +28,15 @@ class V2::ItemsController < ApplicationController
     respond_to do |format|
       unless @item.status==false
         if @item
-          shared_to = (@item.shares.map(&:community)).uniq
+          shared_to = @item.item_shares
           @item = {:item => @item.serializable_hash(:only => [:_id, :name, :description, :item_date, :custom_page], :methods => [:created_time, :updated_time, :end_time, :location_name, :location_state, :location_country, :item_date, :item_date_local, :created_by, :page_count, :latitude, :longitude]),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id), :shared_to => shared_to.to_json(:methods => [:users_count, :shares_count]).parse}.to_success
-          format.xml  { render :xml => @item.to_xml(ROOT) }
-          format.json  { render :json => @item}
+          format.xml  {render :xml => @item.to_xml(ROOT) }
+          format.json  {render :json => @item}
         else
-          format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-          format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+         failure_save
         end
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end
   end
@@ -57,12 +55,11 @@ class V2::ItemsController < ApplicationController
             format.xml  {render :xml => @item.to_xml(ROOT)}
             format.json  {render :json =>@item}
           else
-            format.xml  { render :xml => failure.merge(@item.all_errors).to_xml(ROOT)}
-            format.json  { render :json => @item.all_errors }
+            format.xml  {render :xml => failure.merge(@item.all_errors).to_xml(ROOT)}
+            format.json  {render :json => @item.all_errors}
           end
       else
-          format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-          format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+          failure_save
       end
     end
   end
@@ -79,27 +76,26 @@ class V2::ItemsController < ApplicationController
             params[:item][:location_id]=@location._id
           end
           get_item
-        if @item.update_attributes(params[:item])
-          get_item
-          @item={:item=>@item.to_json(:only=>[:description,:current_category_id,:end_time],:methods=>[:created_time,:updated_time,:item_date,:location_name,:item_date_local]).parse}.to_success
-          format.xml  {render :xml=>@item.to_xml(ROOT)}
-          format.json {render :json =>@item}
-        else
-          format.xml  { render :xml => @item.all_errors.to_xml(ROOT)}
-          format.json {render :json =>@item.all_errors}
-        end
-        rescue Exception => e
-          if e.message.to_s=="argument out of range" || e.message.start_with?("no")
-            format.xml  { render :xml => failure.merge(INVALID_DATE).to_xml(ROOT) }
-            format.json  { render :json=> failure.merge(INVALID_DATE)}
+          if @item.update_attributes(params[:item])
+            get_item
+            @item={:item=>@item.to_json(:only=>[:description,:current_category_id,:end_time],:methods=>[:created_time,:updated_time,:item_date,:location_name,:item_date_local]).parse}.to_success
+            format.xml  {render :xml=>@item.to_xml(ROOT)}
+            format.json {render :json =>@item}
           else
-            format.xml  { render :xml => failure.merge(INVALID_CATEGORY_ID).to_xml(ROOT) }
-            format.json  { render :json=> failure.merge(INVALID_CATEGORY_ID)}
+            format.xml  {render :xml => @item.all_errors.to_xml(ROOT)}
+            format.json {render :json =>@item.all_errors}
           end
-        end
+          rescue Exception => e
+            if e.message.to_s=="argument out of range" || e.message.start_with?("no")
+              format.xml  { render :xml => failure.merge(INVALID_DATE).to_xml(ROOT) }
+              format.json  { render :json=> failure.merge(INVALID_DATE)}
+            else
+              format.xml  {render :xml => failure.merge(INVALID_CATEGORY_ID).to_xml(ROOT) }
+              format.json  {render :json=> failure.merge(INVALID_CATEGORY_ID)}
+            end
+          end
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end
   end
@@ -110,11 +106,10 @@ class V2::ItemsController < ApplicationController
     respond_to do |format|
       if @item
       @item.update_attributes(:status=>false, :web_status => false)
-        format.xml  { render :xml => success.to_xml(ROOT) }
-        format.json  { render :json=> success}
+        format.xml  {render :xml => success.to_xml(ROOT) }
+        format.json  {render :json=> success}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end
   end
@@ -161,8 +156,7 @@ class V2::ItemsController < ApplicationController
         format.json{render :json=>@categories}
         format.xml{render :xml=>@categories.to_xml(ROOT)}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end
   end
@@ -178,8 +172,7 @@ class V2::ItemsController < ApplicationController
         format.json{render :json=>add_category}
         format.xml{render :xml=>add_category.to_xml(ROOT)}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end
   end
@@ -209,8 +202,7 @@ class V2::ItemsController < ApplicationController
         format.json{render :json=>success}
         format.xml{render :xml=>success}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end
   end
@@ -233,8 +225,7 @@ class V2::ItemsController < ApplicationController
         format.json{render :json=>@attendees}
         format.xml{render :xml=>@attendees.to_xml(ROOT)}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+       failure_save
       end
     end
   end
@@ -244,11 +235,10 @@ class V2::ItemsController < ApplicationController
     respond_to do |format|
       if @item
         @item={:item_task=>@item.tasks.serializable_hash(:only=>[:description,:due_date,:_id,:is_completed],:include=>{:item=>{:only=>[:_id,:name]}})}.to_success
-        format.json{ render :json=>@item}
-        format.xml{ render :xml=>@item.to_xml(ROOT)}
+        format.json{render :json=>@item}
+        format.xml{render :xml=>@item.to_xml(ROOT)}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+       failure_save
       end
     end
   end
@@ -277,7 +267,7 @@ class V2::ItemsController < ApplicationController
             format.json {render :json =>  {  :page_count => page_count, :meet => @item.to_json(:only=>[:name,:_id,:description]).parse}.to_success} 
           end
           # index.html.erb
-          format.xml{ render :xml => attachments.to_xml(ROOT)}
+          format.xml{render :xml => attachments.to_xml(ROOT)}
         else
              format.json{render :json=>{:message=> @message}.to_failure}
         end
@@ -294,16 +284,15 @@ class V2::ItemsController < ApplicationController
       @item = @current_user.items.find(params[:id])
       @attachment = @item.pages.first.attachment
       comment = @item.comments.new(:message => params[:message], :user_id => @current_user._id, :commentable_id => @attachment.id, :commentable_type => "Attachment", :created_at => Time.now, :updated_at => Time.now, :community_id => params[:community_id])
-      #@item.delay.comment_notifications(params[:attachment_id], params[:community_id],  params[:message], @current_user)
+      @item.delay.comment_notifications(@attachment.id, params[:community_id],  params[:message], @current_user)
       respond_to do |format|
         if comment.save
-          format.json {render :json =>  { :comment => comment.to_a.to_json(:only => [:message, :created_at, :updated_at], :methods => [:user_name]).parse}.to_success} 
+          format.json {render :json =>  {:comment => comment.to_a.to_json(:only => [:message, :created_at, :updated_at], :methods => [:user_name]).parse}.to_success} 
           format.xml{ render :xml=>success.to_xml(ROOT)}
         else
           failure_save
         end
       end    
-      
   end
   
 

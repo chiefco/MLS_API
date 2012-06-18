@@ -51,6 +51,7 @@ class Item
   after_create :create_activity
   after_update :update_activity
   
+  # Get location details
   def location_details
     meet_location=self.location
     unless meet_location.nil?
@@ -60,6 +61,7 @@ class Item
     end
   end
   
+  # Get user details of item
   def user_details
     val=self.user
     unless val.nil?
@@ -67,15 +69,18 @@ class Item
     end
   end
   
+  # Get audio attachments
   def audio_attachment
     attachment=self.attachments
     attachment.blank? ? 'nil' : attachment.last.file
   end
 
+  # Create new activity 
   def create_activity
     save_activity("ITEM_CREATED")
   end
 
+  # Update activity
   def update_activity
     if self.status_changed?
       save_activity("ITEM_DELETED")
@@ -92,6 +97,7 @@ class Item
     string :user_id
   end
 
+  # Check template fields
   def template_fields
     true
   end
@@ -108,58 +114,72 @@ class Item
     t.add 'user'
   end
 
+  # Get location for item
   def location_name
     self.location.nil? ? "nil" : self.location.name
   end
 
+  # Get item date
   def item_date
     super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %H:%M:%S")
   end
 
+  # Get local date for item
   def item_date_local
     self.item_date.to_time.localtime rescue ''
   end
 
+  # Get end time for item
   def end_time
     super().nil? ? "nil" : super().utc.strftime("%d/%m/%Y %H:%M:%S")
   end
 
+  # Get created time for item
   def created_time
     self.created_at.utc.strftime("%d/%m/%Y %H:%M:%S")
   end
 
+  # Get update time for note
   def updated_time
     self.updated_at.utc.strftime("%d/%m/%Y %H:%M:%S")
   end
   
+  # get shared ids
   def shared_id
     self.share._id.to_s
   end
 
+  # Get created by
   def created_by
     self.user.first_name
   end
   
+  # Get latitude for location
   def latitude
     self.location.latitude rescue nil
   end
   
+  # Get longitude for location
   def longitude
     self.location.longitude rescue nil
   end
 
+  # Get page atachment
   def share_attachments(page)
     self.pages[page].attachment
   end
   
+  # Get shared teams
   def shared_teams
     ((self.shares.map(&:community).map(&:name)).uniq).join(", ") rescue nil
   end
   
+  # Get audio count for item
   def audio_count
     self.attachments.count
   end
 
+  # Get items by sorting
   def upcoming
     date = item_date
     date = Date.strptime(item_date,"%d/%m/%Y %H:%M:%S") if item_date.is_a?(String)
@@ -194,6 +214,7 @@ class Item
 		return query
   end
 
+  # List all items
   def self.list(params,paginate_options,user)
     params[:sort_by] = 'created_at' if params[:sort_by].blank? || !SORT_BY_ALLOWED.include?(params[:sort_by].to_sym)
     params[:order_by] = 'desc' if params[:order_by].blank? || !ORDER_BY_ALLOWED.include?(params[:order_by].to_sym)
@@ -229,6 +250,7 @@ class Item
     end
   end
 
+  # Get upcoming items count
   def self.upcoming_meetings_counts(user)
     today = user.items.undeleted.today.group_by(&:upcoming)['Today'].count rescue 0
     tomorrow = user.items.undeleted.tomorrow.group_by(&:upcoming)['Tommorrow'].count rescue 0
@@ -236,10 +258,12 @@ class Item
     return items_count = today + tomorrow + next_week
   end
 
+  # Save the new activity
   def save_activity(text)
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end
 
+  # List items for ipad
   def self.get_meets(user,value=nil)
     @meets=[]
     @meets_values={}
@@ -260,6 +284,7 @@ class Item
     end
   end
 
+  # Get sorted items by group
   def self.group_values(group_by,result)
     values=[]
     keys=[]
@@ -276,6 +301,7 @@ class Item
      return {group_by=>keys,:items=>values}
    end
 
+   # Get pages for item
    def self.get_pages(item)
       @pages_meet=[]
       item.pages.each do|page|
@@ -286,6 +312,7 @@ class Item
       return @pages_meet
     end
 
+  # Get shares for item
   def self.get_shares(meet)
     @shares_meet=[]
       meet.shares.uniq_by{|a| a.community_id}.each do|share|
@@ -296,7 +323,13 @@ class Item
       return @shares_meet
     end
     
-    def self.comment_notifications(attachment_id, community_id, message, current_user)
+  # Get item shaes
+  def item_shares
+    (self.shares.map(&:community)).uniq
+  end
+    
+ # Send notification for comments    
+   def self.comment_notifications(attachment_id, community_id, message, current_user)
       attachment = Attachment.find(attachment_id).attachable
       item_id = attachment.item_id
       page_order = attachment.page_order
@@ -307,6 +340,7 @@ class Item
       send_comment_notify(current_user_name, community_id, community_name, message, emails, item_id, page_order) unless emails.blank?
     end
     
+  # Send email for comments
   def self.send_comment_notify(current_user_name, community_id, community_name, message, emails, item_id, page_order)
     emails.each do |email|
        Invite.comment_notifications(current_user_name, community_id, community_name, message, email, item_id, page_order).deliver

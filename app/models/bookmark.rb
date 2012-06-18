@@ -12,8 +12,8 @@ class Bookmark
   belongs_to :attachment
   referenced_in :user
   after_save :sunspot_index
-  after_create :create_activity
-  after_update :update_activity
+  #~ after_create :create_activity
+  #~ after_update :update_activity
   scope :undeleted,self.excludes(:status=>false)
 
   searchable do

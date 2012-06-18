@@ -28,24 +28,21 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       unless @item.status==false
         if @item
-          shared_to = (@item.shares.map(&:community)).uniq
+          shared_to = @item.item_shares
           @item = {:item => @item.serializable_hash(:only => [:_id, :name, :description, :item_date, :custom_page], :methods => [ :location_name, :location_state, :location_country, :created_by, :page_count, :latitude, :longitude, :item_date, :item_date_local, :created_time,  :end_time,:updated_time]),:current_category_id=>(@item.current_category_id.nil? ? "nil" : Category.find(@item.current_category_id)._id), :shared_to => shared_to.to_json(:methods => [:users_count, :shares_count]).parse}.to_success
-          format.xml  { render :xml => @item.to_xml(ROOT) }
-          format.json  { render :json => @item}
+          format.xml  {render :xml => @item.to_xml(ROOT) }
+          format.json {render :json => @item}
         else
-          format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-          format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+          failure_save
         end
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end
   end
 
   # POST /items
   # POST /items.xml
-
   def create
     @template=Template.find(params[:item][:template_id]) if params[:item][:template_id]
     params[:item].merge!({:custom_page=>@template.custom_page}) if @template.has_custom_page?
@@ -57,12 +54,11 @@ class V1::ItemsController < ApplicationController
             format.xml  {render :xml => @item.to_xml(ROOT)}
             format.json  {render :json =>@item}
           else
-            format.xml  { render :xml => failure.merge(@item.all_errors).to_xml(ROOT)}
-            format.json  { render :json => @item.all_errors }
+            format.xml  {render :xml => failure.merge(@item.all_errors).to_xml(ROOT)}
+            format.json  {render :json => @item.all_errors}
           end
       else
-          format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-          format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+          failure_save
       end
     end
   end
@@ -79,27 +75,26 @@ class V1::ItemsController < ApplicationController
             params[:item][:location_id]=@location._id
           end
           get_item
-        if @item.update_attributes(params[:item])
-          get_item
-          @item={:item=>@item.to_json(:only=>[:description,:current_category_id,:end_time],:methods=>[:created_time,:updated_time,:item_date,:location_name,:item_date_local]).parse}.to_success
-          format.xml  {render :xml=>@item.to_xml(ROOT)}
-          format.json {render :json =>@item}
-        else
-          format.xml  { render :xml => @item.all_errors.to_xml(ROOT)}
-          format.json {render :json =>@item.all_errors}
-        end
-        rescue Exception => e
-          if e.message.to_s=="argument out of range" || e.message.start_with?("no")
-            format.xml  { render :xml => failure.merge(INVALID_DATE).to_xml(ROOT) }
-            format.json  { render :json=> failure.merge(INVALID_DATE)}
+          if @item.update_attributes(params[:item])
+            get_item
+            @item={:item=>@item.to_json(:only=>[:description,:current_category_id,:end_time],:methods=>[:created_time,:updated_time,:item_date,:location_name,:item_date_local]).parse}.to_success
+            format.xml  {render :xml=>@item.to_xml(ROOT)}
+            format.json {render :json =>@item}
           else
-            format.xml  { render :xml => failure.merge(INVALID_CATEGORY_ID).to_xml(ROOT) }
-            format.json  { render :json=> failure.merge(INVALID_CATEGORY_ID)}
+            format.xml  {render :xml => @item.all_errors.to_xml(ROOT)}
+            format.json {render :json =>@item.all_errors}
           end
-        end
+          rescue Exception => e
+            if e.message.to_s=="argument out of range" || e.message.start_with?("no")
+              format.xml  {render :xml => failure.merge(INVALID_DATE).to_xml(ROOT) }
+              format.json  {render :json=> failure.merge(INVALID_DATE)}
+            else
+              format.xml  {render :xml => failure.merge(INVALID_CATEGORY_ID).to_xml(ROOT)}
+              format.json  {render :json=> failure.merge(INVALID_CATEGORY_ID)}
+            end
+          end
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end
   end
@@ -110,11 +105,10 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       if @item
       @item.update_attributes(:status=>false, :web_status => false)
-        format.xml  { render :xml => success.to_xml(ROOT) }
-        format.json  { render :json=> success}
+        format.xml  {render :xml => success.to_xml(ROOT)}
+        format.json  {render :json=> success}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end
   end
@@ -147,8 +141,7 @@ class V1::ItemsController < ApplicationController
         format.json {render :json=>@topic}
         format.xml {render :xml=>@topic.to_xml(ROOT)}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end
   end
@@ -161,8 +154,7 @@ class V1::ItemsController < ApplicationController
         format.json{render :json=>@categories}
         format.xml{render :xml=>@categories.to_xml(ROOT)}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end
   end
@@ -178,8 +170,7 @@ class V1::ItemsController < ApplicationController
         format.json{render :json=>add_category}
         format.xml{render :xml=>add_category.to_xml(ROOT)}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end
   end
@@ -209,8 +200,7 @@ class V1::ItemsController < ApplicationController
         format.json{render :json=>success}
         format.xml{render :xml=>success}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end
   end
@@ -233,8 +223,7 @@ class V1::ItemsController < ApplicationController
         format.json{render :json=>@attendees}
         format.xml{render :xml=>@attendees.to_xml(ROOT)}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end
   end
@@ -247,8 +236,7 @@ class V1::ItemsController < ApplicationController
         format.json{ render :json=>@item}
         format.xml{ render :xml=>@item.to_xml(ROOT)}
       else
-        format.xml  { render :xml => failure.merge(INVALID_PARAMETER_ID).to_xml(ROOT) }
-        format.json  { render :json=> failure.merge(INVALID_PARAMETER_ID)}
+        failure_save
       end
     end
   end
@@ -327,8 +315,8 @@ class V1::ItemsController < ApplicationController
     respond_to do |format|
       if @item
         @items = Item.stats(params,@current_user,@item)
-        format.json{ render :json=>success.merge(@items).merge(item_count)}
-        format.xml{ render :xml=>success.merge(@items).merge(item_count).to_xml(ROOT)}
+        format.json{render :json=>success.merge(@items).merge(item_count)}
+        format.xml{render :xml=>success.merge(@items).merge(item_count).to_xml(ROOT)}
       else
         failure_save
       end

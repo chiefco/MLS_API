@@ -80,6 +80,10 @@ class User
     template.add :authentication_token #,:as=>:access_token
   end
 
+  #scopes
+  scope :invited_members_with_field, lambda { |invited_members| any_in(:email => invited_members).only(:first_name, :last_name, :email, :job_title, :company, :industry_id) }
+  scope :invited_members_email, lambda { |invited_members| any_in(:email => invited_members) }
+  
   # Chaeck valid user
   def self.valid_user?(token='')
     self.where(:authentication_token=>token,:status=>true).first

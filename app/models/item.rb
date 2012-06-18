@@ -183,6 +183,7 @@ class Item
   def page_count
     self.pages.count
   end
+  
 
   def self.stats(params,user,item)
     query=""
@@ -266,7 +267,7 @@ class Item
       keys<<k
       b=[]
       v.each do |i|
-        x=i.attributes.merge({:id=>i.id,:created_time=>i.created_time,:updated_time=>i.updated_at,:item_date=>i.item_date,:location_name=>i.location_name,:end_time=>i.end_time})
+        x=i.attributes.merge({:id=>i.id,:created_time=>i.created_time,:updated_time=>i.updated_at,:item_date=>i.item_date,:location_name=>i.location_name,:end_time=>i.end_time, :audio_count => i.audio_count})
         x.reject! {|k, v| %w"created_at updated_at location_id category_ids item_date _id".include? k }
         b<<x
       end

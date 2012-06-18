@@ -13,7 +13,11 @@ class Invitation
   validates_presence_of :email,:message=>"email - Blank Parameter", :code=>3002
   #validates_uniqueness_of :email, :message=>"email - Already exist", :code=>3004, :allow_blank => true
   before_create :create_invitation_token
+  
+  #scopes
   scope :unused, self.excludes(:invitation_token => nil)
+  scope :by_user_ids, lambda {|user_id| any_in(:user_id => user_id)}
+  scope :by_emails, lambda {|emails| any_in(:email => emails)}
 
   # Create Invitation token
   def create_invitation_token

@@ -17,15 +17,21 @@ class Community
   has_many :notifications, as: :notifier, :dependent=>:destroy  
 
   validates_presence_of :name,:code=>3013,:message=>"name - Blank Parameter"
+  
+  #scopes
   scope :undeleted,self.excludes(:status=>false)
+  scope :active_community_by_id, lambda {|id| where(:_id => "#{id}", :status => true)}
+  scope :by_id, lambda {|id| where(:_id => id)}
 
   after_create :create_activity
   after_update :update_activity
 
+  # Cteate a new activity
   def create_activity
     save_activity("COMMUNITY_CREATED")
   end
   
+  #Update Activity
   def update_activity
     if self.status_changed?
       save_activity("COMMUNITY_DELETED")
@@ -34,36 +40,44 @@ class Community
     end
   end
 
+  # Find active users
   def active_users
     community_users.where(:status=>true)
   end
 
+  #Find Active id of Active users
   def active_user_ids
     active_users.map(&:user_id)
   end
 
+  # Find Comunity's Deleted user's ids
   def stale_user_ids
     community_users.where(:status=>false).map(&:user_id)
   end
 
+  # Find Comunity's user's ids
   def user_ids
     community_users.map(&:user_id)
   end
 
+  # Find Comunity's Members
   def members
     value=[]
     active_users.collect{|cu| value<<cu.user.serializable_hash(:methods=>:id).merge({:role=>cu.role_id})}
     value
   end
 
+  # Find Comunity's All Members
   def all_members
     User.find(user_ids)
   end
 
+  # Find Comunity's Deleted Members
   def stale_members
     User.find(stale_user_ids)
   end
 
+  #Find Communities By user
   def self.get_communities(user)
     @community=[]
     @community_values={}
@@ -74,6 +88,7 @@ class Community
     return {:community_arrays=>@community,:community_hashes=>@community_values}
   end
 
+  #Send Invite to Community
   def community_invite(invites, message)
     invites.each do |invite|
       invitation = Invitation.find(invite[1])
@@ -81,6 +96,7 @@ class Community
     end
   end
 
+  # Send Invitation to User
   def user_invite(invites)
     invites.each do |invite|
       user = User.find(invite[0])
@@ -88,27 +104,33 @@ class Community
     end
   end
 
+  #Save The activity
   def save_activity(text)
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end
 
+  # Save Invitation Activity
   def save_Invitation_activity(text, community_id, shared_id, user_id)
     @community = Community.find "#{community_id}"
     @community.activities.create(:action=>text, :shared_id => shared_id, :user_id=>user_id)
   end
 
+  #Get the Community users count
   def users_count
     self.community_users.where(:status => true).count
   end
   
+  # Get community Owner first name
   def owner
     self.user.first_name
   end
 
+  #Get the Community Shares count
   def shares_count
     self.attachments.total_attachments.count + self.shares.select{|i| i.shared_type == 'Meet'}.map(&:item).uniq.reject{|v| v.status==false}.count
   end
-
+  
+  #Get unread notification
   def unread_notifications(user=nil)
     user = self.user if user.nil?
     last_viewed = self.notifications.where(:user_id => user._id).first.last_viewed rescue nil
@@ -119,15 +141,18 @@ class Community
     end
   end
 
+  #Get the Meet
   def get_meets
     shares.to_a.select{|c| c.shared_type=="Meet"}.map(&:item).uniq.reject{|v| v.status==false}.to_json(:only=>[:_id,:description,:name],:methods=>[:item_date,:created_time,:updated_time,:shared_id,:location_details, :user_details,:audio_attachment],:include=>{:pages=>{:only=>[:_id,:page_order],:include=>{:attachment=>{:only=>[:file,:_id],:methods=>:messages}},:methods=>[:page_texts]}}).parse
 
   end
   
+  #Get all community attachments
   def get_community_attachments
     attachments.to_a.to_json(:only=>[:_id,:file_type,:content_type,:file_name,:file]).parse
   end
       
+  #Get all the Members of the community
   def members
     owner = user
     members = (community_users.undeleted.map(&:user) - owner.to_a).uniq
@@ -135,6 +160,7 @@ class Community
    {:members => members.map(&:email), :members_first_name=>members.map(&:first_name),:members_last_name=>members.map(&:last_name),:invitees =>invitees - (members.map(&:email) + owner.email.to_a),:id => _id.to_s }
   end
 
+  #Community Invites
   def invite(invites, current_user, message='')
     community_invites, user_invites = [], []
     invites.split(',').each do |invite_email|
@@ -163,6 +189,7 @@ class Community
       self.delay.user_invite(user_invites) unless user_invites.blank?      
   end
 
+  #Remove invites
   def remove_invites(email)
     invited_users=invitations.where(:email=>email) if invitations
     invitees=community_invitees.where(:email=>email) if community_invitees
@@ -170,6 +197,7 @@ class Community
     invitees.destroy_all   if invitees
   end
   
+  #Send Notification
   def self.send_notifications(user_ids, community_id, current_user)
     current_user_email = current_user.email
     current_user_name = current_user.first_name
@@ -184,6 +212,7 @@ class Community
     unsubscribe_notifications(current_user_email, current_user_name, community_id, community_name, unsubscriber_emails)
   end
    
+  #Remove Notification
   def self.remove_notifications(current_user_email, current_user_name, community_id, community_name, emails, unsubscriber_names)
    unsubscriber_names = unsubscriber_names*","
     emails.each do |email|
@@ -191,12 +220,14 @@ class Community
     end
   end
   
+  # Unsubscribe Notification
   def self.unsubscribe_notifications(current_user_email, current_user_name, community_id, community_name, unsubscriber_emails)
     unsubscriber_emails.each do |email|
        Invite.remove_member_notifications(current_user_email, current_user_name, community_id, community_name, email, false).deliver
     end
   end
     
+  #Shared Unsubscribe
   def self.shared_unsubscribe(communities, current_user)
     current_user_email = current_user.email
     current_user_name = current_user.first_name    
@@ -206,39 +237,46 @@ class Community
       shared_unsubscribe_mail(current_user_name, community_name, emails) unless emails.blank?
      end
   end
-   
-  def self.shared_unsubscribe_mail(current_user_name, community_name, emails) 
-     emails.each do |email|
-       Invite.shared_unsubscribe_notifications(current_user_name, community_name, email).deliver
-     end
-  end  
- 
-   def subscribe
-      community_users.where(:user_id=>user._id).first.subscribe_email.to_s
-    end
   
-  def confirm_notifications(community_id, community_name, current_user)
-      current_user_email = current_user.email
-      current_user_name = current_user.first_name
-      emails = CommunityUser.where(:community_id => community_id, :subscribe_email => true ).map(&:user).map(&:email) - [current_user_email]
-      join_notifications(current_user_name, community_id, community_name, emails) unless emails.blank?
+  #Shared Unsubscribe mail sending
+  def self.shared_unsubscribe_mail(current_user_name, community_name, emails) 
+    emails.each do |email|
+      Invite.shared_unsubscribe_notifications(current_user_name, community_name, email).deliver
     end
-    
+  end  
+   
+  #Subscribe the Notification
+  def subscribe
+    community_users.where(:user_id=>user._id).first.subscribe_email.to_s
+  end
+  
+  #Confirm Notification
+  def confirm_notifications(community_id, community_name, current_user)
+    current_user_email = current_user.email
+    current_user_name = current_user.first_name
+    emails = CommunityUser.where(:community_id => community_id, :subscribe_email => true ).map(&:user).map(&:email) - [current_user_email]
+    join_notifications(current_user_name, community_id, community_name, emails) unless emails.blank?
+  end
+  
+  #Join Notification
   def join_notifications(current_user_name, community_id, community_name, emails)
     emails.each do |email|
        Invite.community_accept_notifications(current_user_name, community_id, community_name, email).deliver
     end
   end
   
+  #Search Own Community
   def self.search_own(params,user)    
       params[:q] !='' ? user.communities.undeleted.any_of(self.get_criteria(params[:q])) : user.communities.undeleted
   end
   
+  #Search Shared Community
   def self.search_shared(params,user)
     community_ids = CommunityUser.where(:user_id => "#{user._id}").map(&:community).select{|c| c.user_id != user._id}.map(&:_id)
     params[:q] !='' ? Community.undeleted.any_in(:_id => community_ids).any_of(self.get_criteria(params[:q])) : Community.undeleted.any_in(:_id => community_ids)
   end
   
+  #Get Criteria
   def self.get_criteria(query)
     [ {name: /#{query}/i }]
   end

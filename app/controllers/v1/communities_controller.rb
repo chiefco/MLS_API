@@ -16,11 +16,11 @@ class V1::CommunitiesController < ApplicationController
    def index
     communities = @current_user.communities.undeleted
     @current_user.subscription_type == "free" ? subscribed_user = false : subscribed_user = true
-    shared_communities = CommunityUser.where(:user_id => "#{@current_user._id}").map(&:community).select{|c| c.user_id != @current_user.id && c.status == true}.each {|c| c.unread_notification = c.unread_notifications(@current_user)}
+    shared_communities = CommunityUser.shared_communities(@current_user)
     #~ invited_members = (communities.map(&:community_invitees).flatten.map(&:email) + communities.map(&:invitations).flatten.map(&:email)).uniq
     invited_members =  (@current_user.contacts.map(&:email) - [@current_user.email]).uniq
-    mls_users = User.any_in(:email => invited_members).only(:first_name, :last_name, :email, :job_title, :company, :industry_id)
-    users_email = User.any_in(:email => invited_members).map(&:email)
+    mls_users = User.invited_members_with_field(invited_members)
+    users_email = User.invited_members_email(invited_members).map(&:email)
     other_members    = invited_members - users_email
 
     respond_to do |format|
@@ -42,11 +42,11 @@ class V1::CommunitiesController < ApplicationController
       community_owner = @community.community_users.select{|i| i.user_id == @community.user_id && i.status == true}.map(&:user)
       users = (@community.community_users.undeleted.map(&:user) - community_owner).uniq
       invitees = ((@community.invitations.unused.map(&:email) + @community.community_invitees.map(&:email)) - @community.community_users.undeleted.map(&:user).map(&:email)).uniq 
-      invited_mls_users = User.any_in(:email => invitees).only(:first_name, :last_name, :email, :job_title, :company, :industry_id)
-      users_email = User.any_in(:email => invitees).map(&:email)
+      invited_mls_users = User.invited_members_with_field(invitees)
+      users_email = User.invited_members_email(invitees).map(&:email)
       invited_other_members  = invitees - users_email
     
-      @community_user = @community.community_users.where(:user_id => @current_user._id).first
+      @community_user = @community.community_users.by_user_id(@current_user._id).first
 
       respond_to do |format|
         if @community.status!=false
@@ -118,13 +118,13 @@ class V1::CommunitiesController < ApplicationController
   # Returns the json result(communtiy status sets to false)
   def multiple_delete
     params[:community].each do |com_id|
-      @community = Community.find(com_id)
+      @community = Community.by_id(com_id)
       @community.update_attributes(:status=>false)
     end
-    @community_user = CommunityUser.where(:user_id => "#{@current_user._id}")
+    @community_user = CommunityUser.by_user_id(@current_user._id)
     @communities=[]
     @community_user.each do |com_user|
-      com = Community.where(:_id => "#{com_user.community_id}", :status => true).first
+      com = Community.active_community_by_id(com_user.community_id).first
       @communities<< {:id =>com.id, :name=>com.name,:members=>com.community_users.count,:shares=>com.shares.count, :status => com.status} if com
     end
     respond_to do |format|
@@ -157,7 +157,7 @@ class V1::CommunitiesController < ApplicationController
   #Remove single member
   def remove_member
     respond_to do |format|
-      @community_user=CommunityUser.where(:community_id=>params[:remove_member][:community_id],:user_id=>params[:remove_member][:user_id]).first
+      @community_user=CommunityUser.by_user_id_and_community_id(params[:remove_member][:user_id], params[:remove_member][:community_id] ).first
       unless @community_user.nil?
         @community_user.update_attributes(:status=>false)
         format.json {render :json=>success}
@@ -169,19 +169,19 @@ class V1::CommunitiesController < ApplicationController
   
   # Public: Remove multiple member
   def multiple_member_delete
-    community = Community.where(:_id => params[:community_id]).first
+    community = Community.by_id(params[:community_id]).first
 
     #To remove community members
     if params[:user_id]
-      community_users = community.community_users.any_in(:user_id => params[:user_id]).destroy_all
-      invitations = community.invitations.any_in(:user_id => params[:user_id]).update_all(:invitation_token => nil)
+      community_users = community.community_users.by_user_ids(params[:user_id]).destroy_all
+      invitations = community.invitations.by_user_ids(params[:user_id]).update_all(:invitation_token => nil)
       Community.delay.send_notifications(params[:user_id], params[:community_id], @current_user)    
     end
 
     #To remove invited members
     if params[:invited_ids]
-      community_users = community.community_invitees.any_in(:email => params[:invited_ids]).destroy_all
-      invitations = community.invitations.any_in(:email => params[:invited_ids]).update_all(:invitation_token => nil)
+      community_users = community.community_invitees.by_emails(params[:invited_ids]).destroy_all
+      invitations = community.invitations.by_emails(params[:invited_ids]).update_all(:invitation_token => nil)
     end
 
     respond_to do |format|
@@ -196,7 +196,7 @@ class V1::CommunitiesController < ApplicationController
   # Public: Remove multiple shared team
   def remove_shared_team
     respond_to do |format|
-      @community_user = CommunityUser.any_in(:community_id => params[:community_id]).where(:user_id => @current_user._id).delete_all
+      @community_user = CommunityUser.by_community_ids(params[:community_id]).by_user_id(@current_user._id).delete_all
       Community.delay.shared_unsubscribe(params[:community_id], @current_user)
       unless @community_user.nil?
         format.json {render :json=>success}
@@ -209,7 +209,7 @@ class V1::CommunitiesController < ApplicationController
   # Public: Change the role of the CommunityUser
   def change_role
     respond_to do |format|
-      @community_user=CommunityUser.where(:community_id=>params[:change_role][:community_id],:user_id=>params[:change_role][:user_id]).first
+      @community_user=CommunityUser.by_user_id_and_community_id(params[:change_role][:user_id], params[:change_role][:community_id]).first
       if @community_user
         if @community_user.community.user_id==@current_user._id
           @community_user.update_attributes(:role_id=>params[:change_role][:role_id].nil? ? '0' : params[:change_role][:role_id])
@@ -226,14 +226,14 @@ class V1::CommunitiesController < ApplicationController
   # Public: Invitation accepted logic
   def accept_invitation
     respond_to do |format|
-      @invitation = Invitation.where(:invitation_token=>params[:accept_invitation]).first
+      @invitation = Invitation.by_invitation_token(params[:accept_invitation]).first
       unless @invitation.nil?
         if @invitation.user.nil?
           format.json {render :json => failure.merge({:message => 'Something went wrong'})}
         elsif @invitation.user_id != @current_user.id
           format.json {render :json => failure.merge({:message => 'Please login with the invited user to join the community'})}
         else
-            exist_user = @invitation.community.community_users.where(:user_id => @invitation.user_id).first
+            exist_user = @invitation.community.community_users.by_user_id(@invitation.user_id).first
            if exist_user.nil? || exist_user.blank?
               @invitation.community.community_users.create(:user_id=>@invitation.user_id, :subscribe_email => true)
               @invitation.update_attributes(:invitation_token=>nil)
@@ -265,7 +265,7 @@ class V1::CommunitiesController < ApplicationController
 
   # Public: Invitation logic when called from community
   def invite_from_community
-    @community = Community.find(params[:invite_email]['community'])
+    @community = Community.by_id(params[:invite_email]['community']).first
     @community.invite(params[:invite_email]['users'], @current_user, params[:invite_email]['message']) if params[:invite_email]['users'] != 'use comma separated emails'
     respond_to do |format|
       format.json {render :json => success }
@@ -274,7 +274,7 @@ class V1::CommunitiesController < ApplicationController
 
   # Public: Removing member from community
   def member_delete
-    community_user = CommunityUser.where(:user_id => params[:id], :community_id => params[:community_id]).first
+    community_user = CommunityUser.by_user_id_and_community_id(params[:id], params[:community_id]).first
     respond_to do |format|
       if community_user.delete
         format.json  { render :json => success}
@@ -287,7 +287,7 @@ class V1::CommunitiesController < ApplicationController
   # Public: Folder validation for unique name
   def validate_folder
     if @community
-      folder = Folder.find(params[:folder_id])
+      folder = Folder.by_id(params[:folder_id]).first
       respond_to do |format|
         if @community.folders.include?(folder)
           format.json  { render :json => { :message=>"The folder already exist", :folder => folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at],:methods => [:user_name]).parse}.to_failure }
@@ -308,7 +308,7 @@ class V1::CommunitiesController < ApplicationController
   # Public: File validation for unique name
   def validate_file
     if @community
-      attachment = Attachment.where(:file_name => "#{params[:file_name]}", :folder_id => params[:folder_id], :is_current_version => true).first
+      attachment = Attachment.current_version_with_file_name_and_filder_id(params[:file_name], params[:folder_id]).first
       respond_to do |format|
         if @community.attachments.include?(attachment)
           format.json  { render :json => { :message=>"The file already exist", :attachment => attachment.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision]).parse}.to_failure }
@@ -328,7 +328,7 @@ class V1::CommunitiesController < ApplicationController
   
   #Public: Checks the subscription status for users
   def subscribe_status
-      @community_user = @community.community_users.where(:user_id => @current_user._id).first
+      @community_user = @community.community_users.by_user_id(@current_user._id).first
       respond_to do |format|
       if @community_user.status!=false
         if @community_user.update_attributes(:subscribe_email => params[:subscribe_email])
@@ -365,13 +365,13 @@ class V1::CommunitiesController < ApplicationController
   #Private: To find the category for CRUD methods
   #Called on before filter
   def find_community
-    @community = Community.find(params[:id])
+    @community = Community.by_id(params[:id]).first
   end
 
   #Private: To find the community members
   #Called on before filter
   def find_community_members
-    @community=Community.find(params[:id]) if @current_user.community_membership_ids.include?(params[:id])
+    @community=Community.by_id(params[:id]).first if @current_user.community_membership_ids.include?(params[:id])
   end
 
   #find parameters needed for the contacts
@@ -381,7 +381,7 @@ class V1::CommunitiesController < ApplicationController
 
   #Private: Authorized member check
   def check_authorised_mem
-    @authoriesd_mem = CommunityUser.where(:user_id => @current_user._id, :community_id => params[:id]).first
+    @authoriesd_mem = CommunityUser.by_user_id_and_community_id(@current_user._id, params[:id]).first
   end
   
   #Private: Subscribed member check

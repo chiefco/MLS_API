@@ -19,6 +19,7 @@ class Folder
   scope :undeleted, self.excludes(:status => false, :is_deleted => false)
   scope :personal, self.where(:status => true, :is_deleted => false, :community_id => nil)
   scope :comm_folders, self.where(:status => true, :is_deleted => false, :parent_id => nil)
+  scope :by_id, lambda{|id| where(:_id => id)}
 
   after_create :create_activity
   after_update :update_activity

@@ -18,6 +18,7 @@ class Invitation
   scope :unused, self.excludes(:invitation_token => nil)
   scope :by_user_ids, lambda {|user_id| any_in(:user_id => user_id)}
   scope :by_emails, lambda {|emails| any_in(:email => emails)}
+  scope :by_invitation_token, lambda {|invitation_token| where(:invitation_token => invitation_token)}
 
   # Create Invitation token
   def create_invitation_token

@@ -31,7 +31,7 @@ class V2::CommunitiesController < ApplicationController
   # Returns the json result with community info
   def show
     if @authoriesd_mem
-      notification = @community.notifications.where(:user_id => @current_user._id).first
+      notification = @community.notifications.by_user_id(@current_user._id).first
       notification ? notification.update_attributes(:last_viewed => Time.now) : @community.notifications.create(:user_id => @current_user._id, :last_viewed => Time.now)
       @attachments, @items = [], []
       shares = @community.shares.order_by(:created_at.desc)
@@ -45,7 +45,7 @@ class V2::CommunitiesController < ApplicationController
       users_email = User.invited_members_email(invitees).map(&:email)
       invited_other_members  = invitees - users_email
     
-      @community_user = @community.community_users.where(:user_id => @current_user._id).first
+      @community_user = @community.community_users.by_user_id(@current_user._id).first
 
       respond_to do |format|
         if @community.status!=false
@@ -225,7 +225,7 @@ class V2::CommunitiesController < ApplicationController
   # Public: Invitation accepted logic
   def accept_invitation
     respond_to do |format|
-      @invitation = Invitation.where(:invitation_token=>params[:accept_invitation]).first
+      @invitation = Invitation.by_invitation_token(params[:accept_invitation]).first
       unless @invitation.nil?
         if @invitation.user.nil?
           format.json {render :json => failure.merge({:message => 'Something went wrong'})}
@@ -286,7 +286,7 @@ class V2::CommunitiesController < ApplicationController
   # Public: Folder validation for unique name
   def validate_folder
     if @community
-      folder = Folder.find(params[:folder_id])
+      folder = Folder.by_id(params[:folder_id]).first
       respond_to do |format|
         if @community.folders.include?(folder)
           format.json  { render :json => { :message=>"The folder already exist", :folder => folder.to_json(:only => [:_id, :name, :parent_id, :created_at, :updated_at],:methods => [:user_name]).parse}.to_failure }
@@ -307,7 +307,7 @@ class V2::CommunitiesController < ApplicationController
   # Public: File validation for unique name
   def validate_file
     if @community
-      attachment = Attachment.where(:file_name => "#{params[:file_name]}", :folder_id => params[:folder_id], :is_current_version => true).first
+      attachment = Attachment.current_version_with_file_name_and_filder_id(params[:file_name], params[:folder_id]).first
       respond_to do |format|
         if @community.attachments.include?(attachment)
           format.json  { render :json => { :message=>"The file already exist", :attachment => attachment.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision]).parse}.to_failure }
@@ -364,13 +364,13 @@ class V2::CommunitiesController < ApplicationController
   #Private: To find the category for CRUD methods
   #Called on before filter
   def find_community
-    @community = Community.find(params[:id])
+    @community = Community.by_id(params[:id]).first
   end
 
   #Private: To find the community members
   #Called on before filter
   def find_community_members
-    @community=Community.find(params[:id]) if @current_user.community_membership_ids.include?(params[:id])
+    @community=Community.by_id(params[:id]).first if @current_user.community_membership_ids.include?(params[:id])
   end
 
   #find parameters needed for the contacts

@@ -37,10 +37,12 @@ class Attachment
   field :is_current_version, :type => Boolean, :default => true  
   field :attachment_type, type: String, default: "PERSONAL_ATTACHMENT"  
 
+  #scopes
   scope :current_version, self.where(:is_current_version => true, :folder_id => nil)  
   scope :undeleted, self.excludes(:is_deleted => true)
   scope :file_usage, self.excludes(:is_deleted => true, :size.ne => nil)
   scope :total_attachments, self.where(:is_current_version => true, :is_deleted => false)
+  scope :current_version_with_file_name_and_filder_id, lambda {|file_name,folder_id| where(:file_name => file_name, :folder_id => folder_id, :is_current_version => true)}
 
   searchable do
     string :file_name do

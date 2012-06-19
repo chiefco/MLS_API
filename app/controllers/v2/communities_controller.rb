@@ -44,12 +44,16 @@ class V2::CommunitiesController < ApplicationController
       invited_mls_users = User.invited_members_with_field(invitees)
       users_email = User.invited_members_email(invitees).map(&:email)
       invited_other_members  = invitees - users_email
+      #new change
+      share_attachments = shares.select{|i| i.shared_type == 'Attachment' && i.status == true}
+      
+      @community.attachments.current_version.count
     
       @community_user = @community.community_users.by_user_id(@current_user._id).first
 
       respond_to do |format|
         if @community.status!=false
-          format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :invitees => invitees.to_json.parse, :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id, :audio_count]).parse, :community_attachments => @community.attachments.current_version.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :folder_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision]).parse, :attachments_count => attachments_count, :folder_share => folders.to_json(:methods => [:user_name]).parse,  :users => users.to_json(:only=>[:_id, :first_name, :last_name, :email, :company, :job_titile, :industry_id], :methods => [:user_info]).parse, :community_owner => community_owner.to_json(:only=>[:_id, :first_name, :last_name, :email]).parse, :subscribe_email =>@community_user.to_json(:only => [:subscribe_email]).parse, :invited_mls_users => invited_mls_users.to_json(:only=>[:_id, :first_name, :last_name, :email, :company, :job_titile, :industry_id], :methods => [:user_info]).parse, :invited_other_members => invited_other_members.to_json.parse}.to_success}
+          format.json  {render :json => {:community => @community.serializable_hash(:only=>[:_id,:name,:description]), :invitees => invitees.to_json.parse, :items => items.to_json(:only=>[:name,:_id,:description], :methods=>[:location_name,:item_date,:end_time,:created_time,:updated_time, :template_id, :audio_count]).parse, :community_attachments => @community.attachments.current_version.to_json(:only=>[:_id, :file_name, :file_type, :size, :user_id, :folder_id, :content_type,:file,:created_at], :methods => [:user_name, :has_revision]).parse, :attachments_test => share_attachments.to_json(:only=>[:_id, :user_id, :created_at], :methods => [:user_name, :share_attachments]).parse, :attachments_count => attachments_count, :folder_share => folders.to_json(:methods => [:user_name]).parse,  :users => users.to_json(:only=>[:_id, :first_name, :last_name, :email, :company, :job_titile, :industry_id], :methods => [:user_info]).parse, :community_owner => community_owner.to_json(:only=>[:_id, :first_name, :last_name, :email]).parse, :subscribe_email =>@community_user.to_json(:only => [:subscribe_email]).parse, :invited_mls_users => invited_mls_users.to_json(:only=>[:_id, :first_name, :last_name, :email, :company, :job_titile, :industry_id], :methods => [:user_info]).parse, :invited_other_members => invited_other_members.to_json.parse}.to_success}
         else
           format.json  {render :json=> failure.merge(INVALID_PARAMETER_ID)}
         end

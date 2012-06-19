@@ -37,12 +37,12 @@ class V2::SharesController < ApplicationController
         attachment = Attachment.find(value['item']['shared_id'])
         attachment_id = value['item']['shared_id']
         shr_files << (attachment).file_name
-        attachment.create(value['item']['community_id'], nil, @current_user)
+        #~ attachment.create(value['item']['community_id'], nil, @current_user)
       elsif value['item']['shared_type'] == "Folder" 
         folder_id = value['item']['shared_id']
         folder = Folder.find(folder_id)
         shr_folders << (folder).name
-        folder.make_clone(value['item']['community_id'], @current_user) if folder
+        #~ folder.make_clone(value['item']['community_id'], @current_user) if folder
       else
         item_id = value['item']['shared_id']
         note = Item.find(item_id)

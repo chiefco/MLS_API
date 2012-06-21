@@ -31,7 +31,7 @@ class V2::AttachmentsController < ApplicationController
   # POST /v1/attachments
   # POST /v1/attachments.xml
   def create
-    !params[:community].blank? ? community_id = params[:community] : community_id = nil
+    community_id = (!params[:community].blank? ?  params[:community] : nil)
     if community_id 
       attachments_present = Attachment.where(:file_name => "#{params[:attachment][:file_name]}", :folder_id => params[:attachment][:folder_id], :community_id => community_id) 
       attachment_present = attachments_present.where(:file_name => "#{params[:attachment][:file_name]}", :is_current_version => true, :is_deleted => false).first      
@@ -44,21 +44,18 @@ class V2::AttachmentsController < ApplicationController
     File.open("#{Rails.root}/tmp/#{params[:attachment][:file_name]}", 'wb') do|f|
       f.write(Base64.decode64("#{params[:encoded]}"))
     end
-
     params[:attachment][:attachable_id] =@current_user._id if params[:attachment][:attachable_type] == "User"
     params[:attachment][:file] = File.new("#{Rails.root}/tmp/#{params[:attachment][:file_name]}")
     params[:attachment][:size] = params[:attachment][:file].size
     params[:attachment][:changed_by] = @current_user._id
     params[:attachment][:parent_id] = parent_file._id if attachments_present.size > 0
     attachments_present.size > 0 ? event = "Updated" : event = "Added"
-
     folder = Folder.find(params[:attachment][:folder_id]) if params[:attachment][:folder_id]
     params[:attachment][:folder_id] = folder._id if folder
     @attachment = @current_user.attachments.new(params[:attachment])
     @attachment.save
     File.delete(params[:attachment][:file])
     Share.update(attachment_present._id, @attachment._id, @current_user._id) if attachment_present
-
     respond_to do |format|
       if @attachment.save
         @attachment.update_activity if event == "Updated"

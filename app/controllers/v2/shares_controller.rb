@@ -91,11 +91,10 @@ class V2::SharesController < ApplicationController
       folders.update_all(:is_deleted => true) 
       Folder.delay.delete(folders.map(&:_id))
     end
-
     attachments = Attachment.any_in(_id: params[:share_list]).map(&:id)
     Share.delay.shared_delete(params[:community_id], params[:share_list].count, "", @current_user)
     Attachment.delay.delete(attachments) unless attachments.blank?
-    
+    Share.any_in(:_id => params[:share_list]).destroy_all
     respond_to do |format|
       format.json {render :json=>success}
     end

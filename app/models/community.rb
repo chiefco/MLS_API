@@ -147,6 +147,14 @@ class Community
 
   end
   
+  def get_shared_attachments
+    Attachment.shared_attachments(shares.attachment_shares)
+  end
+  
+  def get_shared_folders
+    Folder.shared_folders(shares.attachment_folders)
+  end
+    
   #Get all community attachments
   def get_community_attachments
     attachments.to_a.to_json(:only=>[:_id,:file_type,:content_type,:file_name,:file]).parse

@@ -11,7 +11,11 @@ class Share
   belongs_to :folder
   belongs_to :permission
   has_many :activities, as: :entity
-
+  
+  #scopes 
+  scope :attachment_shares, where(:shared_type => "Attachment", :status => true)
+  scope :attachment_folders, where(:shared_type => "Folder", :status => true)
+  
   #~ after_create :create_activity
   #~ after_update :update_activity
 

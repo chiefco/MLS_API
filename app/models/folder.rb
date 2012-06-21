@@ -20,6 +20,7 @@ class Folder
   scope :personal, self.where(:status => true, :is_deleted => false, :community_id => nil)
   scope :comm_folders, self.where(:status => true, :is_deleted => false, :parent_id => nil)
   scope :by_id, lambda{|id| where(:_id => id)}
+  scope :shared_folders, lambda {|shares| any_in(:_id => shares.map(&:shared_id))}
 
   after_create :create_activity
   after_update :update_activity

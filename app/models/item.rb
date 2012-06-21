@@ -262,7 +262,11 @@ class Item
   def save_activity(text)
     self.activities.create(:action=>text,:user_id=>self.user.nil?  ? 'nil' : self.user._id)
   end
-
+  
+  def item_messages
+    comments.to_a.to_json(:only=>[:_id,:message],:methods=>[:created_time],:include=>{:user=>{:only=>[:email, :first_name, :last_name]}}).parse
+  end
+  
   # List items for ipad
   def self.get_meets(user,value=nil)
     @meets=[]

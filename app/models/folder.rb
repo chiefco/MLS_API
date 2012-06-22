@@ -21,7 +21,8 @@ class Folder
   scope :comm_folders, self.where(:status => true, :is_deleted => false, :parent_id => nil)
   scope :by_id, lambda{|id| where(:_id => id)}
   scope :shared_folders, lambda {|shares| any_in(:_id => shares.map(&:shared_id))}
-
+  scope :community_folders, where(:community_id.ne => nil)
+  
   after_create :create_activity
   after_update :update_activity
 
@@ -65,8 +66,9 @@ class Folder
   end    
   
   # Delete folder and activites
-  def self.delete(folders)
-    Folder.any_in(:_id => folders).destroy_all
+  def self.delete(folders,delete_folder = true)
+    Folder.any_in(:_id => folders).destroy_all if delete_folder
+    Folder.any_in(:_id => folders).community_folders.destroy_all unless delete_folder
     Activity.any_in(:shared_id => folders).delete_all
   end
 

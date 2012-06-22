@@ -88,13 +88,13 @@ class V2::SharesController < ApplicationController
   def shares_multiple_delete
     folders = Folder.any_in(_id: params[:share_list])
     unless folders.blank?
-      folders.update_all(:is_deleted => true) 
-      Folder.delay.delete(folders.map(&:_id))
+      folders.community_folders.update_all(:is_deleted => true) 
+      Folder.delay.delete(folders.map(&:_id),false)
     end
     attachments = Attachment.any_in(_id: params[:share_list]).map(&:id)
     Share.delay.shared_delete(params[:community_id], params[:share_list].count, "", @current_user)
-    Attachment.delay.delete(attachments) unless attachments.blank?
-    Share.any_in(:_id => params[:share_list]).destroy_all
+    Attachment.delay.delete(attachments,false) unless attachments.blank?
+    Share.any_in(:shared_id => params[:share_list]).where(:community_id => params[:community_id]).destroy_all
     respond_to do |format|
       format.json {render :json=>success}
     end

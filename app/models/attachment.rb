@@ -44,6 +44,7 @@ class Attachment
   scope :total_attachments, self.where(:is_current_version => true, :is_deleted => false)
   scope :current_version_with_file_name_and_filder_id, lambda {|file_name,folder_id| where(:file_name => file_name, :folder_id => folder_id, :is_current_version => true)}
   scope :shared_attachments, lambda {|shares| any_in(:_id => shares.map(&:shared_id))}
+  scope :community_attachments, where(:community_id.ne => nil)
 
   searchable do
     string :file_name do
@@ -87,9 +88,10 @@ class Attachment
     eval(query)
   end
 
-  def self.delete(attachments)
-    Activity.any_in(:shared_id => attachments).delete_all
-    Attachment.any_in(_id: attachments).each{|a| a.destroy}
+  def self.delete(attachments,delete_attachment = true)
+    Activity.any_in(:shared_id => attachments).delete_all 
+    Attachment.any_in(_id: attachments).each{|a| a.destroy} if delete_attachment
+    Attachment.any_in(_id: attachments).community_attachments.destroy_all unless delete_attachment
   end
 
   def self.get_criteria(query)
